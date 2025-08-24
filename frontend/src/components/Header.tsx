@@ -1,14 +1,21 @@
 // Header.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  // Track screen resize
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 bg-white border border-black shadow-lg rounded-2xl px-6 py-3 flex justify-center z-50 max-w-4xl w-[90%]">
-      {/* Nav */}
       <nav className="flex items-center space-x-6 relative">
         <Link
           to="/materials"
@@ -18,17 +25,18 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Dropdown */}
-        <div className="relative">
+        <div
+          className="relative"
+          onMouseEnter={() => isDesktop && setIsDropdownOpen(true)}
+          onMouseLeave={() => isDesktop && setIsDropdownOpen(false)}
+        >
           <button
             className="flex items-center text-black hover:text-gray-700 active:text-gray-500 font-medium transition"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            onMouseEnter={() => setIsDropdownOpen(true)} // desktop hover
-            onMouseLeave={() => setIsDropdownOpen(false)} // desktop hover
+            onClick={() => !isDesktop && setIsDropdownOpen(!isDropdownOpen)}
           >
             Calculators <ChevronDown className="ml-1 w-4 h-4" />
           </button>
 
-          {/* Dropdown menu */}
           {isDropdownOpen && (
             <div className="absolute left-0 top-full w-48 bg-white border border-black rounded-xl shadow-lg py-2 z-20">
               <Link
