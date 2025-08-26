@@ -9,7 +9,7 @@ const Materials: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+    <div className="flex flex-col md:flex-row gap-4 px-30 md:gap-6">
       {/* Sidebar (Drawer on mobile) */}
       <div className="md:w-64">
         {/* Mobile toggle button */}
@@ -24,7 +24,7 @@ const Materials: React.FC = () => {
         <div
           className={`${
             isSidebarOpen ? "block" : "hidden"
-          } md:block border rounded-lg p-3 bg-white`}
+          } md:block  rounded-lg  bg-white`}
         >
           <Sidebar />
         </div>
