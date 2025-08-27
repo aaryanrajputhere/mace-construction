@@ -7,7 +7,6 @@ import {
   Package,
   DollarSign,
   Home,
-  Square,
 } from "lucide-react";
 
 const StudCalculator: React.FC = () => {
