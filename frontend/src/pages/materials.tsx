@@ -8,12 +8,12 @@ const Materials: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 px-30 md:gap-6">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-6 px-4 md:px-8 lg:px-16">
       {/* Sidebar (Drawer on mobile) */}
       <div className="md:w-64">
         {/* Mobile toggle button */}
         <button
-          className="md:hidden px-4 py-2 mb-2 rounded-lg bg-gray-200 text-gray-700 w-full"
+          className="md:hidden px-4 py-2 mb-2 rounded-lg bg-gray-200 text-gray-700 w-full shadow-sm"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
           {isSidebarOpen ? "Hide Filters" : "Show Filters"}
@@ -23,7 +23,7 @@ const Materials: React.FC = () => {
         <div
           className={`${
             isSidebarOpen ? "block" : "hidden"
-          } md:block  rounded-lg  bg-white`}
+          } md:block rounded-lg bg-white shadow-md md:shadow-none`}
         >
           <Sidebar />
         </div>

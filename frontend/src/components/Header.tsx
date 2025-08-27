@@ -129,31 +129,40 @@ const Header = () => {
           <div className="md:hidden border-t border-gray-200 bg-white">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <a
-                href="#"
+                href="/materials"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
               >
-                Products
+                Materials
+              </a>
+              <a
+                href="/calculators/osb"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
+              >
+                OSB Calculator
+              </a>
+              <a
+                href="/calculators/studs"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
+              >
+                Studs Calculator
               </a>
               <a
                 href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMobileMenuOpen(false); // Close mobile menu after clicking
+                  window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: "smooth",
+                  });
+                }}
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
               >
-                Solutions
-              </a>
-              <a
-                href="#"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
-              >
-                Support
-              </a>
-              <a
-                href="#"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
-              >
-                About
+                Contact Us
               </a>
               <div className="pt-4 pb-2">
                 <button
+                  onClick={() => navigate("/quote")}
                   className="w-full flex justify-center px-4 py-2 text-sm font-medium text-white rounded-md hover:opacity-90 transition"
                   style={{ backgroundColor: "#033159" }}
                 >
