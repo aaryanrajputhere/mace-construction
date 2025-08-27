@@ -148,9 +148,17 @@ const OSBCalculator: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="flex items-center text-sm font-medium text-gray-700">
-              <Info className="h-4 w-4 text-gray-400 mr-2" />
+            <label className="flex items-center text-sm font-medium text-gray-800">
+              <Info className="h-4 w-4 text-gray-500 mr-2" />
               Waste Factor (%)
+              <div className="relative group inline-block">
+                <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
+                <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                  Accounts for cutting waste and extra materials. 10% is
+                  standard, increase for complex layouts.
+                  <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </div>
             </label>
             <input
               type="number"

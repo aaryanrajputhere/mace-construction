@@ -157,10 +157,19 @@ const StudCalculator: React.FC = () => {
         <div className="space-y-4 mb-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-700">
-                <Ruler className="h-4 w-4 text-gray-400 mr-2" />
+              <label className="flex items-center text-sm font-medium text-gray-800">
+                <Ruler className="h-4 w-4 text-gray-500 mr-2" />
                 Wall Length (ft)
+                <div className="relative group inline-block">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                    Enter the total length of the wall in feet. For multiple
+                    walls, calculate each separately.
+                    <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
               </label>
+
               <input
                 type="number"
                 value={wallLength || ""}
@@ -171,10 +180,19 @@ const StudCalculator: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-700">
-                <Home className="h-4 w-4 text-gray-400 mr-2" />
+              <label className="flex items-center text-sm font-medium text-gray-800">
+                <Home className="h-4 w-4 text-gray-500 mr-2" />
                 Wall Height (ft)
+                <div className="relative group inline-block">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                    Standard wall height is 8ft. For taller walls, additional
+                    considerations may apply.
+                    <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
               </label>
+
               <input
                 type="number"
                 value={wallHeight || ""}
@@ -212,10 +230,18 @@ const StudCalculator: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-700">
-                <Square className="h-4 w-4 text-gray-400 mr-2" />
+              <label className="flex items-center text-sm font-medium text-gray-800">
                 Opening Width (ft)
+                <div className="relative group inline-block">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                    Total width of doors, windows, or other openings. Additional
+                    framing will be calculated automatically.
+                    <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
               </label>
+
               <input
                 type="number"
                 value={openingWidth || ""}
@@ -227,9 +253,17 @@ const StudCalculator: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-700">
-                <Info className="h-4 w-4 text-gray-400 mr-2" />
+              <label className="flex items-center text-sm font-medium text-gray-800">
+                <Info className="h-4 w-4 text-gray-500 mr-2" />
                 Waste Factor (%)
+                <div className="relative group inline-block">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                    Accounts for cutting waste and extra materials. 10% is
+                    standard, increase for complex layouts.
+                    <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
               </label>
               <input
                 type="number"
@@ -303,11 +337,20 @@ const StudCalculator: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-3 p-2 bg-blue-100 rounded-lg">
-              <p className="text-xs text-blue-800">
-                <Info className="h-3 w-3 inline mr-1" />
-                Calculations include waste factor and standard framing practices
-              </p>
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+              <div className="flex items-start space-x-2">
+                <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-blue-900">
+                    Calculations include:
+                  </p>
+                  <ul className="mt-1 text-xs text-blue-800 space-y-1">
+                    <li>• {waste}% waste factor for cutting and extras</li>
+                    <li>• Standard framing practices and spacing</li>
+                    <li>• Additional framing for openings</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         )}
