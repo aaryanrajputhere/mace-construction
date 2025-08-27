@@ -7,6 +7,7 @@ import Materials from "./pages/materials";
 import StudCalculator from "./pages/calculators/stud";
 import OSBCalculator from "./pages/calculators/osb";
 import QuoteBuilder from "./pages/quote";
+import LandingPage from "./pages/home";
 const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -14,6 +15,7 @@ const App: React.FC = () => {
       {/* Added pt-24 to push content below floating header */}
       <main className="py-10 px-6">
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/materials" element={<Materials />} />
           <Route path="/calculators/studs" element={<StudCalculator />} />
           <Route path="/calculators/osb" element={<OSBCalculator />} />

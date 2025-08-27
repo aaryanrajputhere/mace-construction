@@ -1,6 +1,11 @@
 import { Mail, Phone, MapPin, Globe, Instagram } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const handleGetQuote = () => {
+    navigate("/quote");
+  };
   return (
     <footer className="bg-gray-50">
       {/* Main Footer Content */}
@@ -139,6 +144,7 @@ const Footer = () => {
                   backgroundColor: "#033159",
                   fontFamily: "Helvetica Neue, sans-serif",
                 }}
+                onClick={handleGetQuote}
               >
                 Get Quote Today
               </button>
