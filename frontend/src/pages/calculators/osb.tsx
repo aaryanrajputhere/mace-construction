@@ -19,7 +19,6 @@ const OSBCalculator: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    // Auto-calculate when inputs change
     if (length > 0 && width > 0) {
       calculate();
     } else {
@@ -58,7 +57,6 @@ const OSBCalculator: React.FC = () => {
     const updatedQuote = [...quoteItems, newItem];
     setQuoteItems(updatedQuote);
 
-    // Show success feedback
     const button = document.querySelector("[data-quote-btn]") as HTMLElement;
     if (button) {
       const originalText = button.textContent;
@@ -86,14 +84,24 @@ const OSBCalculator: React.FC = () => {
   return (
     <div className="max-w-lg mx-auto p-6">
       <div
-        className="bg-white shadow-md rounded-xl border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+        className={`bg-white rounded-xl border p-6 transition-all duration-300 ${
+          isHovered
+            ? "shadow-xl -translate-y-1 border-blue-200"
+            : "shadow-md border-gray-100 hover:shadow-lg hover:-translate-y-1"
+        }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center space-x-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-[#033159] to-[#00598F] rounded-lg">
+            <div
+              className={`p-2 rounded-lg transition-colors ${
+                isHovered
+                  ? "bg-gradient-to-br from-[#00598F] to-[#033159]"
+                  : "bg-gradient-to-br from-[#033159] to-[#00598F]"
+              }`}
+            >
               <Calculator className="h-6 w-6 text-white" />
             </div>
             <h2 className="text-xl font-bold text-gray-900">
@@ -101,7 +109,9 @@ const OSBCalculator: React.FC = () => {
             </h2>
           </div>
           <p className="text-sm text-gray-600">
-            Calculate OSB sheets needed for your project
+            {isHovered
+              ? "Release mouse to reset inputs"
+              : "Calculate OSB sheets needed for your project"}
           </p>
         </div>
 

@@ -134,7 +134,9 @@ const StudCalculator: React.FC = () => {
   return (
     <div className="max-w-lg mx-auto p-6">
       <div
-        className="bg-white shadow-md rounded-xl border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+        className={`bg-white shadow-md rounded-xl border border-gray-100 p-6 transition-all duration-300 ${
+          isHovered ? "shadow-lg -translate-y-1" : ""
+        }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
