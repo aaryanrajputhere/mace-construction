@@ -38,7 +38,7 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Hero Section */}
-      <header className="py-35 shadow-sm">
+      <header className=" py-10 md:py-35 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-12 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#033159] leading-tight">
             Construction Estimator & RFQ Platform
