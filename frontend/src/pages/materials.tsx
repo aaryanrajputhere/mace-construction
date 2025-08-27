@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Sidebar from "../components/materials/Sidebar";
 import SearchBar from "../components/materials/SearchBar";
-import Filters from "../components/materials/Filters";
 import MaterialsGrid from "../components/materials/MaterialsGrid";
 
 const Materials: React.FC = () => {
@@ -33,7 +32,7 @@ const Materials: React.FC = () => {
       {/* Main content */}
       <div className="flex-1 space-y-4">
         <SearchBar />
-        <Filters />
+
         <MaterialsGrid />
       </div>
     </div>
