@@ -14,7 +14,6 @@ import {
   Info,
   HelpCircle,
   Lightbulb,
-  Star,
 } from "lucide-react";
 
 const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
@@ -45,7 +44,6 @@ const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
 const SearchFilterBar = () => {
   // Search state
   const [searchValue, setSearchValue] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
 
   // Filter state
   const [sortBy, setSortBy] = useState("");
@@ -81,14 +79,6 @@ const SearchFilterBar = () => {
     { value: "500+", label: "$500+" },
   ];
 
-  const searchSuggestions = [
-    "concrete mixer",
-    "steel rebar",
-    "safety helmet",
-    "power drill",
-    "plywood sheets",
-  ];
-
   const hasActiveFilters = sortBy || filterBy || priceRange;
   const activeFiltersCount = [sortBy, filterBy, priceRange].filter(
     Boolean
@@ -98,10 +88,6 @@ const SearchFilterBar = () => {
     if (searchValue.trim()) {
       console.log("Searching for:", searchValue);
     }
-  };
-
-  const handleClearSearch = () => {
-    setSearchValue("");
   };
 
   const clearAllFilters = () => {
@@ -130,20 +116,12 @@ const SearchFilterBar = () => {
     }
   };
 
-  const toggleFilters = () => {
-    setFiltersExpanded(!filtersExpanded);
-  };
-
   const handleKeyPress = (
     event: React.KeyboardEvent<HTMLInputElement>
   ): void => {
     if (event.key === "Enter") {
       handleSearch();
     }
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchValue(suggestion);
   };
 
   return (
