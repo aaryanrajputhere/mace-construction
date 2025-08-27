@@ -223,7 +223,7 @@ const QuoteBuilder: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
+    <div className="max-w-5xl mx-auto p-2 space-y-8">
       {/* Header */}
       <div className="bg-white shadow-md rounded-xl border border-gray-100 p-6">
         <div className="flex items-center space-x-3 mb-2">
