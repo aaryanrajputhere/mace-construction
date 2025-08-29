@@ -131,37 +131,47 @@ const StudCalculator: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6">
+    <div className="w-full max-w-lg mx-auto p-4 sm:p-6">
       <div
-        className={`bg-white shadow-md rounded-xl border border-gray-100 p-6 transition-all duration-300 ${
-          isHovered ? "shadow-lg -translate-y-1" : ""
+        className={`bg-white rounded-2xl border-2 p-6 sm:p-8 transition-all duration-300 ${
+          isHovered
+            ? "shadow-2xl -translate-y-2 border-blue-200"
+            : "shadow-lg border-gray-100 hover:shadow-xl hover:-translate-y-1"
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-[#033159] to-[#00598F] rounded-lg">
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-3">
+            <div
+              className={`p-3 rounded-xl transition-all duration-300 ${
+                isHovered
+                  ? "bg-gradient-to-br from-[#00598F] to-[#033159] shadow-lg"
+                  : "bg-gradient-to-br from-[#033159] to-[#00598F] shadow-md"
+              }`}
+            >
               <Hammer className="h-6 w-6 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Stud Calculator</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              Stud Calculator
+            </h2>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 pl-1">
             Calculate wall framing materials needed
           </p>
         </div>
 
         {/* Input Fields */}
-        <div className="space-y-4 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-800">
+        <div className="space-y-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-3">
+              <label className="flex items-center text-sm font-semibold text-gray-800">
                 <Ruler className="h-4 w-4 text-gray-500 mr-2" />
                 Wall Length (ft)
                 <div className="relative group inline-block">
-                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
-                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-2 cursor-help hover:text-gray-600 transition-colors" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-64 p-3 bg-gray-900 text-xs text-white rounded-xl shadow-xl z-10">
                     Enter the total length of the wall in feet. For multiple
                     walls, calculate each separately.
                     <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -174,17 +184,17 @@ const StudCalculator: React.FC = () => {
                 value={wallLength || ""}
                 onChange={(e) => setWallLength(Number(e.target.value) || 0)}
                 placeholder="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#033159]/20 focus:border-[#033159] transition-all duration-200 text-base font-medium placeholder-gray-400"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-800">
+            <div className="space-y-3">
+              <label className="flex items-center text-sm font-semibold text-gray-800">
                 <Home className="h-4 w-4 text-gray-500 mr-2" />
                 Wall Height (ft)
                 <div className="relative group inline-block">
-                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
-                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-2 cursor-help hover:text-gray-600 transition-colors" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-56 p-3 bg-gray-900 text-xs text-white rounded-xl shadow-xl z-10">
                     Standard wall height is 8ft. For taller walls, additional
                     considerations may apply.
                     <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -197,43 +207,43 @@ const StudCalculator: React.FC = () => {
                 value={wallHeight || ""}
                 onChange={(e) => setWallHeight(Number(e.target.value) || 0)}
                 placeholder="8"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#033159]/20 focus:border-[#033159] transition-all duration-200 text-base font-medium placeholder-gray-400"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-medium text-gray-700">
+          <div className="space-y-3">
+            <label className="flex items-center text-sm font-semibold text-gray-700">
               <Package className="h-4 w-4 text-gray-400 mr-2" />
               Stud Spacing
             </label>
-            <div className="flex space-x-2">
+            <div className="flex space-x-3">
               {[12, 16, 24].map((spacing) => (
                 <button
                   key={spacing}
                   onClick={() => setStudSpacing(spacing)}
-                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${
+                  className={`flex-1 px-4 py-3 text-sm font-bold rounded-xl border-2 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 ${
                     studSpacing === spacing
-                      ? "bg-[#033159] text-white border-[#033159]"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                      ? "bg-[#033159] text-white border-[#033159] shadow-md"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm"
                   }`}
                 >
                   {spacing}"
                 </button>
               ))}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 pl-1">
               {getStudSpacingLabel(studSpacing)}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-3">
+              <label className="flex items-center text-sm font-semibold text-gray-800">
                 Opening Width (ft)
                 <div className="relative group inline-block">
-                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
-                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-2 cursor-help hover:text-gray-600 transition-colors" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-64 p-3 bg-gray-900 text-xs text-white rounded-xl shadow-xl z-10">
                     Total width of doors, windows, or other openings. Additional
                     framing will be calculated automatically.
                     <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -246,18 +256,18 @@ const StudCalculator: React.FC = () => {
                 value={openingWidth || ""}
                 onChange={(e) => setOpeningWidth(Number(e.target.value) || 0)}
                 placeholder="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#033159]/20 focus:border-[#033159] transition-all duration-200 text-base font-medium placeholder-gray-400"
               />
-              <p className="text-xs text-gray-500">Doors, windows, etc.</p>
+              <p className="text-xs text-gray-500 pl-1">Doors, windows, etc.</p>
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-800">
+            <div className="space-y-3">
+              <label className="flex items-center text-sm font-semibold text-gray-800">
                 <Info className="h-4 w-4 text-gray-500 mr-2" />
                 Waste Factor (%)
                 <div className="relative group inline-block">
-                  <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
-                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                  <Info className="h-3.5 w-3.5 text-gray-400 ml-2 cursor-help hover:text-gray-600 transition-colors" />
+                  <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-64 p-3 bg-gray-900 text-xs text-white rounded-xl shadow-xl z-10">
                     Accounts for cutting waste and extra materials. 10% is
                     standard, increase for complex layouts.
                     <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -270,7 +280,7 @@ const StudCalculator: React.FC = () => {
                 onChange={(e) => setWaste(Number(e.target.value) || 0)}
                 min="0"
                 max="50"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#033159]/20 focus:border-[#033159] transition-all duration-200 text-base font-medium"
               />
             </div>
           </div>
@@ -278,72 +288,74 @@ const StudCalculator: React.FC = () => {
 
         {/* Results */}
         {result !== null && wallLength > 0 && wallHeight > 0 && (
-          <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+          <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border-2 border-gray-200 mb-8 shadow-inner">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-5">
               Material Requirements
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Studs */}
-              <div className="bg-white p-3 rounded-lg border">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-800">
+              <div className="bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-bold text-gray-800 text-base">
                     Studs Required:
                   </span>
                   <div className="flex items-center space-x-2">
-                    <Package className="h-4 w-4 text-[#033159]" />
-                    <span className="text-lg font-bold text-[#033159]">
+                    <Package className="h-5 w-5 text-[#033159]" />
+                    <span className="text-xl font-black text-[#033159]">
                       {result.studs}
                     </span>
                   </div>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 font-medium">
                   <span>Length: {result.studLength}ft each</span>
-                  <span className="mx-2">•</span>
+                  <span className="mx-3">•</span>
                   <span>Spacing: {studSpacing}" O.C.</span>
                 </div>
               </div>
 
               {/* Plates */}
-              <div className="bg-white p-3 rounded-lg border">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-800">
+              <div className="bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-bold text-gray-800 text-base">
                     Top/Bottom Plates:
                   </span>
                   <div className="flex items-center space-x-2">
-                    <Ruler className="h-4 w-4 text-[#033159]" />
-                    <span className="text-lg font-bold text-[#033159]">
+                    <Ruler className="h-5 w-5 text-[#033159]" />
+                    <span className="text-xl font-black text-[#033159]">
                       {result.plates} LF
                     </span>
                   </div>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 font-medium">
                   Linear feet of plate material needed
                 </div>
               </div>
 
               {/* Summary */}
-              <div className="bg-[#033159] text-white p-3 rounded-lg">
+              <div className="bg-gradient-to-r from-[#033159] to-[#00598F] text-white p-4 rounded-xl shadow-lg">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Total Linear Feet:</span>
-                  <span className="text-lg font-bold">
+                  <span className="font-bold text-base">
+                    Total Linear Feet:
+                  </span>
+                  <span className="text-2xl font-black">
                     {result.totalLinearFeet} LF
                   </span>
                 </div>
-                <div className="text-sm text-blue-200 mt-1">
+                <div className="text-sm text-blue-200 mt-2 font-medium">
                   Total lumber needed for framing
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-              <div className="flex items-start space-x-2">
-                <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="mt-6 p-4 bg-blue-100 rounded-xl border-2 border-blue-200">
+              <div className="flex items-start space-x-3">
+                <Info className="h-4 w-4 text-blue-600 mt-1 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-medium text-blue-900">
+                  <p className="text-sm font-bold text-blue-900">
                     Calculations include:
                   </p>
-                  <ul className="mt-1 text-xs text-blue-800 space-y-1">
+                  <ul className="mt-2 text-xs sm:text-sm text-blue-800 space-y-1.5 font-medium">
                     <li>• {waste}% waste factor for cutting and extras</li>
                     <li>• Standard framing practices and spacing</li>
                     <li>• Additional framing for openings</li>
@@ -355,31 +367,33 @@ const StudCalculator: React.FC = () => {
         )}
 
         {/* Action Buttons */}
-        <div className="flex space-x-3">
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
           {result && (
             <button
               onClick={addToQuote}
               data-stud-quote-btn
-              className="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center space-x-2 bg-[#033159] hover:bg-[#022244]"
+              className="flex-1 px-6 py-4 text-base font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex items-center justify-center space-x-3 bg-gradient-to-r from-[#033159] to-[#00598F] hover:from-[#022244] hover:to-[#044a73] active:scale-98"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-5 w-5" />
               <span>Add to Quote</span>
             </button>
           )}
 
           <button
             onClick={clearInputs}
-            className="px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+            className="px-6 py-4 text-base font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:-translate-y-0.5 border-2 border-gray-200 hover:border-gray-300 active:scale-98"
           >
             Clear
           </button>
         </div>
 
         {/* Info Footer */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Standard 2x4 or 2x6 framing lumber</span>
-            <DollarSign className="h-3 w-3" />
+        <div className="mt-8 pt-6 border-t-2 border-gray-200">
+          <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500">
+            <span className="font-medium">
+              Standard 2x4 or 2x6 framing lumber
+            </span>
+            <DollarSign className="h-4 w-4" />
           </div>
         </div>
       </div>

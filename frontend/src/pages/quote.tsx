@@ -223,31 +223,33 @@ const QuoteBuilder: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-2 space-y-8">
+    <div className="max-w-6xl mx-auto p-4 lg:p-6 space-y-8 lg:space-y-10">
       {/* Header */}
-      <div className="bg-white shadow-md rounded-xl border border-gray-100 p-6">
-        <div className="flex items-center space-x-3 mb-2">
-          <div className="p-2 bg-gradient-to-br from-[#033159] to-[#00598F] rounded-lg">
-            <FileText className="h-6 w-6 text-white" />
+      <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-3">
+          <div className="p-3 bg-gradient-to-br from-[#033159] to-[#00598F] rounded-xl shadow-md">
+            <FileText className="h-7 w-7 text-white" />
           </div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-gray-900">Quote Builder</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+              Quote Builder
+            </h1>
             <Tooltip text="Create and send requests for quotes to multiple vendors at once">
-              <HelpCircle className="h-5 w-5 text-gray-500" />
+              <HelpCircle className="h-5 w-5 text-gray-500 mt-1 sm:mt-0" />
             </Tooltip>
           </div>
         </div>
-        <p className="text-gray-700 font-medium">
+        <p className="text-gray-700 font-medium text-base lg:text-lg">
           Build and send your request for quote to multiple vendors
         </p>
       </div>
 
       {/* Items Section */}
-      <div className="bg-white shadow-md rounded-xl border border-gray-100 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Package className="h-5 w-5 text-gray-500 mr-2" />
+      <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
+          <div className="flex items-center space-x-3">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <Package className="h-6 w-6 text-gray-500 mr-3" />
               Quote Items
             </h2>
             <Tooltip text="Add materials and products you need quotes for. Items from calculators will appear here automatically.">
@@ -256,7 +258,7 @@ const QuoteBuilder: React.FC = () => {
           </div>
           <button
             onClick={addNewItem}
-            className="px-4 py-2 bg-[#033159] text-white rounded-lg hover:bg-[#022244] transition-all duration-200 flex items-center space-x-2 text-sm font-semibold shadow-sm hover:shadow-md"
+            className="px-6 py-3 bg-gradient-to-r from-[#033159] to-[#00598F] text-white rounded-xl hover:from-[#022244] hover:to-[#004a7a] transition-all duration-300 flex items-center justify-center space-x-2 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-1"
           >
             <Plus className="h-4 w-4" />
             <span>Add Item</span>
@@ -264,12 +266,12 @@ const QuoteBuilder: React.FC = () => {
         </div>
 
         {items.length === 0 ? (
-          <div className="text-center py-12 text-gray-600">
-            <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-lg font-semibold mb-2 text-gray-800">
+          <div className="text-center py-16 text-gray-600">
+            <Package className="h-16 w-16 mx-auto mb-6 text-gray-400" />
+            <p className="text-xl font-bold mb-3 text-gray-800">
               No items added yet
             </p>
-            <p className="text-sm text-gray-700">
+            <p className="text-base text-gray-700">
               Add items from calculators or create custom items
             </p>
           </div>
@@ -277,17 +279,17 @@ const QuoteBuilder: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-2 font-semibold text-gray-800">
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base">
                     Item Description
                   </th>
-                  <th className="text-left py-3 px-2 font-semibold text-gray-800 w-24">
+                  <th className="text-left py-4 px-3 font-bold text-gray-800 w-32 text-base">
                     Quantity
                   </th>
-                  <th className="text-left py-3 px-2 font-semibold text-gray-800 w-20">
+                  <th className="text-left py-4 px-3 font-bold text-gray-800 w-24 text-base">
                     Unit
                   </th>
-                  <th className="text-center py-3 px-2 font-semibold text-gray-800 w-20">
+                  <th className="text-center py-4 px-3 font-bold text-gray-800 w-24 text-base">
                     <Tooltip text="Remove item from quote">
                       <span>Actions</span>
                     </Tooltip>
@@ -298,13 +300,13 @@ const QuoteBuilder: React.FC = () => {
                 {items.map((item, index) => (
                   <tr
                     key={item.id}
-                    className={`border-b border-gray-100 ${
+                    className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
                       index % 2 === 0 ? "bg-gray-50" : "bg-white"
                     }`}
                   >
-                    <td className="py-3 px-2">
+                    <td className="py-4 px-3">
                       <input
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
                         value={item.description}
                         onChange={(e) =>
                           updateItem(item.id, "description", e.target.value)
@@ -312,10 +314,10 @@ const QuoteBuilder: React.FC = () => {
                         placeholder="Enter item description"
                       />
                     </td>
-                    <td className="py-3 px-2">
+                    <td className="py-4 px-3">
                       <input
                         type="number"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
                         value={item.quantity}
                         onChange={(e) =>
                           updateItem(
@@ -327,9 +329,9 @@ const QuoteBuilder: React.FC = () => {
                         min="0"
                       />
                     </td>
-                    <td className="py-3 px-2">
+                    <td className="py-4 px-3">
                       <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
                         value={item.unit}
                         onChange={(e) =>
                           updateItem(item.id, "unit", e.target.value)
@@ -343,13 +345,13 @@ const QuoteBuilder: React.FC = () => {
                         <option value="lot">lot</option>
                       </select>
                     </td>
-                    <td className="py-3 px-2 text-center">
+                    <td className="py-4 px-3 text-center">
                       <Tooltip text="Delete this item">
                         <button
                           onClick={() => deleteItem(item.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                          className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-5 w-5" />
                         </button>
                       </Tooltip>
                     </td>
@@ -362,10 +364,10 @@ const QuoteBuilder: React.FC = () => {
       </div>
 
       {/* Project Information */}
-      <div className="bg-white shadow-md rounded-xl border border-gray-100 p-6">
-        <div className="flex items-center space-x-2 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            <Building className="h-5 w-5 text-gray-500 mr-2" />
+      <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="flex items-center space-x-3 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <Building className="h-6 w-6 text-gray-500 mr-3" />
             Project Information
           </h2>
           <Tooltip text="Provide project details to help vendors understand your requirements">
@@ -373,66 +375,66 @@ const QuoteBuilder: React.FC = () => {
           </Tooltip>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-semibold text-gray-800">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          <div className="space-y-3">
+            <label className="flex items-center text-sm font-bold text-gray-800">
               <Edit3 className="h-4 w-4 text-gray-500 mr-2" />
               Project Name *
               <Tooltip text="Give your project a clear, descriptive name">
-                <HelpCircle className="h-3 w-3 text-gray-400 ml-1" />
+                <HelpCircle className="h-3 w-3 text-gray-400 ml-2" />
               </Tooltip>
             </label>
             <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               placeholder="e.g., Kitchen Renovation - Smith Residence"
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-semibold text-gray-800">
+          <div className="space-y-3">
+            <label className="flex items-center text-sm font-bold text-gray-800">
               <MapPin className="h-4 w-4 text-gray-500 mr-2" />
               Site Address
               <Tooltip text="Job site location helps vendors calculate delivery costs">
-                <HelpCircle className="h-3 w-3 text-gray-400 ml-1" />
+                <HelpCircle className="h-3 w-3 text-gray-400 ml-2" />
               </Tooltip>
             </label>
             <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
               value={siteAddress}
               onChange={(e) => setSiteAddress(e.target.value)}
               placeholder="123 Main St, City, State 12345"
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-semibold text-gray-800">
+          <div className="space-y-3">
+            <label className="flex items-center text-sm font-bold text-gray-800">
               <Calendar className="h-4 w-4 text-gray-500 mr-2" />
               Needed By
               <Tooltip text="When do you need materials delivered? This affects pricing and availability">
-                <HelpCircle className="h-3 w-3 text-gray-400 ml-1" />
+                <HelpCircle className="h-3 w-3 text-gray-400 ml-2" />
               </Tooltip>
             </label>
             <input
               type="date"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
               value={neededBy}
               onChange={(e) => setNeededBy(e.target.value)}
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label className="flex items-center text-sm font-semibold text-gray-800">
+          <div className="space-y-3 lg:col-span-2">
+            <label className="flex items-center text-sm font-bold text-gray-800">
               <FileText className="h-4 w-4 text-gray-500 mr-2" />
               Additional Notes
               <Tooltip text="Include special requirements, delivery instructions, or quality specifications">
-                <HelpCircle className="h-3 w-3 text-gray-400 ml-1" />
+                <HelpCircle className="h-3 w-3 text-gray-400 ml-2" />
               </Tooltip>
             </label>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900"
-              rows={3}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium resize-none"
+              rows={4}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Special requirements, delivery instructions, quality specifications..."
@@ -442,10 +444,10 @@ const QuoteBuilder: React.FC = () => {
       </div>
 
       {/* File Upload */}
-      <div className="bg-white shadow-md rounded-xl border border-gray-100 p-6">
-        <div className="flex items-center space-x-2 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            <Upload className="h-5 w-5 text-gray-500 mr-2" />
+      <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="flex items-center space-x-3 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <Upload className="h-6 w-6 text-gray-500 mr-3" />
             Attachments
           </h2>
           <Tooltip text="Upload blueprints, specifications, or reference images to help vendors provide accurate quotes">
@@ -453,8 +455,8 @@ const QuoteBuilder: React.FC = () => {
           </Tooltip>
         </div>
 
-        <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#033159] transition-colors duration-200">
+        <div className="space-y-6">
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 lg:p-12 text-center hover:border-[#033159] hover:bg-gray-50 transition-all duration-300 cursor-pointer">
             <input
               type="file"
               multiple
@@ -464,39 +466,37 @@ const QuoteBuilder: React.FC = () => {
               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.dwg"
             />
             <label htmlFor="file-upload" className="cursor-pointer">
-              <Paperclip className="h-8 w-8 text-gray-500 mx-auto mb-2" />
-              <p className="text-sm text-gray-800 font-medium">
+              <Paperclip className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+              <p className="text-base text-gray-800 font-bold mb-2">
                 Click to upload blueprints, specifications, or other documents
               </p>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-sm text-gray-600">
                 Supports PDF, DOC, images, and CAD files (Max 10MB each)
               </p>
             </label>
           </div>
 
           {files.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-semibold text-gray-800">
-                Uploaded Files:
-              </p>
+            <div className="space-y-3">
+              <p className="text-sm font-bold text-gray-800">Uploaded Files:</p>
               {files.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200"
+                  className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200"
                 >
-                  <div className="flex items-center space-x-2">
-                    <Paperclip className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-800 font-medium">
+                  <div className="flex items-center space-x-3">
+                    <Paperclip className="h-5 w-5 text-gray-500" />
+                    <span className="text-sm text-gray-800 font-bold">
                       {file.name}
                     </span>
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-gray-600 font-medium">
                       ({(file.size / 1024).toFixed(1)} KB)
                     </span>
                   </div>
                   <Tooltip text="Remove file">
                     <button
                       onClick={() => removeFile(index)}
-                      className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors duration-200"
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -509,10 +509,10 @@ const QuoteBuilder: React.FC = () => {
       </div>
 
       {/* Vendor Selection */}
-      <div className="bg-white shadow-md rounded-xl border border-gray-100 p-6">
-        <div className="flex items-center space-x-2 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            <Users className="h-5 w-5 text-gray-500 mr-2" />
+      <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="flex items-center space-x-3 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <Users className="h-6 w-6 text-gray-500 mr-3" />
             Select Vendors *
           </h2>
           <Tooltip text="Choose which vendors to send your RFQ to. Selecting multiple vendors helps ensure competitive pricing">
@@ -524,15 +524,15 @@ const QuoteBuilder: React.FC = () => {
           {vendors.map((vendor) => (
             <label
               key={vendor}
-              className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+              className="flex items-center space-x-4 p-5 border-2 border-gray-200 rounded-xl hover:bg-gray-50 hover:border-[#033159] cursor-pointer transition-all duration-200"
             >
               <input
                 type="checkbox"
                 checked={selectedVendors.includes(vendor)}
                 onChange={() => toggleVendor(vendor)}
-                className="w-4 h-4 text-[#033159] border-gray-300 rounded focus:ring-[#033159]"
+                className="w-5 h-5 text-[#033159] border-gray-300 rounded-lg focus:ring-[#033159] focus:ring-2"
               />
-              <span className="text-sm font-semibold text-gray-800">
+              <span className="text-base font-bold text-gray-800">
                 {vendor}
               </span>
             </label>
@@ -540,31 +540,34 @@ const QuoteBuilder: React.FC = () => {
         </div>
 
         {selectedVendors.length > 0 && (
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-900 font-medium">
-              RFQ will be sent to: <strong>{selectedVendors.join(", ")}</strong>
+          <div className="mt-6 p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
+            <p className="text-sm text-blue-900 font-bold">
+              RFQ will be sent to:{" "}
+              <strong className="font-normal">
+                {selectedVendors.join(", ")}
+              </strong>
             </p>
           </div>
         )}
       </div>
 
       {/* Submit Section */}
-      <div className="bg-white shadow-md rounded-xl border border-gray-100 p-6">
-        <div className="flex items-center justify-between">
+      <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
               Ready to Submit?
             </h3>
-            <p className="text-sm text-gray-700 font-medium mt-1">
+            <p className="text-base text-gray-700 font-medium">
               Your RFQ will be sent to {selectedVendors.length} selected vendor
               {selectedVendors.length !== 1 ? "s" : ""}
             </p>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
             {!isFormValid && (
-              <div className="flex items-center text-amber-700 text-sm font-medium">
-                <AlertCircle className="h-4 w-4 mr-2" />
+              <div className="flex items-center text-amber-700 text-sm font-bold">
+                <AlertCircle className="h-5 w-5 mr-2" />
                 <span>Complete required fields</span>
               </div>
             )}
@@ -579,9 +582,9 @@ const QuoteBuilder: React.FC = () => {
               <button
                 onClick={handleSubmit}
                 disabled={!isFormValid || isSubmitting}
-                className={`px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 ${
+                className={`w-full sm:w-auto px-8 py-4 rounded-xl font-bold flex items-center justify-center space-x-3 transition-all duration-300 text-base ${
                   isFormValid && !isSubmitting
-                    ? "bg-[#033159] text-white hover:bg-[#022244] hover:shadow-lg hover:-translate-y-0.5 shadow-md"
+                    ? "bg-gradient-to-r from-[#033159] to-[#00598F] text-white hover:from-[#022244] hover:to-[#004a7a] hover:shadow-xl hover:-translate-y-1 shadow-lg"
                     : "bg-gray-300 text-gray-600 cursor-not-allowed"
                 }`}
               >
@@ -592,7 +595,7 @@ const QuoteBuilder: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4" />
+                    <Send className="h-5 w-5" />
                     <span>Submit RFQ</span>
                   </>
                 )}

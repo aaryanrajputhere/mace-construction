@@ -2,25 +2,24 @@ import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-type DropdownType = "Calculators" | null;
-
 const Header = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<DropdownType>(null);
+  const [activeDropdown, setActiveDropdown] = useState<"Calculators" | null>(
+    null
+  );
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const toggleDropdown = (dropdown: DropdownType) => {
+  const toggleDropdown = (dropdown: "Calculators" | null) => {
     setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-    setActiveDropdown(null); // close dropdowns when menu toggles
+    setActiveDropdown(null);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -35,85 +34,104 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100 font-['Helvetica Neue']">
+    <header className="bg-white shadow-lg border-b-2 border-gray-200 font-['Helvetica Neue'] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-18 sm:h-20">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <a href="/" className="flex items-center">
-              <img
-                src="/logos/logo.svg"
-                alt="MACE Logo"
-                className="h-8 w-auto"
-              />
+            <a href="/" className="flex items-center group">
+              <div className="p-2 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-200">
+                <img
+                  src="/logos/logo.svg"
+                  alt="MACE Logo"
+                  className="h-8 sm:h-10 w-auto"
+                />
+              </div>
             </a>
           </div>
 
           {/* Desktop Navigation */}
           <nav
-            className="hidden md:flex items-center space-x-8"
+            className="hidden md:flex items-center space-x-2 lg:space-x-4"
             ref={dropdownRef}
           >
-            {/* Materias */}
             <a
               href="/materials"
-              className="text-sm font-medium text-gray-700 hover:text-[#00598F] transition"
+              className="px-4 py-2.5 text-sm lg:text-base font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
             >
               Materials
             </a>
+
             <div className="relative">
               <button
                 onClick={() => toggleDropdown("Calculators")}
-                aria-expanded={activeDropdown === "Calculators"}
-                className="flex items-center text-sm font-medium text-gray-700 hover:text-[#00598F] transition"
+                className={`flex items-center px-4 py-2.5 text-sm lg:text-base font-semibold rounded-xl transition-all duration-200 hover:shadow-md transform hover:scale-[1.02] ${
+                  activeDropdown === "Calculators"
+                    ? "bg-[#033159] text-white shadow-md"
+                    : "text-gray-700 hover:text-white hover:bg-[#033159]"
+                }`}
               >
-                Calculators <ChevronDown className="ml-1 h-4 w-4" />
+                Calculators
+                <ChevronDown
+                  className={`ml-2 h-4 w-4 transition-transform duration-200 ${
+                    activeDropdown === "Calculators" ? "rotate-180" : ""
+                  }`}
+                />
               </button>
+
               {activeDropdown === "Calculators" && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                  <a
-                    href="/calculators/studs"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#033159]"
-                  >
-                    Studs{" "}
-                  </a>
-                  <a
-                    href="/calculators/osb"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#033159]"
-                  >
-                    OSB
-                  </a>
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border-2 border-gray-200 z-50 overflow-hidden">
+                  <div className="p-2 space-y-1">
+                    <a
+                      href="/calculators/studs"
+                      className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
+                    >
+                      <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200 group-hover:bg-opacity-50">
+                        <span className="text-xs">📐</span>
+                      </div>
+                      Studs Calculator
+                    </a>
+                    <a
+                      href="/calculators/osb"
+                      className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
+                    >
+                      <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200 group-hover:bg-opacity-50">
+                        <span className="text-xs">📊</span>
+                      </div>
+                      OSB Calculator
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
 
             <a
               href="#"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.preventDefault();
                 window.scrollTo({
                   top: document.body.scrollHeight,
                   behavior: "smooth",
                 });
               }}
-              className="text-sm font-medium text-gray-700 hover:text-[#00598F] transition"
+              className="px-4 py-2.5 text-sm lg:text-base font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
             >
               Contact Us
             </a>
           </nav>
-
           {/* CTA + Mobile Button */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 sm:space-x-4">
             <button
               onClick={() => navigate("/quote")}
-              className="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-md hover:opacity-90 transition"
-              style={{ backgroundColor: "#033159" }}
+              className="hidden md:inline-flex items-center px-5 lg:px-6 py-3 text-sm lg:text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
+              <span className="mr-2">💬</span>
               Get Quote
             </button>
+
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-[#00598F] hover:bg-gray-50 transition"
+              className="md:hidden inline-flex items-center justify-center p-3 rounded-xl text-gray-700 hover:text-white hover:bg-[#033159] transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -126,46 +144,65 @@ const Header = () => {
 
         {/* Mobile Nav */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+          <div className="md:hidden border-t-2 border-gray-200 bg-gradient-to-b from-white to-gray-50">
+            <div className="px-3 pt-4 pb-6 space-y-2">
               <a
                 href="/materials"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
+                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
               >
+                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
+                  <span className="text-sm">🏗️</span>
+                </div>
                 Materials
               </a>
+
               <a
                 href="/calculators/osb"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
+                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
               >
+                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
+                  <span className="text-sm">📊</span>
+                </div>
                 OSB Calculator
               </a>
+
               <a
                 href="/calculators/studs"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
+                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
               >
+                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
+                  <span className="text-sm">📐</span>
+                </div>
                 Studs Calculator
               </a>
+
               <a
                 href="#"
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                   e.preventDefault();
-                  setIsMobileMenuOpen(false); // Close mobile menu after clicking
+                  setIsMobileMenuOpen(false);
                   window.scrollTo({
                     top: document.body.scrollHeight,
                     behavior: "smooth",
                   });
                 }}
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-[#00598F] hover:bg-gray-50 rounded-md"
+                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
               >
+                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
+                  <span className="text-sm">📞</span>
+                </div>
                 Contact Us
               </a>
-              <div className="pt-4 pb-2">
+
+              <div className="pt-4">
                 <button
-                  onClick={() => navigate("/quote")}
-                  className="w-full flex justify-center px-4 py-2 text-sm font-medium text-white rounded-md hover:opacity-90 transition"
-                  style={{ backgroundColor: "#033159" }}
+                  onClick={() => {
+                    navigate("/quote");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center px-5 py-4 text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
                 >
+                  <span className="mr-2">💬</span>
                   Get Quote
                 </button>
               </div>

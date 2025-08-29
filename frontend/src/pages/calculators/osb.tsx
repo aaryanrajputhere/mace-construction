@@ -82,33 +82,33 @@ const OSBCalculator: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6">
+    <div className="w-full max-w-lg mx-auto p-4 sm:p-6">
       <div
-        className={`bg-white rounded-xl border p-6 transition-all duration-300 ${
+        className={`bg-white rounded-2xl border-2 p-6 sm:p-8 transition-all duration-300 ${
           isHovered
-            ? "shadow-xl -translate-y-1 border-blue-200"
-            : "shadow-md border-gray-100 hover:shadow-lg hover:-translate-y-1"
+            ? "shadow-2xl -translate-y-2 border-blue-200"
+            : "shadow-lg border-gray-100 hover:shadow-xl hover:-translate-y-1"
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-3 mb-2">
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-3">
             <div
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-3 rounded-xl transition-all duration-300 ${
                 isHovered
-                  ? "bg-gradient-to-br from-[#00598F] to-[#033159]"
-                  : "bg-gradient-to-br from-[#033159] to-[#00598F]"
+                  ? "bg-gradient-to-br from-[#00598F] to-[#033159] shadow-lg"
+                  : "bg-gradient-to-br from-[#033159] to-[#00598F] shadow-md"
               }`}
             >
               <Calculator className="h-6 w-6 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               OSB Sheet Calculator
             </h2>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 pl-1">
             {isHovered
               ? "Release mouse to reset inputs"
               : "Calculate OSB sheets needed for your project"}
@@ -116,10 +116,10 @@ const OSBCalculator: React.FC = () => {
         </div>
 
         {/* Input Fields */}
-        <div className="space-y-4 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-700">
+        <div className="space-y-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-3">
+              <label className="flex items-center text-sm font-semibold text-gray-700">
                 <Ruler className="h-4 w-4 text-gray-400 mr-2" />
                 Length (ft)
               </label>
@@ -128,12 +128,12 @@ const OSBCalculator: React.FC = () => {
                 value={length || ""}
                 onChange={(e) => setLength(Number(e.target.value) || 0)}
                 placeholder="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#033159]/20 focus:border-[#033159] transition-all duration-200 text-base font-medium placeholder-gray-400"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-700">
+            <div className="space-y-3">
+              <label className="flex items-center text-sm font-semibold text-gray-700">
                 <Ruler className="h-4 w-4 text-gray-400 mr-2" />
                 Width (ft)
               </label>
@@ -142,18 +142,18 @@ const OSBCalculator: React.FC = () => {
                 value={width || ""}
                 onChange={(e) => setWidth(Number(e.target.value) || 0)}
                 placeholder="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#033159]/20 focus:border-[#033159] transition-all duration-200 text-base font-medium placeholder-gray-400"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-medium text-gray-800">
+          <div className="space-y-3">
+            <label className="flex items-center text-sm font-semibold text-gray-800">
               <Info className="h-4 w-4 text-gray-500 mr-2" />
               Waste Factor (%)
               <div className="relative group inline-block">
-                <Info className="h-3.5 w-3.5 text-gray-400 ml-1.5 cursor-help" />
-                <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-gray-900 text-xs text-white rounded-lg shadow-lg">
+                <Info className="h-3.5 w-3.5 text-gray-400 ml-2 cursor-help hover:text-gray-600 transition-colors" />
+                <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-64 p-3 bg-gray-900 text-xs text-white rounded-xl shadow-xl z-10">
                   Accounts for cutting waste and extra materials. 10% is
                   standard, increase for complex layouts.
                   <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -166,9 +166,9 @@ const OSBCalculator: React.FC = () => {
               onChange={(e) => setWaste(Number(e.target.value) || 0)}
               min="0"
               max="50"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#033159]/20 focus:border-[#033159] transition-all duration-200 text-base font-medium"
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 pl-1">
               Recommended: 10-15% for cuts and waste
             </p>
           </div>
@@ -176,50 +176,54 @@ const OSBCalculator: React.FC = () => {
 
         {/* Results */}
         {result !== null && totalArea > 0 && (
-          <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+          <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border-2 border-gray-200 mb-8 shadow-inner">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
               Calculation Results
             </h3>
 
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Project Area:</span>
-                <span className="font-medium text-gray-800">
+            <div className="space-y-3 text-sm sm:text-base">
+              <div className="flex items-center justify-between py-1">
+                <span className="text-gray-600 font-medium">Project Area:</span>
+                <span className="font-bold text-gray-800">
                   {totalArea.toFixed(1)} sq ft
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Waste ({waste}%):</span>
-                <span className="font-medium text-gray-800">
+              <div className="flex items-center justify-between py-1">
+                <span className="text-gray-600 font-medium">
+                  Waste ({waste}%):
+                </span>
+                <span className="font-bold text-gray-800">
                   {wasteArea.toFixed(1)} sq ft
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Total Area Needed:</span>
-                <span className="font-medium text-gray-800">
+              <div className="flex items-center justify-between py-1">
+                <span className="text-gray-600 font-medium">
+                  Total Area Needed:
+                </span>
+                <span className="font-bold text-gray-800">
                   {(totalArea + wasteArea).toFixed(1)} sq ft
                 </span>
               </div>
 
-              <hr className="border-gray-300 my-2" />
+              <hr className="border-gray-300 my-4" />
 
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700 font-medium">
+              <div className="flex items-center justify-between py-2 bg-white rounded-lg px-4 border border-gray-200">
+                <span className="text-gray-700 font-bold text-base">
                   OSB Sheets Required:
                 </span>
                 <div className="flex items-center space-x-2">
-                  <Package className="h-4 w-4 text-[#033159]" />
-                  <span className="text-lg font-bold text-[#033159]">
+                  <Package className="h-5 w-5 text-[#033159]" />
+                  <span className="text-2xl font-black text-[#033159]">
                     {result}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-3 p-2 bg-blue-100 rounded-lg">
-              <p className="text-xs text-blue-800">
+            <div className="mt-4 p-3 bg-blue-100 rounded-xl border border-blue-200">
+              <p className="text-xs sm:text-sm text-blue-800 font-medium">
                 <Info className="h-3 w-3 inline mr-1" />
                 Based on standard 4'×8' (32 sq ft) OSB sheets
               </p>
@@ -228,31 +232,33 @@ const OSBCalculator: React.FC = () => {
         )}
 
         {/* Action Buttons */}
-        <div className="flex space-x-3">
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
           {result && (
             <button
               onClick={addToQuote}
               data-quote-btn
-              className="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center space-x-2 bg-[#033159] hover:bg-[#022244]"
+              className="flex-1 px-6 py-4 text-base font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex items-center justify-center space-x-3 bg-gradient-to-r from-[#033159] to-[#00598F] hover:from-[#022244] hover:to-[#044a73] active:scale-98"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-5 w-5" />
               <span>Add to Quote</span>
             </button>
           )}
 
           <button
             onClick={clearInputs}
-            className="px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+            className="px-6 py-4 text-base font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:-translate-y-0.5 border-2 border-gray-200 hover:border-gray-300 active:scale-98"
           >
             Clear
           </button>
         </div>
 
         {/* Sheet Info */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Standard OSB Sheet: 4' × 8' (32 sq ft)</span>
-            <DollarSign className="h-3 w-3" />
+        <div className="mt-8 pt-6 border-t-2 border-gray-200">
+          <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500">
+            <span className="font-medium">
+              Standard OSB Sheet: 4' × 8' (32 sq ft)
+            </span>
+            <DollarSign className="h-4 w-4" />
           </div>
         </div>
       </div>

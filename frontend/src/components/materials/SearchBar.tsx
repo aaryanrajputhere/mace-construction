@@ -125,52 +125,58 @@ const SearchFilterBar = () => {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+    <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 w-full max-w-md mx-auto sm:max-w-lg lg:max-w-6xl">
       {/* Quick Tips Banner */}
       {showQuickTips && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Lightbulb className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-semibold text-blue-800">
-                Quick Tip:
-              </span>
-              <span className="text-sm text-blue-700">
-                Try searching for "concrete", "tools", or "safety equipment" to
-                get started
-              </span>
+        <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-blue-200 p-4 sm:p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center space-x-3 flex-1">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Lightbulb className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <span className="text-sm sm:text-base font-bold text-blue-900 block mb-1">
+                  Quick Tip:
+                </span>
+                <span className="text-sm text-blue-800">
+                  Try searching for "concrete", "tools", or "safety equipment"
+                  to get started
+                </span>
+              </div>
             </div>
             <button
               onClick={() => setShowQuickTips(false)}
-              className="text-blue-600 hover:text-blue-800 transition-colors"
+              className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-all duration-200 flex-shrink-0"
               aria-label="Close tip"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
           </div>
         </div>
       )}
 
       {/* Main Search Row */}
-      <div className="p-4">
-        <div className="flex items-center gap-3">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           {/* Search Input */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 p-1 bg-gray-100 rounded-lg">
+              <Search className="h-4 w-4 text-gray-600" />
+            </div>
             <input
               type="text"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search for materials, tools, or equipment..."
-              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full pl-14 pr-12 py-4 border-2 border-gray-300 rounded-xl text-sm sm:text-base font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 transition-all duration-200 hover:border-gray-400 shadow-sm focus:shadow-md"
             />
             {searchValue && (
               <button
                 onClick={() => setSearchValue("")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg transition-colors duration-200"
               >
-                <X className="h-4 w-4 text-gray-400" />
+                <X className="h-4 w-4 text-gray-500" />
               </button>
             )}
           </div>
@@ -179,7 +185,7 @@ const SearchFilterBar = () => {
           {searchValue && (
             <button
               onClick={handleSearch}
-              className="px-4 py-3 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
+              className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl text-sm sm:text-base font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap"
             >
               Search
             </button>
@@ -188,38 +194,39 @@ const SearchFilterBar = () => {
           {/* Filter Toggle */}
           <button
             onClick={() => setFiltersExpanded(!filtersExpanded)}
-            className={`px-4 py-3 rounded-lg text-sm font-medium border ${
+            className={`px-5 py-4 rounded-xl text-sm sm:text-base font-bold border-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 whitespace-nowrap ${
               filtersExpanded || hasActiveFilters
-                ? "bg-blue-50 text-blue-700 border-blue-200"
-                : "bg-gray-50 text-gray-700 border-gray-300"
+                ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300 shadow-md"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400"
             }`}
           >
-            <Filter className="h-4 w-4 inline mr-2" />
-            Filters
+            <Filter className="h-4 w-4" />
+            <span>Filters</span>
             {hasActiveFilters && (
-              <span className="ml-1 px-1.5 py-0.5 text-xs bg-blue-600 text-white rounded-full">
+              <span className="px-2 py-1 text-xs bg-blue-600 text-white rounded-full font-bold shadow-sm">
                 {activeFiltersCount}
               </span>
             )}
             {filtersExpanded ? (
-              <ChevronUp className="h-4 w-4 inline ml-1" />
+              <ChevronUp className="h-4 w-4" />
             ) : (
-              <ChevronDown className="h-4 w-4 inline ml-1" />
+              <ChevronDown className="h-4 w-4" />
             )}
           </button>
         </div>
       </div>
+
       {/* Expandable Filters Section */}
       {filtersExpanded && (
-        <div className="border-t border-gray-200 bg-gray-50">
-          <div className="p-5">
+        <div className="border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <div className="p-6 sm:p-8">
             {/* Filter Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
               {/* Sort By */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <label
-                    className="block text-sm font-bold text-gray-900"
+                    className="block text-sm sm:text-base font-bold text-gray-900"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -227,14 +234,16 @@ const SearchFilterBar = () => {
                     Sort By
                   </label>
                   <Tooltip content="Choose how to order your search results. Best Match uses relevance scoring and popularity.">
-                    <Info className="h-4 w-4 text-gray-600" />
+                    <div className="p-1 bg-gray-200 rounded-full">
+                      <Info className="h-4 w-4 text-gray-600" />
+                    </div>
                   </Tooltip>
                 </div>
                 <div className="relative">
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full pl-4 pr-10 py-3 bg-white border-2 border-gray-300 rounded-lg text-sm transition-all duration-200 outline-none hover:border-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 appearance-none cursor-pointer font-semibold text-gray-900"
+                    className="w-full pl-4 pr-12 py-4 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base transition-all duration-200 outline-none hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 appearance-none cursor-pointer font-semibold text-gray-900 shadow-sm focus:shadow-md"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -245,17 +254,17 @@ const SearchFilterBar = () => {
                       </option>
                     ))}
                   </select>
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none p-1 bg-gray-100 rounded-lg">
                     <ChevronDown className="h-5 w-5 text-gray-700" />
                   </div>
                 </div>
               </div>
 
               {/* Availability Filter */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <label
-                    className="block text-sm font-bold text-gray-900"
+                    className="block text-sm sm:text-base font-bold text-gray-900"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -263,14 +272,16 @@ const SearchFilterBar = () => {
                     Availability
                   </label>
                   <Tooltip content="Filter by stock status. In Stock items are ready to ship immediately, Low Stock may have limited quantities available.">
-                    <Info className="h-4 w-4 text-gray-600" />
+                    <div className="p-1 bg-gray-200 rounded-full">
+                      <Info className="h-4 w-4 text-gray-600" />
+                    </div>
                   </Tooltip>
                 </div>
                 <div className="relative">
                   <select
                     value={filterBy}
                     onChange={(e) => setFilterBy(e.target.value)}
-                    className="w-full pl-4 pr-10 py-3 bg-white border-2 border-gray-300 rounded-lg text-sm transition-all duration-200 outline-none hover:border-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 appearance-none cursor-pointer font-semibold text-gray-900"
+                    className="w-full pl-4 pr-12 py-4 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base transition-all duration-200 outline-none hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 appearance-none cursor-pointer font-semibold text-gray-900 shadow-sm focus:shadow-md"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -281,17 +292,17 @@ const SearchFilterBar = () => {
                       </option>
                     ))}
                   </select>
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none p-1 bg-gray-100 rounded-lg">
                     <ChevronDown className="h-5 w-5 text-gray-700" />
                   </div>
                 </div>
               </div>
 
               {/* Price Range */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <label
-                    className="block text-sm font-bold text-gray-900"
+                    className="block text-sm sm:text-base font-bold text-gray-900"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -299,14 +310,16 @@ const SearchFilterBar = () => {
                     Price Range
                   </label>
                   <Tooltip content="Filter by price ranges to find materials within your budget. All prices are per unit and exclude shipping.">
-                    <Info className="h-4 w-4 text-gray-600" />
+                    <div className="p-1 bg-gray-200 rounded-full">
+                      <Info className="h-4 w-4 text-gray-600" />
+                    </div>
                   </Tooltip>
                 </div>
                 <div className="relative">
                   <select
                     value={priceRange}
                     onChange={(e) => setPriceRange(e.target.value)}
-                    className="w-full pl-4 pr-10 py-3 bg-white border-2 border-gray-300 rounded-lg text-sm transition-all duration-200 outline-none hover:border-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 appearance-none cursor-pointer font-semibold text-gray-900"
+                    className="w-full pl-4 pr-12 py-4 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base transition-all duration-200 outline-none hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 appearance-none cursor-pointer font-semibold text-gray-900 shadow-sm focus:shadow-md"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -317,7 +330,7 @@ const SearchFilterBar = () => {
                       </option>
                     ))}
                   </select>
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none p-1 bg-gray-100 rounded-lg">
                     <ChevronDown className="h-5 w-5 text-gray-700" />
                   </div>
                 </div>
@@ -326,11 +339,11 @@ const SearchFilterBar = () => {
 
             {/* Active Filters Display */}
             {hasActiveFilters && (
-              <div className="mt-6 pt-6 border-t border-gray-300">
-                <div className="flex items-start justify-between mb-4">
+              <div className="mt-8 pt-8 border-t border-gray-300">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
                   <div className="flex items-center space-x-2">
                     <h4
-                      className="text-base font-bold text-gray-900"
+                      className="text-base sm:text-lg font-bold text-gray-900"
                       style={{
                         fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                       }}
@@ -338,7 +351,9 @@ const SearchFilterBar = () => {
                       Active Filters ({activeFiltersCount})
                     </h4>
                     <Tooltip content="These filters are currently applied to your search results. Click the X on any filter to remove it individually, or use Clear All to reset.">
-                      <HelpCircle className="h-4 w-4 text-gray-600" />
+                      <div className="p-1 bg-gray-200 rounded-full">
+                        <HelpCircle className="h-4 w-4 text-gray-600" />
+                      </div>
                     </Tooltip>
                   </div>
 
@@ -348,14 +363,14 @@ const SearchFilterBar = () => {
                       onClick={clearAllFilters}
                       disabled={isClearing}
                       className={`
-                        inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold 
-                        transition-all duration-200 outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50
-                        ${
-                          isClearing
-                            ? "bg-gray-200 text-gray-600 cursor-not-allowed"
-                            : "bg-red-100 text-red-900 hover:bg-red-200 hover:text-red-900 active:bg-red-300 shadow-md hover:shadow-lg"
-                        }
-                      `}
+                    inline-flex items-center px-5 py-3 rounded-xl text-sm sm:text-base font-bold 
+                    transition-all duration-200 outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]
+                    ${
+                      isClearing
+                        ? "bg-gray-200 text-gray-600 cursor-not-allowed"
+                        : "bg-gradient-to-r from-red-100 to-red-200 text-red-900 hover:from-red-200 hover:to-red-300"
+                    }
+                  `}
                       style={{
                         fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                       }}
@@ -377,9 +392,9 @@ const SearchFilterBar = () => {
                 </div>
 
                 {/* Filter Tags */}
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 sm:gap-4">
                   {sortBy && (
-                    <div className="inline-flex items-center pl-4 pr-2 py-2 rounded-full text-sm font-bold bg-blue-100 text-blue-900 group shadow-md">
+                    <div className="inline-flex items-center pl-4 pr-2 py-3 rounded-full text-sm font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 group shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]">
                       <TrendingUp className="h-4 w-4 mr-2" />
                       <span className="mr-2">
                         {sortOptions.find((opt) => opt.value === sortBy)?.label}
@@ -387,7 +402,7 @@ const SearchFilterBar = () => {
                       <Tooltip content="Remove sort filter">
                         <button
                           onClick={() => clearIndividualFilter("sort")}
-                          className="ml-1 p-1 rounded-full hover:bg-blue-200 transition-colors duration-150 outline-none focus:ring-1 focus:ring-blue-500"
+                          className="ml-1 p-1.5 rounded-full hover:bg-blue-300 transition-colors duration-150 outline-none focus:ring-1 focus:ring-blue-500"
                           aria-label="Clear sort filter"
                         >
                           <X className="h-4 w-4" />
@@ -397,7 +412,7 @@ const SearchFilterBar = () => {
                   )}
 
                   {filterBy && (
-                    <div className="inline-flex items-center pl-4 pr-2 py-2 rounded-full text-sm font-bold bg-green-100 text-green-900 group shadow-md">
+                    <div className="inline-flex items-center pl-4 pr-2 py-3 rounded-full text-sm font-bold bg-gradient-to-r from-green-100 to-green-200 text-green-900 group shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]">
                       <Package className="h-4 w-4 mr-2" />
                       <span className="mr-2">
                         {
@@ -409,7 +424,7 @@ const SearchFilterBar = () => {
                       <Tooltip content="Remove availability filter">
                         <button
                           onClick={() => clearIndividualFilter("availability")}
-                          className="ml-1 p-1 rounded-full hover:bg-green-200 transition-colors duration-150 outline-none focus:ring-1 focus:ring-green-500"
+                          className="ml-1 p-1.5 rounded-full hover:bg-green-300 transition-colors duration-150 outline-none focus:ring-1 focus:ring-green-500"
                           aria-label="Clear availability filter"
                         >
                           <X className="h-4 w-4" />
@@ -419,7 +434,7 @@ const SearchFilterBar = () => {
                   )}
 
                   {priceRange && (
-                    <div className="inline-flex items-center pl-4 pr-2 py-2 rounded-full text-sm font-bold bg-purple-100 text-purple-900 group shadow-md">
+                    <div className="inline-flex items-center pl-4 pr-2 py-3 rounded-full text-sm font-bold bg-gradient-to-r from-purple-100 to-purple-200 text-purple-900 group shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]">
                       <span className="mr-3">
                         {
                           priceRanges.find((opt) => opt.value === priceRange)
@@ -429,7 +444,7 @@ const SearchFilterBar = () => {
                       <Tooltip content="Remove price range filter">
                         <button
                           onClick={() => clearIndividualFilter("price")}
-                          className="ml-1 p-1 rounded-full hover:bg-purple-200 transition-colors duration-150 outline-none focus:ring-1 focus:ring-purple-500"
+                          className="ml-1 p-1.5 rounded-full hover:bg-purple-300 transition-colors duration-150 outline-none focus:ring-1 focus:ring-purple-500"
                           aria-label="Clear price range filter"
                         >
                           <X className="h-4 w-4" />
@@ -443,11 +458,13 @@ const SearchFilterBar = () => {
 
             {/* No Filters State with Helpful Guidance */}
             {!hasActiveFilters && (
-              <div className="mt-6 pt-6 border-t border-gray-300">
-                <div className="text-center py-6 bg-white rounded-lg border-2 border-dashed border-gray-300">
-                  <SlidersHorizontal className="h-8 w-8 text-gray-500 mx-auto mb-3" />
+              <div className="mt-8 pt-8 border-t border-gray-300">
+                <div className="text-center py-8 bg-white rounded-2xl border-2 border-dashed border-gray-300 shadow-sm">
+                  <div className="p-3 bg-gray-100 rounded-2xl w-fit mx-auto mb-4">
+                    <SlidersHorizontal className="h-8 w-8 text-gray-500" />
+                  </div>
                   <h3
-                    className="text-base font-bold text-gray-900 mb-2"
+                    className="text-base sm:text-lg font-bold text-gray-900 mb-3"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -455,7 +472,7 @@ const SearchFilterBar = () => {
                     No filters applied yet
                   </h3>
                   <p
-                    className="text-sm text-gray-700 mb-3"
+                    className="text-sm sm:text-base text-gray-700 mb-6 max-w-md mx-auto"
                     style={{
                       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                     }}
@@ -463,10 +480,19 @@ const SearchFilterBar = () => {
                     Use the dropdowns above to narrow down your search results
                     and find exactly what you need.
                   </p>
-                  <div className="flex justify-center space-x-4 text-xs text-gray-600">
-                    <span>💡 Sort by price</span>
-                    <span>📦 Filter by stock</span>
-                    <span>💰 Set price range</span>
+                  <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">💡</span>
+                      <span>Sort by price</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">📦</span>
+                      <span>Filter by stock</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">💰</span>
+                      <span>Set price range</span>
+                    </div>
                   </div>
                 </div>
               </div>
