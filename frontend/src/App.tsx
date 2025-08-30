@@ -10,10 +10,10 @@ import QuoteBuilder from "./pages/quote";
 import LandingPage from "./pages/home";
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[100dvh] bg-gray-50">
       <Header />
-      {/* Added pt-24 to push content below floating header */}
-      <main className="py-10 px-6">
+      {/* Container with consistent padding */}
+      <main className="container py-10 space-scale-lg">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/materials" element={<Materials />} />

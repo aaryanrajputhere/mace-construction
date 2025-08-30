@@ -276,20 +276,20 @@ const QuoteBuilder: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b-2 border-gray-200">
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base">
+          <div className="table-container shadow rounded-xl">
+            <table className="w-full mobile-card-table">
+              <thead className="table-sticky-header">
+                <tr className="border-b-2 border-gray-200 bg-white">
+                  <th scope="col" className="text-left py-4 px-3 font-bold text-gray-800 text-base" style={{ minWidth: "200px" }}>
                     Item Description
                   </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 w-32 text-base">
+                  <th scope="col" className="text-left py-4 px-3 font-bold text-gray-800 w-32 text-base">
                     Quantity
                   </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 w-24 text-base">
+                  <th scope="col" className="text-left py-4 px-3 font-bold text-gray-800 w-24 text-base">
                     Unit
                   </th>
-                  <th className="text-center py-4 px-3 font-bold text-gray-800 w-24 text-base">
+                  <th scope="col" className="text-center py-4 px-3 font-bold text-gray-800 w-24 text-base">
                     <Tooltip text="Remove item from quote">
                       <span>Actions</span>
                     </Tooltip>
@@ -304,9 +304,11 @@ const QuoteBuilder: React.FC = () => {
                       index % 2 === 0 ? "bg-gray-50" : "bg-white"
                     }`}
                   >
-                    <td className="py-4 px-3">
+                    <td className="py-4 px-3" data-label="Description">
+                      <label className="sr-only" htmlFor={`item-desc-${item.id}`}>Description for item {index + 1}</label>
                       <input
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
+                        id={`item-desc-${item.id}`}
+                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
                         value={item.description}
                         onChange={(e) =>
                           updateItem(item.id, "description", e.target.value)
@@ -314,10 +316,14 @@ const QuoteBuilder: React.FC = () => {
                         placeholder="Enter item description"
                       />
                     </td>
-                    <td className="py-4 px-3">
+                    <td className="py-4 px-3" data-label="Quantity">
+                      <label className="sr-only" htmlFor={`item-qty-${item.id}`}>Quantity for item {index + 1}</label>
                       <input
+                        id={`item-qty-${item.id}`}
                         type="number"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
                         value={item.quantity}
                         onChange={(e) =>
                           updateItem(
@@ -327,11 +333,15 @@ const QuoteBuilder: React.FC = () => {
                           )
                         }
                         min="0"
+                        aria-label={`Quantity for ${item.description}`}
                       />
                     </td>
-                    <td className="py-4 px-3">
+                    <td className="py-4 px-3" data-label="Unit">
+                      <label className="sr-only" htmlFor={`item-unit-${item.id}`}>Unit for item {index + 1}</label>
                       <select
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
+                        id={`item-unit-${item.id}`}
+                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                        aria-label={`Unit for ${item.description}`}
                         value={item.unit}
                         onChange={(e) =>
                           updateItem(item.id, "unit", e.target.value)
@@ -345,13 +355,15 @@ const QuoteBuilder: React.FC = () => {
                         <option value="lot">lot</option>
                       </select>
                     </td>
-                    <td className="py-4 px-3 text-center">
+                    <td className="py-4 px-3 text-center" data-label="Actions">
                       <Tooltip text="Delete this item">
                         <button
+                          className="min-h-[44px] min-w-[44px] p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                          aria-label={`Remove ${item.description}`}
                           onClick={() => deleteItem(item.id)}
-                          className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                         >
                           <Trash2 className="h-5 w-5" />
+                          <span className="sr-only">Delete</span>
                         </button>
                       </Tooltip>
                     </td>
@@ -375,9 +387,9 @@ const QuoteBuilder: React.FC = () => {
           </Tooltip>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           <div className="space-y-3">
-            <label className="flex items-center text-sm font-bold text-gray-800">
+            <label htmlFor="project-name" className="flex items-center text-sm font-bold text-gray-800">
               <Edit3 className="h-4 w-4 text-gray-500 mr-2" />
               Project Name *
               <Tooltip text="Give your project a clear, descriptive name">
@@ -385,7 +397,10 @@ const QuoteBuilder: React.FC = () => {
               </Tooltip>
             </label>
             <input
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
+              id="project-name"
+              className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+              aria-required="true"
+              aria-describedby="project-name-help"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               placeholder="e.g., Kitchen Renovation - Smith Residence"

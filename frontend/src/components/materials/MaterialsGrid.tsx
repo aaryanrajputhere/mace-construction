@@ -247,7 +247,7 @@ const sampleMaterials = [
 
 const MaterialsGrid: React.FC = () => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0" role="feed" aria-label="Materials grid">
       {sampleMaterials.map((mat) => (
         <MaterialCard
           key={mat.id}

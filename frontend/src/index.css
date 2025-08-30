@@ -1,9 +1,13 @@
 @import "tailwindcss";
+@import "./styles/globals.css";
+
 /* index.css */
 html,
 body {
   -ms-overflow-style: none; /* IE & Edge */
   scrollbar-width: none; /* Firefox */
+  height: 100dvh; /* Use dynamic viewport height */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 html::-webkit-scrollbar,

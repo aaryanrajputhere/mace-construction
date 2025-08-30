@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --container-padding: clamp(1rem, 5vw, 2rem);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    font-size: clamp(16px, 1.6vw, 18px);
+    line-height: 1.5;
+    font-family: system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.25;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    line-height: 1.3;
+  }
+
+  /* Container width control */
+  .container {
+    width: min(100% - 2rem, 1280px);
+    margin-inline: auto;
+    padding-inline: var(--container-padding);
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    outline: 2px solid #033159;
+    outline-offset: 2px;
+  }
+
+  /* Interactive elements */
+  button, 
+  [type="button"],
+  [type="submit"] {
+    min-height: 44px;
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+    touch-action: manipulation;
+  }
+
+  /* Form elements */
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevent iOS zoom */
+    min-height: 44px;
+    padding: 0.75rem;
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+  }
+
+  /* Table styles */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-sticky-header th {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+  }
+
+  /* Mobile card layout for tables */
+  @media (max-width: 400px) {
+    .mobile-card-table tr {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .mobile-card-table td {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      padding: 0.5rem 0;
+    }
+
+    .mobile-card-table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+    }
+  }
+
+  /* Spacing scale */
+  .space-scale > * + * {
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .space-scale-lg > * + * {
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  /* Long text readability */
+  .readable-content {
+    max-width: 70ch;
+  }
+}

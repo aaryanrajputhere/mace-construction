@@ -66,9 +66,11 @@ const MaterialCard: React.FC<Props> = ({
       {/* Card */}
       <div
         onClick={() => setIsPanelOpen(true)}
-        className="bg-white shadow-lg rounded-2xl border border-gray-200 p-6 lg:p-7 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-2 cursor-pointer group"
+        className="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 sm:p-6 lg:p-7 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-2 cursor-pointer group focus-within:ring-2 focus-within:ring-[#033159] focus-within:ring-opacity-50"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        role="article"
+        tabIndex={0}
       >
         {/* Image */}
         <div className="mb-6 w-full h-52 flex items-center justify-center rounded-xl overflow-hidden bg-gray-100 relative">
@@ -158,7 +160,8 @@ const MaterialCard: React.FC<Props> = ({
 
         {/* Button */}
         <button
-          className="w-full px-6 py-4 text-base font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex items-center justify-center space-x-3 focus:outline-none focus:ring-2 focus:ring-[#033159] focus:ring-opacity-50 bg-gradient-to-r from-[#033159] to-[#00598F] hover:from-[#022244] hover:to-[#004a7a] group-hover:scale-105"
+          className="w-full min-h-[44px] px-6 py-3 sm:py-4 text-base font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex items-center justify-center space-x-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 bg-gradient-to-r from-[#033159] to-[#00598F] hover:from-[#022244] hover:to-[#004a7a] group-hover:scale-105"
+          aria-label="Add to Quote"
           onClick={(e) => {
             e.stopPropagation();
             setIsPanelOpen(true);

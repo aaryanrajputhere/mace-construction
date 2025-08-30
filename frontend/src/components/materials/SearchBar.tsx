@@ -163,13 +163,16 @@ const SearchFilterBar = () => {
             <div className="absolute left-4 top-1/2 transform -translate-y-1/2 p-1 bg-gray-100 rounded-lg">
               <Search className="h-4 w-4 text-gray-600" />
             </div>
+            <label htmlFor="material-search" className="sr-only">Search materials, tools, or equipment</label>
             <input
-              type="text"
+              id="material-search"
+              type="search"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search for materials, tools, or equipment..."
-              className="w-full pl-14 pr-12 py-4 border-2 border-gray-300 rounded-xl text-sm sm:text-base font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 transition-all duration-200 hover:border-gray-400 shadow-sm focus:shadow-md"
+              className="w-full pl-14 pr-12 py-3 sm:py-4 min-h-[44px] border-2 border-gray-300 rounded-xl text-base font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 transition-all duration-200 hover:border-gray-400 shadow-sm focus:shadow-md"
+              aria-label="Search materials"
             />
             {searchValue && (
               <button
