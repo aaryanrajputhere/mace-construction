@@ -1,0 +1,68 @@
+/* Quote table styles */
+.table-container {
+  max-width: 100%;
+  max-height: 70vh; /* Fixed height for scroll */
+  overflow-x: auto;
+  overflow-y: auto;
+  border-radius: 0.75rem;
+  position: relative;
+}
+
+.table-sticky-header th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-card-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Mobile card layout */
+@media (max-width: 400px) {
+  .mobile-card-table thead {
+    display: none;
+  }
+
+  .mobile-card-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 0.5rem;
+  }
+
+  .mobile-card-table td {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    padding: 0.5rem !important;
+    width: 100%;
+  }
+
+  .mobile-card-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #374151;
+    margin-right: 1rem;
+  }
+
+  .mobile-card-table td[data-label="Actions"] {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem !important;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .mobile-card-table td[data-label="Actions"]::before {
+    display: none;
+  }
+
+  .mobile-card-table input,
+  .mobile-card-table select {
+    max-width: 100%;
+  }
+}

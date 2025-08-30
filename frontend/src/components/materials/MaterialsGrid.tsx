@@ -247,18 +247,27 @@ const sampleMaterials = [
 
 const MaterialsGrid: React.FC = () => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0" role="feed" aria-label="Materials grid">
-      {sampleMaterials.map((mat) => (
-        <MaterialCard
-          key={mat.id}
-          name={mat.name}
-          size={mat.size}
-          unit={mat.unit}
-          price={mat.price}
-          vendors={[mat.supplier]}
-          image={mat.image} // 👈 pass image here
-        />
-      ))}
+    <div className="max-w-[100vw] mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        role="feed"
+        aria-label="Materials grid"
+        style={{
+          fontSize: "clamp(16px, 1.6vw, 18px)",
+        }}
+      >
+        {sampleMaterials.map((mat) => (
+          <MaterialCard
+            key={mat.id}
+            name={mat.name}
+            size={mat.size}
+            unit={mat.unit}
+            price={mat.price}
+            vendors={[mat.supplier]}
+            image={mat.image} // 👈 pass image here
+          />
+        ))}
+      </div>
     </div>
   );
 };

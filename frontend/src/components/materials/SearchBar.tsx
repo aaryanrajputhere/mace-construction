@@ -163,7 +163,9 @@ const SearchFilterBar = () => {
             <div className="absolute left-4 top-1/2 transform -translate-y-1/2 p-1 bg-gray-100 rounded-lg">
               <Search className="h-4 w-4 text-gray-600" />
             </div>
-            <label htmlFor="material-search" className="sr-only">Search materials, tools, or equipment</label>
+            <label htmlFor="material-search" className="sr-only">
+              Search materials, tools, or equipment
+            </label>
             <input
               id="material-search"
               type="search"

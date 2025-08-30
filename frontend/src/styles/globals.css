@@ -48,7 +48,7 @@
   }
 
   /* Interactive elements */
-  button, 
+  button,
   [type="button"],
   [type="submit"] {
     min-height: 44px;

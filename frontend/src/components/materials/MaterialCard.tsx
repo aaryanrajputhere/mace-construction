@@ -66,11 +66,14 @@ const MaterialCard: React.FC<Props> = ({
       {/* Card */}
       <div
         onClick={() => setIsPanelOpen(true)}
-        className="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 sm:p-6 lg:p-7 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-2 cursor-pointer group focus-within:ring-2 focus-within:ring-[#033159] focus-within:ring-opacity-50"
+        className="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 max-w-[100vw-32px] mx-auto w-full sm:p-6 lg:p-7 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-2 cursor-pointer group focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 focus-visible:outline-none"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         role="article"
         tabIndex={0}
+        style={{
+          fontSize: "clamp(16px, 1.6vw, 18px)",
+        }}
       >
         {/* Image */}
         <div className="mb-6 w-full h-52 flex items-center justify-center rounded-xl overflow-hidden bg-gray-100 relative">
@@ -104,7 +107,12 @@ const MaterialCard: React.FC<Props> = ({
 
         {/* Title */}
         <div className="mb-5">
-          <h3 className="text-xl font-bold text-gray-900 leading-tight mb-2">
+          <h3
+            className="font-bold text-gray-900 leading-tight mb-2"
+            style={{
+              fontSize: "clamp(20px, 2vw, 24px)",
+            }}
+          >
             {name}
           </h3>
           {size && <p className="text-base text-[#00598F] font-bold">{size}</p>}
@@ -186,14 +194,20 @@ const MaterialCard: React.FC<Props> = ({
             {/* Header */}
             <div className="p-6 lg:p-8 border-b border-gray-200">
               <button
-                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 focus-visible:outline-none"
+                aria-label="Close panel"
                 onClick={() => setIsPanelOpen(false)}
               >
                 <X className="h-6 w-6" />
               </button>
 
               <div className="flex items-center space-x-3">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2
+                  className="font-bold text-gray-900"
+                  style={{
+                    fontSize: "clamp(24px, 2.5vw, 30px)",
+                  }}
+                >
                   Quote Details
                 </h2>
                 <Tooltip content="Configure your material requirements and add to quote">
@@ -254,7 +268,7 @@ const MaterialCard: React.FC<Props> = ({
                 <select
                   value={selectedVendor}
                   onChange={(e) => setSelectedVendor(e.target.value)}
-                  className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#033159] focus:border-transparent bg-white text-gray-900 font-bold"
+                  className="w-full border-2 border-gray-300 rounded-xl px-4 py-4 min-h-[44px] text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 focus-visible:border-transparent bg-white text-gray-900 font-bold"
                 >
                   {vendors.length > 0 ? (
                     vendors.map((vendor, index) => (
@@ -280,8 +294,9 @@ const MaterialCard: React.FC<Props> = ({
                 </div>
                 <div className="flex items-center justify-center space-x-6 bg-gray-50 rounded-xl p-4">
                   <button
-                    className="w-12 h-12 border-2 border-gray-300 rounded-xl text-xl font-bold hover:bg-gray-100 hover:border-[#033159] focus:outline-none focus:ring-2 focus:ring-[#033159] transition-all duration-200 text-gray-700"
+                    className="w-12 min-h-[44px] border-2 border-gray-300 rounded-xl text-xl font-bold hover:bg-gray-100 hover:border-[#033159] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 transition-all duration-200 text-gray-700"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    aria-label="Decrease quantity"
                   >
                     –
                   </button>
@@ -289,8 +304,9 @@ const MaterialCard: React.FC<Props> = ({
                     {quantity}
                   </span>
                   <button
-                    className="w-12 h-12 border-2 border-gray-300 rounded-xl text-xl font-bold hover:bg-gray-100 hover:border-[#033159] focus:outline-none focus:ring-2 focus:ring-[#033159] transition-all duration-200 text-gray-700"
+                    className="w-12 min-h-[44px] border-2 border-gray-300 rounded-xl text-xl font-bold hover:bg-gray-100 hover:border-[#033159] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 transition-all duration-200 text-gray-700"
                     onClick={() => setQuantity(quantity + 1)}
+                    aria-label="Increase quantity"
                   >
                     +
                   </button>
@@ -301,7 +317,7 @@ const MaterialCard: React.FC<Props> = ({
             {/* Footer */}
             <div className="p-6 lg:p-8 border-t border-gray-200">
               <button
-                className="w-full px-6 py-4 bg-gradient-to-r from-[#033159] to-[#00598F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:from-[#022244] hover:to-[#004a7a] focus:outline-none focus:ring-2 focus:ring-[#033159] focus:ring-opacity-50 flex items-center justify-center space-x-3 text-base"
+                className="w-full px-6 py-4 min-h-[44px] bg-gradient-to-r from-[#033159] to-[#00598F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:from-[#022244] hover:to-[#004a7a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 flex items-center justify-center space-x-3 text-base"
                 onClick={() => {
                   console.log("Added to Quote:", {
                     name,
