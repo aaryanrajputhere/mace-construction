@@ -8,6 +8,6 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/quotes", quoteRoutes);
-app.use("/api/material", materialRoutes);
+app.use("/api/materials", materialRoutes);
 
 export default app;
