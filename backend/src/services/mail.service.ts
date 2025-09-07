@@ -2,7 +2,10 @@ import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  auth: { user: "your-email@gmail.com", pass: "your-app-password" },
+  auth: {
+    user: "rfq@maceinfo.com ",
+    pass: "orsn gkxg etcb rjia",
+  },
 });
 
 export const sendRFQEmails = async (
@@ -13,19 +16,32 @@ export const sendRFQEmails = async (
   driveLinks: string[]
 ) => {
   for (const vendor of vendors) {
+    const vendorName = "Vendor Name";
+    const materialsList = items
+      .map(
+        (item, idx) =>
+          `- ${item.name || item.description || `Item ${idx + 1}`}: ${
+            item.size || ""
+          }${item.size ? ", " : ""}${item.qty || ""}`
+      )
+      .join("<br>");
     await transporter.sendMail({
-      from: "your-email@gmail.com",
+      from: "rfq@maceinfo.com",
       to: vendor.email,
-      subject: `New RFQ: ${rfqId}`,
+      subject: `RFQ Request – ${projectInfo.name}, RFQ ID #${rfqId}`,
       html: `
-        <h3>Request for Quote: ${rfqId}</h3>
-        <p>Project: ${projectInfo.name}</p>
-        <p><strong>Items:</strong></p>
-        <pre>${JSON.stringify(items, null, 2)}</pre>
+        <p>Hello ${vendorName},</p>
+        <p>We are requesting pricing and lead time for the following materials:</p>
+        <p><strong>Project:</strong> ${projectInfo.name}</p>
+        <p><strong>Site Address:</strong> ${projectInfo.address || ""}</p>
+        <p><strong>Needed By:</strong> ${projectInfo.neededBy || ""}</p>
+        <p><strong>Requested Materials:</strong><br>${materialsList}</p>
         <p>Files: ${driveLinks
           .map((l) => `<a href="${l}">File</a>`)
           .join(", ")}</p>
-        <p><a href="https://yourapp.com/vendor-reply/${rfqId}">Reply Here</a></p>
+        <p>Please submit your pricing and lead time using the vendor reply link below:<br>
+        <a href="https://yourapp.com/vendor-reply/${rfqId}">Vendor Reply Form Link</a></p>
+        <p>Thank you,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
       `,
     });
   }

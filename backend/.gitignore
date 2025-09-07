@@ -1,6 +1,7 @@
 # Node modules
 node_modules/
 
+service-account.json
 # Build output
 dist/
 build/

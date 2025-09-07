@@ -155,43 +155,37 @@ const QuoteBuilder: React.FC = () => {
 
     setIsSubmitting(true);
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const rfqId = "RFQ-" + Date.now().toString().slice(-6);
-
-    const rfqData = {
-      rfqId,
+    const projectInfo = {
       projectName,
       siteAddress,
       neededBy,
       notes,
-      items,
-      vendors: selectedVendors,
-      files: files.map((f) => f.name),
       createdAt: new Date().toISOString(),
     };
 
-    // Save log
-    const logs = JSON.parse(localStorage.getItem("rfqLogs") || "[]");
-    logs.push(rfqData);
-    localStorage.setItem("rfqLogs", JSON.stringify(logs));
+    const formData = new FormData();
+    formData.append("projectInfo", JSON.stringify(projectInfo));
+    formData.append("items", JSON.stringify(items));
+    formData.append("vendors", JSON.stringify(selectedVendors));
+    files.forEach((file) => formData.append("files", file));
 
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/quotes/apply`, {
+        method: "POST",
+        body: formData,
+      });
 
-    // Reset form after delay
-    setTimeout(() => {
-      setItems([]);
-      setProjectName("");
-      setSiteAddress("");
-      setNeededBy("");
-      setNotes("");
-      setFiles([]);
-      setSelectedVendors([]);
-      setSubmitSuccess(false);
-      localStorage.removeItem("quote");
-    }, 3000);
+      if (!res.ok) throw new Error("Failed to submit RFQ");
+
+      const result = await res.json();
+      console.log("✅ RFQ submitted:", result);
+      setSubmitSuccess(true);
+    } catch (err) {
+      console.error("❌ RFQ submission error:", err);
+      alert("Error submitting RFQ. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid =
