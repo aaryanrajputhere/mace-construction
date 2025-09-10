@@ -65,8 +65,9 @@ const QuoteBuilder: React.FC = () => {
   // Load items from localStorage (from calculators/catalog)
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("quote") || "[]");
-    // Transform localStorage objects to match table fields
-    const mapped = stored.map((item: any) => ({
+    // Transform localStorage objects to match table fields and assign sequential IDs
+    const mapped = stored.map((item: any, index: number) => ({
+      id: index + 1, // Assign sequential ID
       Category: item.category || "",
       "Item Name": item.name || "",
       "Size/Option": item.size || item.option || "",
@@ -81,9 +82,13 @@ const QuoteBuilder: React.FC = () => {
 
   // Add new item
   const addNewItem = () => {
+    const newId =
+      items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1;
+
     setItems([
       ...items,
       {
+        id: newId,
         Category: "",
         "Item Name": "",
         "Size/Option": "",
@@ -107,8 +112,13 @@ const QuoteBuilder: React.FC = () => {
   const deleteItem = (index: number) => {
     setItems((prev) => {
       const updated = prev.filter((_, i) => i !== index);
-      localStorage.setItem("quote", JSON.stringify(updated));
-      return updated;
+      // Re-assign sequential IDs after deletion
+      const reIndexed = updated.map((item, i) => ({
+        ...item,
+        id: i + 1,
+      }));
+      localStorage.setItem("quote", JSON.stringify(reIndexed));
+      return reIndexed;
     });
   };
 
@@ -325,7 +335,7 @@ const QuoteBuilder: React.FC = () => {
                   <tbody>
                     {items.map((item, index) => (
                       <tr
-                        key={index}
+                        key={item.id} // Use the ID as the key
                         className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
                           index % 2 === 0 ? "bg-gray-50" : "bg-white"
                         }`}
