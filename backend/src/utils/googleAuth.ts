@@ -1,28 +1,21 @@
 import { google } from "googleapis";
-import path from "path";
 
 let auth: any;
 
-/**
- * Singleton GoogleAuth instance
- */
 export const getGoogleAuth = () => {
   if (!auth) {
     auth = new google.auth.GoogleAuth({
-      keyFile: path.join(__dirname, "../../service-account.json"), // adjust path if needed
+      credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS || "{}"),
       scopes: [
         "https://www.googleapis.com/auth/drive",
         "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/gmail.send", // only if you use Gmail API
+        "https://www.googleapis.com/auth/gmail.send",
       ],
     });
   }
   return auth;
 };
 
-/**
- * Helpers to get clients
- */
 export const getDriveClient = () => {
   return google.drive({ version: "v3", auth: getGoogleAuth() });
 };
