@@ -11,7 +11,9 @@ export function useMaterials() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("http://localhost:5000/api/materials");
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/materials`
+        );
         const data = await res.json();
         if (data.success) {
           setMaterials(data.data);

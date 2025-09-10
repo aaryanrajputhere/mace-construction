@@ -180,10 +180,13 @@ const QuoteBuilder: React.FC = () => {
     files.forEach((file) => formData.append("files", file));
 
     try {
-      const res = await fetch(`http://localhost:5000/api/quotes/apply`, {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/quotes/apply`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to submit RFQ");
 
