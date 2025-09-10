@@ -1,3 +1,22 @@
+function saveQuoteToLocalStorage(item: {
+  category: string;
+  name: string;
+  size: string;
+  unit: string;
+  price: number;
+  vendor: string;
+  quantity: number;
+}) {
+  try {
+    const existing = JSON.parse(localStorage.getItem("quote") || "[]");
+    const updated = Array.isArray(existing) ? [...existing, item] : [item];
+    localStorage.setItem("quote", JSON.stringify(updated));
+  } catch (err) {
+    console.error("Failed to save to localStorage:", err);
+    localStorage.setItem("quote", JSON.stringify([item]));
+  }
+}
+
 import React, { useState } from "react";
 import {
   ShoppingCart,
@@ -7,16 +26,9 @@ import {
   X,
   Info,
   HelpCircle,
+  Calculator,
 } from "lucide-react";
-
-interface Props {
-  name: string;
-  size?: string;
-  unit: string;
-  price: string;
-  vendors: string[];
-  image?: string;
-}
+import type { Material } from "../../types/materials";
 
 const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
   content,
@@ -43,23 +55,39 @@ const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
   );
 };
 
-const MaterialCard: React.FC<Props> = ({
-  name,
-  size,
-  unit,
-  price,
-  vendors,
-  image,
-}) => {
+// Use the Material type for props
+const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
   const [imgError, setImgError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
   const [quantity, setQuantity] = useState(1);
+
+  // Vendors is a string, so split by comma and trim
+  const vendors: string[] =
+    material.Vendors && material.Vendors.length > 0
+      ? material.Vendors.split(",").map((v: string) => v.trim())
+      : [];
+
   const [selectedVendor, setSelectedVendor] = useState(
     vendors.length > 0 ? vendors[0] : ""
   );
+
+  const {
+    Category,
+    "Item Name": name,
+    "Size/Option": size,
+    Unit: unit,
+    Price: price,
+    image,
+  } = material;
+
+  // Calculate total price
+  const calculateTotal = (): number => {
+    const priceNum = parseFloat(String(price).replace(/[^0-9.-]/g, "")) || 0;
+    return priceNum * quantity;
+  };
 
   return (
     <>
@@ -107,6 +135,13 @@ const MaterialCard: React.FC<Props> = ({
 
         {/* Title */}
         <div className="mb-5">
+          {/* Category Badge */}
+          <div className="mb-3">
+            <span className="inline-block px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-[#033159] to-[#00598F] rounded-full">
+              {Category}
+            </span>
+          </div>
+
           <h3
             className="font-bold text-gray-900 leading-tight mb-2"
             style={{
@@ -234,6 +269,10 @@ const MaterialCard: React.FC<Props> = ({
               {/* Product Info */}
               <div className="space-y-4 text-base mb-8">
                 <div className="flex justify-between">
+                  <span className="font-bold text-gray-700">Category:</span>
+                  <span className="font-bold text-gray-900">{Category}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="font-bold text-gray-700">Material:</span>
                   <span className="font-bold text-gray-900">{name}</span>
                 </div>
@@ -271,7 +310,7 @@ const MaterialCard: React.FC<Props> = ({
                   className="w-full border-2 border-gray-300 rounded-xl px-4 py-4 min-h-[44px] text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 focus-visible:border-transparent bg-white text-gray-900 font-bold"
                 >
                   {vendors.length > 0 ? (
-                    vendors.map((vendor, index) => (
+                    vendors.map((vendor: string, index: number) => (
                       <option key={index} value={vendor}>
                         {vendor}
                       </option>
@@ -312,6 +351,22 @@ const MaterialCard: React.FC<Props> = ({
                   </button>
                 </div>
               </div>
+
+              {/* Total Price Display */}
+              <div className="mb-8 bg-gradient-to-r from-[#033159] to-[#00598F] rounded-xl p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Calculator className="h-6 w-6" />
+                    <span className="text-lg font-bold">Total Price:</span>
+                  </div>
+                  <span className="text-2xl font-bold">
+                    ${calculateTotal().toFixed(2)}
+                  </span>
+                </div>
+                <div className="mt-2 text-sm opacity-90">
+                  {quantity} × ${price} = ${calculateTotal().toFixed(2)}
+                </div>
+              </div>
             </div>
 
             {/* Footer */}
@@ -319,22 +374,27 @@ const MaterialCard: React.FC<Props> = ({
               <button
                 className="w-full px-6 py-4 min-h-[44px] bg-gradient-to-r from-[#033159] to-[#00598F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:from-[#022244] hover:to-[#004a7a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 flex items-center justify-center space-x-3 text-base"
                 onClick={() => {
-                  console.log("Added to Quote:", {
+                  const quoteItem = {
+                    category: Category,
                     name,
+                    size,
                     unit,
-                    price,
+                    price: Number(price.toString().replace(/[^0-9.-]/g, "")), // convert string -> number and remove currency symbols
                     vendor: selectedVendor,
                     quantity,
-                  });
+                  };
+
+                  console.log("Added to Quote:", quoteItem);
+
                   setIsPanelOpen(false);
                   setShowPopup(true);
+                  saveQuoteToLocalStorage(quoteItem);
                   setTimeout(() => {
                     setShowPopup(false);
                   }, 5000);
                 }}
               >
-                <ShoppingCart className="h-5 w-5" />
-                <span>Confirm & Add to Quote</span>
+                Add to Quote
               </button>
             </div>
           </div>
@@ -367,6 +427,9 @@ const MaterialCard: React.FC<Props> = ({
                 Added to Quote
               </p>
               <p className="text-sm text-gray-600 font-medium">
+                {quantity} × {name} = ${calculateTotal().toFixed(2)}
+              </p>
+              <p className="text-xs text-gray-500 font-medium">
                 Click to view quote →
               </p>
             </div>

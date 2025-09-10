@@ -71,8 +71,11 @@ export const saveRFQFiles = async (
   rfqId: string
 ): Promise<{ folderLink: string; fileLinks: string[] }> => {
   // ✅ Parent is your "rfq-uploads" folder inside Shared Drive
-  const parentFolderId = "1TgFwDO3shZUeDoH66PAEK0QVqil9RnvT"; // rfq-uploads folder ID
-  const folderId = await createDriveFolder(`RFQ-${rfqId}`, parentFolderId);
+  const DRIVE_PARENT_FOLDER_ID = process.env.DRIVE_PARENT_FOLDER_ID || "";
+  const folderId = await createDriveFolder(
+    `RFQ-${rfqId}`,
+    DRIVE_PARENT_FOLDER_ID
+  );
   const folderLink = `https://drive.google.com/drive/folders/${folderId}`;
 
   // Upload files

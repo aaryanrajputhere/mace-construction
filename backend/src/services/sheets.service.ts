@@ -1,16 +1,9 @@
 // src/services/sheets.service.ts
 import { getSheetsClient } from "../utils/googleAuth";
 
-/**
- * Google Sheet ID and target sheet/tab name.
- * Extracted from the link you shared.
- */
-const SHEET_ID = "1u8LSSKZl5sJwecpwUNs5_CP4mvPSO6EOKqmEh8DrWvA";
-const SHEET_NAME = "RFQs"; // change if actual tab is different
+const RFQ_SHEET_ID = process.env.RFQ_SHEET_ID || "";
+const RFQ_SHEET_NAME = process.env.RFQ_SHEET_NAME || "RFQs";
 
-/**
- * RFQ type definition
- */
 export interface RFQData {
   rfq_id: string;
   created_at: string;
@@ -21,16 +14,15 @@ export interface RFQData {
   project_address: string;
   needed_by: string;
   notes: string;
+  items_json: string;
+  vendors_json: string;
+  drive_folder_url: string;
 }
 
-/**
- * Append a new RFQ row to the Google Sheet
- */
 export const addRFQToSheet = async (rfq: RFQData) => {
   try {
     const sheets = getSheetsClient();
 
-    // Row in the same order as your header
     const values = [
       [
         rfq.rfq_id,
@@ -42,16 +34,17 @@ export const addRFQToSheet = async (rfq: RFQData) => {
         rfq.project_address,
         rfq.needed_by,
         rfq.notes,
+        rfq.items_json,
+        rfq.vendors_json,
+        rfq.drive_folder_url,
       ],
     ];
 
     const response = await sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A:I`, // A through I (9 columns)
+      spreadsheetId: RFQ_SHEET_ID,
+      range: `${RFQ_SHEET_NAME}!A:L`, // ✅ now matches 12 columns
       valueInputOption: "USER_ENTERED",
-      requestBody: {
-        values,
-      },
+      requestBody: { values },
     });
 
     return response.data;

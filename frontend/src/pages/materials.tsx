@@ -1,11 +1,18 @@
-// src/pages/Materials.tsx
 import React, { useState } from "react";
-import Sidebar from "../components/materials/Sidebar";
+import type { Material } from "../types/materials";
+import { useMaterials } from "../hooks/useMaterials";
 import SearchBar from "../components/materials/SearchBar";
-import MaterialsGrid from "../components/materials/MaterialsGrid";
+import Sidebar from "../components/materials/Sidebar";
 
-const Materials: React.FC = () => {
+interface MaterialsGridProps {
+  materials: Material[];
+  loading: boolean;
+  error: string | null;
+}
+
+const MaterialsGrid: React.FC<MaterialsGridProps> = ({}) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { materials, loading, error } = useMaterials();
 
   return (
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 px-4 xl:px-8 lg:px-16">
@@ -33,10 +40,14 @@ const Materials: React.FC = () => {
       <div className="flex-1 space-y-4">
         <SearchBar />
 
-        <MaterialsGrid />
+        <MaterialsGrid
+          materials={materials as Material[]}
+          loading={loading}
+          error={error}
+        />
       </div>
     </div>
   );
 };
 
-export default Materials;
+export default MaterialsGrid;

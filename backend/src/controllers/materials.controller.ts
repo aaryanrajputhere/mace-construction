@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { getSheetsClient } from "../utils/googleAuth";
 
-const SHEET_ID = "1Jv1nNsh5GMm3k9OyD8k2OP4innj1LoIqzZqEH38B1jY";
-const SHEET_NAME = "Materials";
+const MATERIALS_SHEET_ID = process.env.MATERIALS_SHEET_ID || "";
+const MATERIALS_SHEET_NAME = process.env.MATERIALS_SHEET_NAME || "";
 
 export const getMaterials = async (req: Request, res: Response) => {
   try {
     const sheets = getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A:Z`,
+      spreadsheetId: MATERIALS_SHEET_ID,
+      range: `${MATERIALS_SHEET_NAME}!A:Z`,
     });
     const rows = response.data.values;
     if (!rows || rows.length === 0) {

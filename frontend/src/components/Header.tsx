@@ -80,7 +80,10 @@ const Header = () => {
               </button>
 
               {activeDropdown === "Calculators" && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border-2 border-gray-200 z-50 overflow-hidden">
+                <div
+                  className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden"
+                  style={{ zIndex: 9999 }}
+                >
                   <div className="p-2 space-y-1">
                     <a
                       href="/calculators/studs"

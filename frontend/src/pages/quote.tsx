@@ -11,19 +11,15 @@ import {
   Send,
   Edit3,
   Package,
-  Users,
   Paperclip,
   CheckCircle,
   AlertCircle,
   HelpCircle,
+  User,
+  Mail,
+  Phone,
 } from "lucide-react";
-
-interface QuoteItem {
-  id: number;
-  description: string;
-  quantity: number;
-  unit: string;
-}
+import type { Material } from "../types/materials";
 
 interface TooltipProps {
   text: string;
@@ -45,7 +41,7 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
       {isVisible && (
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap z-50 shadow-lg">
           {text}
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
         </div>
       )}
     </div>
@@ -53,71 +49,81 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
 };
 
 const QuoteBuilder: React.FC = () => {
-  const [items, setItems] = useState<QuoteItem[]>([]);
+  const [requesterName, setRequesterName] = useState("");
+  const [requesterEmail, setRequesterEmail] = useState("");
+  const [requesterPhone, setRequesterPhone] = useState("");
+
+  const [items, setItems] = useState<Material[]>([]);
   const [projectName, setProjectName] = useState("");
   const [siteAddress, setSiteAddress] = useState("");
   const [neededBy, setNeededBy] = useState("");
   const [notes, setNotes] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const [vendors, setVendors] = useState<string[]>([]);
-  const [selectedVendors, setSelectedVendors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Load items from localStorage (from calculators/catalog)
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("quote") || "[]");
-    const mapped = stored.map((item: any, i: number) => ({
-      id: i + 1,
-      description: item.name || "Custom Item",
-      quantity: item.quantity || item.studs || 0,
-      unit: item.unit || (item.studs ? "pcs" : "lf"),
+    // Transform localStorage objects to match table fields
+    const mapped = stored.map((item: any) => ({
+      Category: item.category || "",
+      "Item Name": item.name || "",
+      "Size/Option": item.size || item.option || "",
+      Unit: item.unit || "",
+      Price: item.price !== undefined ? String(item.price) : "",
+      Vendors: item.vendor || item.vendors || "",
+      image: item.image || "",
+      Quantity: item.quantity !== undefined ? String(item.quantity) : "1",
     }));
     setItems(mapped);
-
-    // vendor list mock (you can fetch from API later)
-    setVendors([
-      "ABC Lumber Co.",
-      "BuildRight Supply",
-      "ProConstruct Materials",
-      "Elite Building Supply",
-    ]);
   }, []);
 
   // Add new item
   const addNewItem = () => {
-    const newId = Math.max(0, ...items.map((i) => i.id)) + 1;
     setItems([
       ...items,
       {
-        id: newId,
-        description: "",
-        quantity: 1,
-        unit: "pcs",
+        Category: "",
+        "Item Name": "",
+        "Size/Option": "",
+        Unit: "",
+        Price: "",
+        Vendors: "",
+        image: "",
+        Quantity: "1",
       },
     ]);
   };
 
   // Handle editing table
-  const updateItem = (id: number, field: keyof QuoteItem, value: any) => {
+  const updateItem = (index: number, field: keyof Material, value: any) => {
     setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
     );
   };
 
   // Delete row
-  const deleteItem = (id: number) => {
+  const deleteItem = (index: number) => {
     setItems((prev) => {
-      const updated = prev.filter((item) => item.id !== id);
-      // Update localStorage
-      const storageItems = updated.map((item) => ({
-        name: item.description,
-        quantity: item.quantity,
-        unit: item.unit,
-      }));
-      localStorage.setItem("quote", JSON.stringify(storageItems));
+      const updated = prev.filter((_, i) => i !== index);
+      localStorage.setItem("quote", JSON.stringify(updated));
       return updated;
     });
+  };
+
+  // Calculate total price for an item
+  const calculateItemTotal = (price: string, quantity: string): number => {
+    const priceNum = parseFloat(price.replace(/[^0-9.-]/g, "")) || 0;
+    const quantityNum = parseInt(quantity) || 0;
+    return priceNum * quantityNum;
+  };
+
+  // Calculate grand total
+  const calculateGrandTotal = (): number => {
+    return items.reduce((total, item) => {
+      return total + calculateItemTotal(item.Price, item.Quantity || "1");
+    }, 0);
   };
 
   // Handle file uploads
@@ -131,42 +137,46 @@ const QuoteBuilder: React.FC = () => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle vendor selection
-  const toggleVendor = (vendor: string) => {
-    setSelectedVendors((prev) =>
-      prev.includes(vendor)
-        ? prev.filter((v) => v !== vendor)
-        : [...prev, vendor]
-    );
-  };
-
   // Submit RFQ
   const handleSubmit = async () => {
+    if (!projectName.trim() || items.length === 0) {
+      alert("Please fill in project name and add items.");
+      return;
+    }
+
     if (
-      !projectName.trim() ||
-      items.length === 0 ||
-      selectedVendors.length === 0
+      !requesterName.trim() ||
+      !requesterEmail.trim() ||
+      !requesterPhone.trim()
     ) {
       alert(
-        "Please fill in project name, add items, and select at least one vendor."
+        "Please fill in your contact information (name, email, and phone number)."
       );
       return;
     }
 
-    setIsSubmitting(true);
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(requesterEmail)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
 
+    setIsSubmitting(true);
     const projectInfo = {
       projectName,
       siteAddress,
       neededBy,
       notes,
+      requesterName,
+      requesterEmail,
+      requesterPhone,
       createdAt: new Date().toISOString(),
     };
 
     const formData = new FormData();
     formData.append("projectInfo", JSON.stringify(projectInfo));
     formData.append("items", JSON.stringify(items));
-    formData.append("vendors", JSON.stringify(selectedVendors));
     files.forEach((file) => formData.append("files", file));
 
     try {
@@ -189,7 +199,11 @@ const QuoteBuilder: React.FC = () => {
   };
 
   const isFormValid =
-    projectName.trim() && items.length > 0 && selectedVendors.length > 0;
+    projectName.trim() &&
+    items.length > 0 &&
+    requesterName.trim() &&
+    requesterEmail.trim() &&
+    requesterPhone.trim();
 
   if (submitSuccess) {
     return (
@@ -203,8 +217,7 @@ const QuoteBuilder: React.FC = () => {
               RFQ Submitted Successfully!
             </h2>
             <p className="text-gray-700 font-medium">
-              Your quote request has been sent to {selectedVendors.length}{" "}
-              vendor{selectedVendors.length > 1 ? "s" : ""}.
+              Your quote request has been sent to the vendors.
             </p>
           </div>
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
@@ -220,7 +233,7 @@ const QuoteBuilder: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto space-y-8 lg:space-y-10 pt-2 ">
       {/* Sticky Header */}
-      <div className="sticky top-[90px] z-50 px-4 lg:px-6 ">
+      <div className="sticky top-[90px] z-40 px-4 lg:px-6 ">
         <div className="bg-white shadow-lg rounded-2xl border border-blue-900 p-2 lg:p-4 transition-all duration-300 backdrop-blur-sm bg-opacity-95">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-gradient-to-br from-[#033159] to-[#00598F] rounded-lg shadow-md">
@@ -273,138 +286,151 @@ const QuoteBuilder: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="table-container shadow rounded-xl">
-              <table className="w-full mobile-card-table">
-                <thead className="table-sticky-header">
-                  <tr className="border-b-2 border-gray-200 bg-white">
-                    <th
-                      scope="col"
-                      className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap"
-                      style={{ minWidth: "280px" }}
-                    >
-                      Item Description
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-left py-4 px-3 font-bold text-gray-800 w-32 text-base whitespace-nowrap"
-                    >
-                      Quantity
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-left py-4 px-3 font-bold text-gray-800 w-24 text-base whitespace-nowrap"
-                    >
-                      Unit
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-center py-4 px-3 font-bold text-gray-800 w-24 text-base whitespace-nowrap"
-                    >
-                      <Tooltip text="Remove item from quote">
-                        <span>Actions</span>
-                      </Tooltip>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      }`}
-                    >
-                      <td className="py-4 px-3" data-label="Description">
-                        <label
-                          className="sr-only"
-                          htmlFor={`item-desc-${item.id}`}
-                        >
-                          Description for item {index + 1}
-                        </label>
-                        <input
-                          id={`item-desc-${item.id}`}
-                          className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                          value={item.description}
-                          onChange={(e) =>
-                            updateItem(item.id, "description", e.target.value)
-                          }
-                          placeholder="Enter item description"
-                        />
-                      </td>
-                      <td className="py-4 px-3" data-label="Quantity">
-                        <label
-                          className="sr-only"
-                          htmlFor={`item-qty-${item.id}`}
-                        >
-                          Quantity for item {index + 1}
-                        </label>
-                        <input
-                          id={`item-qty-${item.id}`}
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                          }}
-                          className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            updateItem(
-                              item.id,
-                              "quantity",
-                              Number(e.target.value) || 0
-                            )
-                          }
-                          min="0"
-                          aria-label={`Quantity for ${item.description}`}
-                        />
-                      </td>
-                      <td className="py-4 px-3" data-label="Unit">
-                        <label
-                          className="sr-only"
-                          htmlFor={`item-unit-${item.id}`}
-                        >
-                          Unit for item {index + 1}
-                        </label>
-                        <select
-                          id={`item-unit-${item.id}`}
-                          className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                          aria-label={`Unit for ${item.description}`}
-                          value={item.unit}
-                          onChange={(e) =>
-                            updateItem(item.id, "unit", e.target.value)
-                          }
-                        >
-                          <option value="pcs">pcs</option>
-                          <option value="lf">lf</option>
-                          <option value="sf">sf</option>
-                          <option value="cf">cf</option>
-                          <option value="ea">ea</option>
-                          <option value="lot">lot</option>
-                        </select>
-                      </td>
-                      <td
-                        className="py-4 px-3 text-center"
-                        data-label="Actions"
-                      >
-                        <Tooltip text="Delete this item">
-                          <button
-                            className="min-h-[44px] min-w-[44px] p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-                            aria-label={`Remove ${item.description}`}
-                            onClick={() => deleteItem(item.id)}
-                          >
-                            <Trash2 className="h-5 w-5" />
-                            <span className="sr-only">Delete</span>
-                          </button>
+            <>
+              <div className="table-container shadow rounded-xl">
+                <table className="w-full mobile-card-table">
+                  <thead className="table-sticky-header">
+                    <tr className="border-b-2 border-gray-200 bg-white">
+                      <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        Item Name
+                      </th>
+                      <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        Size/Option
+                      </th>
+                      <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        Unit
+                      </th>
+                      <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        Price
+                      </th>
+                      <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        Quantity
+                      </th>
+                      <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        Total
+                      </th>
+                      <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        Vendors
+                      </th>
+                      <th className="text-center py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
+                        <Tooltip text="Remove item from quote">
+                          <span>Actions</span>
                         </Tooltip>
-                      </td>
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {items.map((item, index) => (
+                      <tr
+                        key={index}
+                        className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        }`}
+                      >
+                        <td className="py-4 px-3" data-label="Item Name">
+                          <input
+                            className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                            value={item["Item Name"]}
+                            onChange={(e) =>
+                              updateItem(index, "Item Name", e.target.value)
+                            }
+                            placeholder="Enter item name"
+                          />
+                        </td>
+                        <td className="py-4 px-3" data-label="Size/Option">
+                          <input
+                            className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                            value={item["Size/Option"]}
+                            onChange={(e) =>
+                              updateItem(index, "Size/Option", e.target.value)
+                            }
+                            placeholder="Enter size/option"
+                          />
+                        </td>
+                        <td className="py-4 px-3" data-label="Unit">
+                          <input
+                            className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                            value={item.Unit}
+                            onChange={(e) =>
+                              updateItem(index, "Unit", e.target.value)
+                            }
+                            placeholder="Unit"
+                          />
+                        </td>
+                        <td className="py-4 px-3" data-label="Price">
+                          <input
+                            className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                            value={item.Price}
+                            onChange={(e) =>
+                              updateItem(index, "Price", e.target.value)
+                            }
+                            placeholder="Price"
+                          />
+                        </td>
+                        <td className="py-4 px-3" data-label="Quantity">
+                          <input
+                            type="number"
+                            min="1"
+                            className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                            value={item.Quantity || "1"}
+                            onChange={(e) =>
+                              updateItem(index, "Quantity", e.target.value)
+                            }
+                            placeholder="1"
+                          />
+                        </td>
+                        <td className="py-4 px-3" data-label="Total">
+                          <div className="px-4 py-3 min-h-[44px] bg-gray-100 rounded-xl border border-gray-200 text-gray-900 font-bold text-base flex items-center">
+                            $
+                            {calculateItemTotal(
+                              item.Price,
+                              item.Quantity || "1"
+                            ).toFixed(2)}
+                          </div>
+                        </td>
+                        <td className="py-4 px-3" data-label="Vendors">
+                          <input
+                            className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                            value={item.Vendors}
+                            onChange={(e) =>
+                              updateItem(index, "Vendors", e.target.value)
+                            }
+                            placeholder="Vendors"
+                          />
+                        </td>
+                        <td
+                          className="py-4 px-3 text-center"
+                          data-label="Actions"
+                        >
+                          <Tooltip text="Delete this item">
+                            <button
+                              className="min-h-[44px] min-w-[44px] p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                              aria-label={`Remove ${item["Item Name"]}`}
+                              onClick={() => deleteItem(index)}
+                            >
+                              <Trash2 className="h-5 w-5" />
+                              <span className="sr-only">Delete</span>
+                            </button>
+                          </Tooltip>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Grand Total */}
+              <div className="mt-6 flex justify-end">
+                <div className="bg-gradient-to-r from-[#033159] to-[#00598F] text-white rounded-xl p-3 shadow-lg">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-lg font-bold">Grand Total:</span>
+                    <span className="text-2xl font-bold">
+                      ${calculateGrandTotal().toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
 
@@ -475,6 +501,71 @@ const QuoteBuilder: React.FC = () => {
               />
             </div>
 
+            <div className="space-y-3">
+              <label
+                htmlFor="requester-name"
+                className="flex items-center text-sm font-bold text-gray-800"
+              >
+                <User className="h-4 w-4 text-gray-500 mr-2" />
+                Your Name *
+                <Tooltip text="Who should vendors contact about this quote?">
+                  <HelpCircle className="h-3 w-3 text-gray-400 ml-2" />
+                </Tooltip>
+              </label>
+              <input
+                id="requester-name"
+                className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                aria-required="true"
+                value={requesterName}
+                onChange={(e) => setRequesterName(e.target.value)}
+                placeholder="Your full name"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <label
+                htmlFor="requester-email"
+                className="flex items-center text-sm font-bold text-gray-800"
+              >
+                <Mail className="h-4 w-4 text-gray-500 mr-2" />
+                Email Address *
+                <Tooltip text="Primary email for quote responses">
+                  <HelpCircle className="h-3 w-3 text-gray-400 ml-2" />
+                </Tooltip>
+              </label>
+              <input
+                id="requester-email"
+                type="email"
+                className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                aria-required="true"
+                value={requesterEmail}
+                onChange={(e) => setRequesterEmail(e.target.value)}
+                placeholder="your.email@example.com"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <label
+                htmlFor="requester-phone"
+                className="flex items-center text-sm font-bold text-gray-800"
+              >
+                <Phone className="h-4 w-4 text-gray-500 mr-2" />
+                Phone Number *
+                <Tooltip text="Phone number for urgent questions about your quote">
+                  <HelpCircle className="h-3 w-3 text-gray-400 ml-2" />
+                </Tooltip>
+              </label>
+              <input
+                id="requester-phone"
+                type="tel"
+                className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                aria-required="true"
+                value={requesterPhone}
+                onChange={(e) => setRequesterPhone(e.target.value)}
+                placeholder="(555) 123-4567"
+              />
+            </div>
+
             <div className="space-y-3 lg:col-span-2">
               <label className="flex items-center text-sm font-bold text-gray-800">
                 <FileText className="h-4 w-4 text-gray-500 mr-2" />
@@ -488,7 +579,7 @@ const QuoteBuilder: React.FC = () => {
                 rows={4}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Special requirements, delivery instructions, quality specifications..."
+                placeholder="Enter any special requirements, delivery instructions, or quality specifications..."
               />
             </div>
           </div>
@@ -498,165 +589,130 @@ const QuoteBuilder: React.FC = () => {
         <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div className="flex items-center space-x-3 mb-6">
             <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              <Upload className="h-6 w-6 text-gray-500 mr-3" />
-              Attachments
+              <Paperclip className="h-6 w-6 text-gray-500 mr-3" />
+              Attach Files
             </h2>
-            <Tooltip text="Upload blueprints, specifications, or reference images to help vendors provide accurate quotes">
+            <Tooltip text="Upload drawings, specifications, or any documents to help vendors provide accurate quotes">
               <HelpCircle className="h-4 w-4 text-gray-500" />
             </Tooltip>
           </div>
 
-          <div className="space-y-6">
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 lg:p-12 text-center hover:border-[#033159] hover:bg-gray-50 transition-all duration-300 cursor-pointer">
-              <input
-                type="file"
-                multiple
-                onChange={handleFileUpload}
-                className="hidden"
-                id="file-upload"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.dwg"
-              />
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <Paperclip className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                <p className="text-base text-gray-800 font-bold mb-2">
-                  Click to upload blueprints, specifications, or other documents
-                </p>
-                <p className="text-sm text-gray-600">
-                  Supports PDF, DOC, images, and CAD files (Max 10MB each)
-                </p>
-              </label>
-            </div>
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[#033159] transition-colors duration-200">
+            <input
+              type="file"
+              multiple
+              id="file-upload"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <label
+              htmlFor="file-upload"
+              className="flex flex-col items-center cursor-pointer"
+            >
+              <Upload className="h-10 w-10 text-gray-400 mb-3" />
+              <span className="text-base font-bold text-gray-800 mb-1">
+                Drop files here or click to upload
+              </span>
+              <span className="text-sm text-gray-600">
+                Supported: PDF, DOCX, JPG, PNG (max 10MB each)
+              </span>
+            </label>
+          </div>
 
-            {files.length > 0 && (
-              <div className="space-y-3">
-                <p className="text-sm font-bold text-gray-800">
-                  Uploaded Files:
-                </p>
-                {files.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Paperclip className="h-5 w-5 text-gray-500" />
-                      <span className="text-sm text-gray-800 font-bold">
-                        {file.name}
-                      </span>
-                      <span className="text-xs text-gray-600 font-medium">
-                        ({(file.size / 1024).toFixed(1)} KB)
-                      </span>
-                    </div>
-                    <Tooltip text="Remove file">
-                      <button
-                        onClick={() => removeFile(index)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </Tooltip>
+          {files.length > 0 && (
+            <ul className="mt-6 space-y-3">
+              {files.map((file, i) => (
+                <li
+                  key={i}
+                  className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <FileText className="h-5 w-5 text-gray-500" />
+                    <span className="text-gray-800 font-medium">
+                      {file.name}
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Vendor Selection */}
-        <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div className="flex items-center space-x-3 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              <Users className="h-6 w-6 text-gray-500 mr-3" />
-              Select Vendors *
-            </h2>
-            <Tooltip text="Choose which vendors to send your RFQ to. Selecting multiple vendors helps ensure competitive pricing">
-              <HelpCircle className="h-4 w-4 text-gray-500" />
-            </Tooltip>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {vendors.map((vendor) => (
-              <label
-                key={vendor}
-                className="flex items-center space-x-4 p-5 border-2 border-gray-200 rounded-xl hover:bg-gray-50 hover:border-[#033159] cursor-pointer transition-all duration-200"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedVendors.includes(vendor)}
-                  onChange={() => toggleVendor(vendor)}
-                  className="w-5 h-5 text-[#033159] border-gray-300 rounded-lg focus:ring-[#033159] focus:ring-2"
-                />
-                <span className="text-base font-bold text-gray-800">
-                  {vendor}
-                </span>
-              </label>
-            ))}
-          </div>
-
-          {selectedVendors.length > 0 && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
-              <p className="text-sm text-blue-900 font-bold">
-                RFQ will be sent to:{" "}
-                <strong className="font-normal">
-                  {selectedVendors.join(", ")}
-                </strong>
-              </p>
-            </div>
+                  <button
+                    onClick={() => removeFile(i)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
         {/* Submit Section */}
-        <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
+        <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
                 Ready to Submit?
               </h3>
               <p className="text-base text-gray-700 font-medium">
-                Your RFQ will be sent to {selectedVendors.length} selected
-                vendor
-                {selectedVendors.length !== 1 ? "s" : ""}
+                Your RFQ will be sent to vendors
               </p>
             </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-              {!isFormValid && (
-                <div className="flex items-center text-amber-700 text-sm font-bold">
-                  <AlertCircle className="h-5 w-5 mr-2" />
-                  <span>Complete required fields</span>
-                </div>
-              )}
-
-              <Tooltip
-                text={
-                  isFormValid
-                    ? "Send your RFQ to selected vendors"
-                    : "Please complete all required fields first"
-                }
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleSubmit}
+                disabled={!isFormValid || isSubmitting}
+                className={`px-6 py-3 rounded-xl flex items-center justify-center space-x-2 font-bold shadow-lg transition-all duration-300 ${
+                  !isFormValid || isSubmitting
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#033159] to-[#00598F] text-white hover:from-[#022244] hover:to-[#004a7a] hover:-translate-y-1 hover:shadow-xl"
+                }`}
               >
-                <button
-                  onClick={handleSubmit}
-                  disabled={!isFormValid || isSubmitting}
-                  className={`w-full sm:w-auto px-8 py-4 rounded-xl font-bold flex items-center justify-center space-x-3 transition-all duration-300 text-base ${
-                    isFormValid && !isSubmitting
-                      ? "bg-gradient-to-r from-[#033159] to-[#00598F] text-white hover:from-[#022244] hover:to-[#004a7a] hover:shadow-xl hover:-translate-y-1 shadow-lg"
-                      : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Submitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-5 w-5" />
-                      <span>Submit RFQ</span>
-                    </>
-                  )}
-                </button>
-              </Tooltip>
+                {isSubmitting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      ></path>
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    <span>Submit RFQ</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => window.history.back()}
+                className="px-6 py-3 border border-gray-300 text-gray-800 rounded-xl hover:bg-gray-50 transition-all duration-200 font-bold"
+              >
+                Cancel
+              </button>
             </div>
           </div>
+          {!isFormValid && (
+            <div className="mt-4 flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+              <AlertCircle className="h-5 w-5" />
+              <span className="text-sm font-medium">
+                Please add at least one item and fill in the project name before
+                submitting.
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
