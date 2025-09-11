@@ -42,9 +42,26 @@ export const createQuote = async (req: Request, res: Response) => {
 
     const rfqId = generateRFQ();
 
+    // Extract unique vendors from all items
+    const uniqueVendors = new Set<string>();
+    items.forEach((item: any) => {
+      if (item.vendor) {
+        const vendorString = item.vendor;
+        // Split by comma and clean up each vendor name
+        const vendors = vendorString
+          .split(",")
+          .map((vendor: string) => vendor.trim())
+          .filter((vendor: string) => vendor.length > 0);
+
+        vendors.forEach((vendor: string) => uniqueVendors.add(vendor));
+      }
+    });
+
+    const vendorsArray = Array.from(uniqueVendors);
+    const vendors_json = JSON.stringify(vendorsArray);
+
     // 1️⃣ Save RFQ files (creates folder + uploads files)
     const { folderLink, fileLinks } = await saveRFQFiles(files, `RFQ-${rfqId}`);
-
     // 2️⃣ Add RFQ metadata to Google Sheet
     const rfqData: RFQData = {
       rfq_id: rfqId,
@@ -57,7 +74,7 @@ export const createQuote = async (req: Request, res: Response) => {
       needed_by: projectInfo.neededBy || "",
       notes: projectInfo.notes || "",
       items_json: item_json || "",
-      vendors_json: "",
+      vendors_json: vendors_json || "",
       drive_folder_url: folderLink || "",
     };
 
