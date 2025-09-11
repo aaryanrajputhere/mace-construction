@@ -45,8 +45,8 @@ export const createQuote = async (req: Request, res: Response) => {
     // Extract unique vendors from all items
     const uniqueVendors = new Set<string>();
     items.forEach((item: any) => {
-      if (item.vendor) {
-        const vendorString = item.vendor;
+      if (item.Vendors) {
+        const vendorString = item.Vendors;
         // Split by comma and clean up each vendor name
         const vendors = vendorString
           .split(",")
