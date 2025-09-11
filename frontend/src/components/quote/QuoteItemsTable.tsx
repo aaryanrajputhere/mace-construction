@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 interface QuoteItemsTableProps {
   items: Material[];
-  onAddItem: () => void;
   onUpdateItem: (index: number, field: keyof Material, value: any) => void;
   onDeleteItem: (index: number) => void;
   calculateItemTotal: (price: string, quantity: string) => number;
@@ -14,7 +13,6 @@ interface QuoteItemsTableProps {
 
 const QuoteItemsTable: React.FC<QuoteItemsTableProps> = ({
   items,
-  onAddItem,
   onUpdateItem,
   onDeleteItem,
   calculateItemTotal,

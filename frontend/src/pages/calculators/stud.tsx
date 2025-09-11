@@ -13,6 +13,7 @@ const StudCalculator: React.FC = () => {
   const [wallLength, setWallLength] = useState<number>(0);
   const [wallHeight, setWallHeight] = useState<number>(0);
   const [studSpacing, setStudSpacing] = useState<number>(16); // default 16"
+  const [lumberSize, setLumberSize] = useState<string>("2x4"); // 2x4 or 2x6
   const [openingWidth, setOpeningWidth] = useState<number>(0);
   const [waste, setWaste] = useState<number>(10);
   const [result, setResult] = useState<{
@@ -21,7 +22,6 @@ const StudCalculator: React.FC = () => {
     totalLinearFeet: number;
     studLength: number;
   } | null>(null);
-  const [quoteItems, setQuoteItems] = useState<any[]>([]);
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const StudCalculator: React.FC = () => {
     } else {
       setResult(null);
     }
-  }, [wallLength, wallHeight, studSpacing, openingWidth, waste]);
+  }, [wallLength, wallHeight, studSpacing, openingWidth, waste, lumberSize]);
 
   const calculate = () => {
     if (wallLength <= 0 || wallHeight <= 0) return;
@@ -69,26 +69,70 @@ const StudCalculator: React.FC = () => {
     });
   };
 
+  const getLumberPrice = (size: string) => {
+    return size === "2x4" ? 3.25 : 4.75; // $3.25 for 2x4, $4.75 for 2x6
+  };
+
   const addToQuote = () => {
     if (!result) return;
 
-    const newItem = {
-      id: Date.now(),
-      name: "Wall Framing Package",
-      studs: result.studs,
-      studLength: result.studLength,
-      plates: result.plates,
-      wallLength: wallLength,
-      wallHeight: wallHeight,
-      spacing: studSpacing,
-      waste: waste,
+    // Get existing quote items from localStorage
+    const existingQuote = JSON.parse(localStorage.getItem("quote") || "[]");
+
+    // Create individual items for studs and plates
+    const timestamp = Date.now();
+    const price = getLumberPrice(lumberSize);
+    const newItems = [];
+
+    // Add Studs
+    newItems.push({
+      id: timestamp + 1,
+      category: "Framing",
+      name: `Stud ${lumberSize}`,
+      size: `${result.studLength}ft`,
+      unit: "pcs",
+      price: price,
+      quantity: result.studs,
+      vendors: "Home Depot, Lowes, Menards",
+      image: "",
       addedAt: new Date().toLocaleString(),
-    };
+    });
 
-    const updatedQuote = [...quoteItems, newItem];
-    setQuoteItems(updatedQuote);
+    // Add Top Plate
+    newItems.push({
+      id: timestamp + 2,
+      category: "Framing",
+      name: `Top Plate ${lumberSize}`,
+      size: `${result.studLength}ft`,
+      unit: "pcs",
+      price: price,
+      quantity: Math.ceil(result.plates / 2), // Half of total plates
+      vendors: "Home Depot, Lowes, Menards",
+      image: "",
+      addedAt: new Date().toLocaleString(),
+    });
 
-    // Show success feedback
+    // Add Bottom Plate
+    newItems.push({
+      id: timestamp + 3,
+      category: "Framing",
+      name: `Bottom Plate ${lumberSize}`,
+      size: `${result.studLength}ft`,
+      unit: "pcs",
+      price: price,
+      quantity: Math.ceil(result.plates / 2), // Half of total plates
+      vendors: "Home Depot, Lowes, Menards",
+      image: "",
+      addedAt: new Date().toLocaleString(),
+    });
+
+    // Add all new items to existing quote
+    const updatedQuote = [...existingQuote, ...newItems];
+
+    // Save back to localStorage
+    localStorage.setItem("quote", JSON.stringify(updatedQuote));
+
+    // Visual feedback
     const button = document.querySelector(
       "[data-stud-quote-btn]"
     ) as HTMLElement;
@@ -107,12 +151,16 @@ const StudCalculator: React.FC = () => {
         );
       }, 2000);
     }
+
+    // Trigger storage event to update other components
+    window.dispatchEvent(new Event("storage"));
   };
 
   const clearInputs = () => {
     setWallLength(0);
     setWallHeight(0);
     setStudSpacing(16);
+    setLumberSize("2x4");
     setOpeningWidth(0);
     setWaste(10);
   };
@@ -212,6 +260,40 @@ const StudCalculator: React.FC = () => {
             </div>
           </div>
 
+          {/* Lumber Size Selection */}
+          <div className="space-y-3">
+            <label className="flex items-center text-sm font-semibold text-gray-800">
+              <Package className="h-4 w-4 text-gray-500 mr-2" />
+              Lumber Size
+              <div className="relative group inline-block">
+                <Info className="h-3.5 w-3.5 text-gray-400 ml-2 cursor-help hover:text-gray-600 transition-colors" />
+                <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-64 p-3 bg-gray-900 text-xs text-white rounded-xl shadow-xl z-10">
+                  2x4 for standard walls, 2x6 for insulation or structural
+                  requirements
+                  <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </div>
+            </label>
+            <div className="flex space-x-3">
+              {["2x4", "2x6"].map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setLumberSize(size)}
+                  className={`flex-1 px-4 py-3 text-sm font-bold rounded-xl border-2 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 ${
+                    lumberSize === size
+                      ? "bg-[#033159] text-white border-[#033159] shadow-md"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm"
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 pl-1">
+              {lumberSize === "2x4" ? "$3.25 per piece" : "$4.75 per piece"}
+            </p>
+          </div>
+
           <div className="space-y-3">
             <label className="flex items-center text-sm font-semibold text-gray-700">
               <Package className="h-4 w-4 text-gray-400 mr-2" />
@@ -290,7 +372,7 @@ const StudCalculator: React.FC = () => {
         {result !== null && wallLength > 0 && wallHeight > 0 && (
           <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border-2 border-gray-200 mb-8 shadow-inner">
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-5">
-              Material Requirements
+              Material Requirements ({lumberSize})
             </h3>
 
             <div className="space-y-4">
@@ -308,9 +390,13 @@ const StudCalculator: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-sm text-gray-600 font-medium">
-                  <span>Length: {result.studLength}ft each</span>
+                  <span>
+                    Length: {result.studLength}ft {lumberSize}
+                  </span>
                   <span className="mx-3">•</span>
                   <span>Spacing: {studSpacing}" O.C.</span>
+                  <span className="mx-3">•</span>
+                  <span>${getLumberPrice(lumberSize)} each</span>
                 </div>
               </div>
 
@@ -328,7 +414,7 @@ const StudCalculator: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-sm text-gray-600 font-medium">
-                  Linear feet of plate material needed
+                  Linear feet of {lumberSize} plate material needed
                 </div>
               </div>
 
@@ -343,7 +429,7 @@ const StudCalculator: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-sm text-blue-200 mt-2 font-medium">
-                  Total lumber needed for framing
+                  Total {lumberSize} lumber needed for framing
                 </div>
               </div>
             </div>
@@ -359,6 +445,7 @@ const StudCalculator: React.FC = () => {
                     <li>• {waste}% waste factor for cutting and extras</li>
                     <li>• Standard framing practices and spacing</li>
                     <li>• Additional framing for openings</li>
+                    <li>• {lumberSize} lumber sizing</li>
                   </ul>
                 </div>
               </div>
@@ -391,7 +478,7 @@ const StudCalculator: React.FC = () => {
         <div className="mt-8 pt-6 border-t-2 border-gray-200">
           <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500">
             <span className="font-medium">
-              Standard 2x4 or 2x6 framing lumber
+              {lumberSize} framing lumber calculation
             </span>
             <DollarSign className="h-4 w-4" />
           </div>

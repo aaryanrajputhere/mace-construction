@@ -15,7 +15,6 @@ const OSBCalculator: React.FC = () => {
   const [result, setResult] = useState<number | null>(null);
   const [totalArea, setTotalArea] = useState<number>(0);
   const [wasteArea, setWasteArea] = useState<number>(0);
-  const [quoteItems, setQuoteItems] = useState<any[]>([]);
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -45,18 +44,30 @@ const OSBCalculator: React.FC = () => {
   const addToQuote = () => {
     if (!result) return;
 
+    // Get existing quote items from localStorage
+    const existingQuote = JSON.parse(localStorage.getItem("quote") || "[]");
+
+    // Create new OSB item matching the expected format
     const newItem = {
       id: Date.now(),
-      name: "OSB Sheets (4'×8')",
+      category: "Sheathing",
+      name: "OSB Sheathing 7/16 4x8",
+      size: "4' x 8'",
+      unit: "sheet",
+      price: 14.95,
       quantity: result,
-      area: totalArea,
-      waste: waste,
+      vendors: "Home Depot, Lowes",
+      image: "",
       addedAt: new Date().toLocaleString(),
     };
 
-    const updatedQuote = [...quoteItems, newItem];
-    setQuoteItems(updatedQuote);
+    // Add to existing quote items
+    const updatedQuote = [...existingQuote, newItem];
 
+    // Save back to localStorage
+    localStorage.setItem("quote", JSON.stringify(updatedQuote));
+
+    // Visual feedback
     const button = document.querySelector("[data-quote-btn]") as HTMLElement;
     if (button) {
       const originalText = button.textContent;
@@ -73,6 +84,9 @@ const OSBCalculator: React.FC = () => {
         );
       }, 2000);
     }
+
+    // Optional: Trigger a storage event to update other components
+    window.dispatchEvent(new Event("storage"));
   };
 
   const clearInputs = () => {
