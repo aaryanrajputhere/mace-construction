@@ -58,7 +58,7 @@ export const createQuote = async (req: Request, res: Response) => {
     });
 
     const vendorsArray = Array.from(uniqueVendors);
-    const vendors_json = JSON.stringify(vendorsArray);
+    const vendors_json = vendorsArray.join(", ");
 
     // 1️⃣ Save RFQ files (creates folder + uploads files)
     const { folderLink, fileLinks } = await saveRFQFiles(files, `RFQ-${rfqId}`);
