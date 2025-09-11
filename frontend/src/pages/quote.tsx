@@ -35,7 +35,6 @@ const QuoteBuilder: React.FC = () => {
     isFormValid,
 
     // Functions
-    addNewItem,
     updateItem,
     deleteItem,
     calculateItemTotal,
@@ -64,7 +63,6 @@ const QuoteBuilder: React.FC = () => {
         {/* Items Section */}
         <QuoteItemsTable
           items={items}
-          onAddItem={addNewItem}
           onUpdateItem={updateItem}
           onDeleteItem={deleteItem}
           calculateItemTotal={calculateItemTotal}
