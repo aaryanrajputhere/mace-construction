@@ -80,14 +80,8 @@ export const createQuote = async (req: Request, res: Response) => {
 
     const sheetResponse = await addRFQToSheet(rfqData);
 
-    // 3️⃣ Define vendor list for email notifications
-    // const vendors = [
-    //   { email: "vendor1@example.com" },
-    //   { email: "vendor2@example.com" },
-    //   { email: "vendor3@example.com" },
-    // ];
+    
 
-    // 4️⃣ Send RFQ emails to vendors
     // await sendRFQEmails(
     //   rfqId,
     //   {

@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Material {
+  id        Int             @id @default(autoincrement())
+  category  String
+  itemName  String
+  size      String
+  unit      String
+  price     Float
+  image     String?         // optional field in case you add images later
+  vendors   MaterialVendor[] // many-to-many with Vendor
+  createdAt DateTime         @default(now())
+}
+
+model Vendor {
+  id        Int             @id @default(autoincrement())
+  name      String          @unique
+  email     String?
+  phone     String?
+  notes     String?
+  materials MaterialVendor[] // many-to-many with Material
+  createdAt DateTime         @default(now())
+}
+
+model MaterialVendor {
+  id         Int      @id @default(autoincrement())
+  materialId Int
+  vendorId   Int
+
+  material   Material @relation(fields: [materialId], references: [id])
+  vendor     Vendor   @relation(fields: [vendorId], references: [id])
+
+  @@unique([materialId, vendorId]) // prevent duplicates
+}
+

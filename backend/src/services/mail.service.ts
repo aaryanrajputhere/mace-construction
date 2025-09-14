@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -8,15 +9,25 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
+
 export const sendRFQEmails = async (
   rfqId: string,
   projectInfo: any,
   items: any[],
-  vendors: { email: string }[],
+  vendors: { email: string; name: string }[], // using name + email
   driveLinks: string[]
 ) => {
   for (const vendor of vendors) {
-    const vendorName = "Vendor Name";
+    // 🔑 Create token per vendor (use name + email for uniqueness)
+    const token = jwt.sign(
+      { vendorName: vendor.name, vendorEmail: vendor.email, rfqId }, // payload
+      SECRET,
+      { expiresIn: "7d" } // expires in 7 days
+    );
+
+    const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;
+
     const materialsList = items
       .map(
         (item, idx) =>
@@ -25,12 +36,13 @@ export const sendRFQEmails = async (
           }${item.size ? ", " : ""}${item.qty || ""}`
       )
       .join("<br>");
+
     await transporter.sendMail({
       from: "rfq@maceinfo.com",
       to: vendor.email,
       subject: `RFQ Request – ${projectInfo.name}, RFQ ID #${rfqId}`,
       html: `
-        <p>Hello ${vendorName},</p>
+        <p>Hello ${vendor.name},</p>
         <p>We are requesting pricing and lead time for the following materials:</p>
         <p><strong>Project:</strong> ${projectInfo.name}</p>
         <p><strong>Site Address:</strong> ${projectInfo.address || ""}</p>
@@ -39,8 +51,9 @@ export const sendRFQEmails = async (
         <p>Files: ${driveLinks
           .map((l) => `<a href="${l}">File</a>`)
           .join(", ")}</p>
-        <p>Please submit your pricing and lead time using the vendor reply link below:<br>
-        <a href="https://yourapp.com/vendor-reply/${rfqId}">Vendor Reply Form Link</a></p>
+        <p>Please submit your pricing and lead time using your secure vendor link below:<br>
+        <a href="${secureLink}">Submit Your Reply</a></p>
+        <p>This link is unique to you and will expire in 7 days.</p>
         <p>Thank you,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
       `,
     });
