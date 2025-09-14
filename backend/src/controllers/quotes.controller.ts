@@ -42,22 +42,21 @@ export const createQuote = async (req: Request, res: Response) => {
 
     const rfqId = generateRFQ();
 
-    // Extract unique vendors from all items
-    const uniqueVendors = new Set<string>();
+    // Map each vendor to their items
+    const vendorItemsMap: Record<string, any[]> = {};
     items.forEach((item: any) => {
       if (item.Vendors) {
-        const vendorString = item.Vendors;
-        // Split by comma and clean up each vendor name
-        const vendors = vendorString
-          .split(",")
-          .map((vendor: string) => vendor.trim())
-          .filter((vendor: string) => vendor.length > 0);
-
-        vendors.forEach((vendor: string) => uniqueVendors.add(vendor));
+        item.Vendors.split(",")
+          .map((v: string) => v.trim())
+          .forEach((vendor: string) => {
+            if (!vendorItemsMap[vendor]) vendorItemsMap[vendor] = [];
+            vendorItemsMap[vendor].push(item);
+          });
       }
     });
 
-    const vendorsArray = Array.from(uniqueVendors);
+    // Prepare vendor list as a string
+    const vendorsArray = Object.keys(vendorItemsMap);
     const vendors_json = vendorsArray.join(", ");
 
     // 1️⃣ Save RFQ files (creates folder + uploads files)
@@ -80,22 +79,38 @@ export const createQuote = async (req: Request, res: Response) => {
 
     const sheetResponse = await addRFQToSheet(rfqData);
 
-    
+    // Prepare vendor email lookup (replace with your actual vendor email mapping)
+    const vendorEmailLookup: Record<string, string> = {
+      "Vendor A": "vendorA@example.com",
+      "Vendor B": "vendorB@example.com",
+      "Vendor C": "vendorC@example.com",
+      "Vendor D": "vendorD@example.com",
+      "Home Depot": "homedepot@example.com",
+      Lowes: "lowes@example.com",
+      Menards: "menards@example.com",
+      // ...add all vendors here
+    };
 
-    // await sendRFQEmails(
-    //   rfqId,
-    //   {
-    //     name: rfqData.project_name,
-    //     address: rfqData.project_address,
-    //     neededBy: rfqData.needed_by,
-    //     requesterName: rfqData.requester_name,
-    //     requesterEmail: rfqData.requester_email,
-    //     requesterPhone: rfqData.requester_phone,
-    //   },
-    //   items,
-    //   vendors,
-    //   fileLinks
-    // );
+    // Send RFQ emails to each vendor with their items
+    for (const [vendor, vendorItems] of Object.entries(vendorItemsMap)) {
+      const email = vendorEmailLookup[vendor];
+      if (!email) continue; // skip if no email found
+
+      await sendRFQEmails(
+        rfqId,
+        {
+          name: rfqData.project_name,
+          address: rfqData.project_address,
+          neededBy: rfqData.needed_by,
+          requesterName: rfqData.requester_name,
+          requesterEmail: rfqData.requester_email,
+          requesterPhone: rfqData.requester_phone,
+        },
+        vendorItems, // only items for this vendor
+        [{ email, name: vendor }],
+        fileLinks
+      );
+    }
 
     // 5️⃣ Respond with Drive + Sheet info and email confirmation
     res.status(201).json({
