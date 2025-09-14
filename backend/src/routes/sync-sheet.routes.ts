@@ -4,7 +4,7 @@ import { syncMaterials } from "../controllers/sync-sheet.controller";
 const router = Router();
 
 // GET /api/materials
-router.get("/materials", syncMaterials);
+router.post("/materials", syncMaterials);
 
 // GET /api/vendors
 // router.get("/vendors", syncVendors);

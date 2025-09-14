@@ -1,9 +1,12 @@
 import express from "express";
-import { handleVendorReply } from "../controllers/vendors.controller";
+import {
+  getVendors,
+  handleVendorReply,
+} from "../controllers/vendors.controller";
 
 const router = express.Router();
 
-// router.get('/vendors' , );
+router.get("/", getVendors);
 
 // Vendor submits reply (POST)
 router.post("/vendor-reply/:rfqId/:token", handleVendorReply);
