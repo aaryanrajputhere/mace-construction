@@ -26,7 +26,7 @@ export const syncMaterials = async (req: Request, res: Response) => {
         })
       );
 
-      // 2. Upsert material (auto-generate ID if missing)
+      // 2. Prepare material data
       const materialData = {
         itemName: row.ItemName || "",
         category: row.Category || "",
@@ -37,14 +37,18 @@ export const syncMaterials = async (req: Request, res: Response) => {
 
       let material;
       if (row.id) {
-        // Use id if provided
-        material = await prisma.material.upsert({
-          where: { id: row.id },
-          update: materialData,
-          create: { id: row.id, ...materialData },
+        // Try to update by ID if it exists
+        material = await prisma.material.update({
+          where: { id: Number(row.id) },
+          data: materialData,
+        }).catch(async () => {
+          // If not found, create without forcing the ID
+          return prisma.material.create({
+            data: materialData,
+          });
         });
       } else {
-        // Auto-generate id
+        // If no ID, just create new
         material = await prisma.material.create({
           data: materialData,
         });
