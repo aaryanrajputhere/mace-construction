@@ -16,9 +16,9 @@ export const syncMaterials = async (req: Request, res: Response) => {
         .map((v: string) => v.trim())
         .filter(Boolean);
 
-      const vendors = await Promise.all(
+      await Promise.all(
         vendorNames.map(async (name: string) => {
-          return prisma.vendor.upsert({
+          await prisma.vendor.upsert({
             where: { name },
             update: {},
             create: { name },
@@ -33,41 +33,26 @@ export const syncMaterials = async (req: Request, res: Response) => {
         size: row.Size || "",
         unit: row.Unit || "",
         price: parseFloat(row.Price) || 0,
+        image: row.Image || null,
       };
 
-      let material;
       if (row.id) {
         // Try to update by ID if it exists
-        material = await prisma.material.update({
-          where: { id: Number(row.id) },
-          data: materialData,
-        }).catch(async () => {
-          // If not found, create without forcing the ID
-          return prisma.material.create({
+        await prisma.material
+          .update({
+            where: { id: Number(row.id) },
             data: materialData,
+          })
+          .catch(async () => {
+            // If not found, create without forcing the ID
+            await prisma.material.create({
+              data: materialData,
+            });
           });
-        });
       } else {
         // If no ID, just create new
-        material = await prisma.material.create({
+        await prisma.material.create({
           data: materialData,
-        });
-      }
-
-      // 3. Connect material with vendors
-      for (const vendor of vendors) {
-        await prisma.materialVendor.upsert({
-          where: {
-            materialId_vendorId: {
-              materialId: material.id,
-              vendorId: vendor.id,
-            },
-          },
-          update: {},
-          create: {
-            materialId: material.id,
-            vendorId: vendor.id,
-          },
         });
       }
     }
