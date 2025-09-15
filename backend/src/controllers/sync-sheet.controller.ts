@@ -20,7 +20,11 @@ export const syncRFQs = async (req: Request, res: Response) => {
           : new Date(),
         requester_name: row["requester_name"] || "",
         requester_email: row["requester_email"] || "",
-        requester_phone: row["requester_phone"] || "",
+        requester_phone:
+          row["requester_phone"] !== undefined &&
+          row["requester_phone"] !== null
+            ? String(row["requester_phone"])
+            : "",
         project_name: row["project_name"] || "",
         project_address: row["project_address"] || "",
         items_json:
@@ -35,7 +39,6 @@ export const syncRFQs = async (req: Request, res: Response) => {
 
       // Optional string fields
       const optionalStringFields = [
-        "needed_by",
         "notes",
         "drive_folder_url",
         "status",
@@ -53,6 +56,17 @@ export const syncRFQs = async (req: Request, res: Response) => {
         ) {
           rfqData[field] = String(row[field]);
         }
+      }
+      // Special handling for needed_by (convert Date to string if needed)
+      if (
+        row["needed_by"] !== undefined &&
+        row["needed_by"] !== null &&
+        row["needed_by"] !== ""
+      ) {
+        rfqData["needed_by"] =
+          typeof row["needed_by"] === "string"
+            ? row["needed_by"]
+            : String(row["needed_by"]);
       }
 
       // Optional number fields
