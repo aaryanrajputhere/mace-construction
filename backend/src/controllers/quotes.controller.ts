@@ -4,7 +4,7 @@ import { saveRFQFiles } from "../services/drive.service";
 import { generateRFQ } from "../utils/generateRFQ";
 import { addRFQToSheet, RFQData } from "../services/sheets.service";
 import { sendRFQEmails } from "../services/mail.service";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -57,10 +57,12 @@ export const createQuote = async (req: Request, res: Response) => {
           });
       }
     });
+    console.log(vendorItemsMap)
 
     // Prepare vendor list as a string
     const vendorsArray = Object.keys(vendorItemsMap);
     const vendors_json = vendorsArray.join(", ");
+    
 
     // 1️⃣ Save RFQ files (creates folder + uploads files)
     const { folderLink, fileLinks } = await saveRFQFiles(files, `RFQ-${rfqId}`);
@@ -102,6 +104,7 @@ export const createQuote = async (req: Request, res: Response) => {
     // Send RFQ emails to each vendor with their items
     for (const [vendor, vendorItems] of Object.entries(vendorItemsMap)) {
       const email = vendorEmailLookup[vendor];
+      console.log(email);
       if (!email) continue; // skip if no email found
 
       await sendRFQEmails(

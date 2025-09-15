@@ -2,7 +2,9 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  service: process.env.SMTP_SERVICE || "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -23,7 +25,7 @@ export const sendRFQEmails = async (
     const token = jwt.sign(
       { vendorName: vendor.name, vendorEmail: vendor.email, rfqId }, // payload
       SECRET,
-      { expiresIn: "7d" } // expires in 7 days
+      { expiresIn: "7d" }
     );
 
     const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;
