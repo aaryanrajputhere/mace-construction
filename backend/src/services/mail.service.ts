@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import { Resend } from "resend";
+import sgMail from "@sendgrid/mail";
 
-const resend = new Resend("re_EAhCcRLu_4p4acrps3g84hV8nikSqxBmJ");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
 
 export const sendRFQEmail = async (
@@ -30,16 +30,13 @@ export const sendRFQEmail = async (
 
   console.log("Sending Email to:", vendor.email);
   try {
-    await resend.emails.send({
-      from: "itsaaryanrajput@gmail.com",
+    await sgMail.send({
+      from: "rfq@maceinfo.com",
       to: vendor.email,
       subject: `RFQ Request – ${projectInfo.name}, RFQ ID #${rfqId}`,
       html: `
         <p>Hello ${vendor.name},</p>
         <p>We are requesting pricing and lead time for the following materials:</p>
-        <p><strong>Project:</strong> ${projectInfo.name}</p>
-        <p><strong>Site Address:</strong> ${projectInfo.address || ""}</p>
-        <p><strong>Needed
         <p><strong>Project:</strong> ${projectInfo.name}</p>
         <p><strong>Site Address:</strong> ${projectInfo.address || ""}</p>
         <p><strong>Needed By:</strong> ${projectInfo.neededBy || ""}</p>

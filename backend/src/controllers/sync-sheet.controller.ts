@@ -12,8 +12,8 @@ export const syncRFQs = async (req: Request, res: Response) => {
     await prisma.rFQ.deleteMany({});
 
     for (const row of rows) {
-      // Prepare RFQ data
-      const rfqData = {
+      // Prepare RFQ data with correct types and undefined for optional fields
+      const rfqData: any = {
         rfq_id: row["rfq_id"] || "",
         created_at: row["created_at"]
           ? new Date(row["created_at"])
@@ -23,26 +23,71 @@ export const syncRFQs = async (req: Request, res: Response) => {
         requester_phone: row["requester_phone"] || "",
         project_name: row["project_name"] || "",
         project_address: row["project_address"] || "",
-        needed_by: row["needed_by"] || null,
-        notes: row["notes"] || null,
-        items_json: row["items_json"] || "",
-        vendors_json: row["vendors_json"] || "",
-        drive_folder_url: row["drive_folder_url"] || null,
-        status: row["status"] || null,
-        email_message_id: row["email_message_id"] || null,
-        decision_at: row["decision_at"] ? new Date(row["decision_at"]) : null,
-        awarded_vendor_name: row["awarded_vendor_name"] || null,
-        awarded_reply_id: row["awarded_reply_id"] || null,
-        awarded_total_price: row["awarded_total_price"]
-          ? parseFloat(row["awarded_total_price"])
-          : null,
-        awarded_lead_time_days: row["awarded_lead_time_days"]
-          ? parseInt(row["awarded_lead_time_days"])
-          : null,
-        po_number: row["po_number"] || null,
-        po_date: row["po_date"] ? new Date(row["po_date"]) : null,
-        po_notes: row["po_notes"] || null,
+        items_json:
+          typeof row["items_json"] === "string"
+            ? row["items_json"]
+            : JSON.stringify(row["items_json"] || ""),
+        vendors_json:
+          typeof row["vendors_json"] === "string"
+            ? row["vendors_json"]
+            : JSON.stringify(row["vendors_json"] || ""),
       };
+
+      // Optional string fields
+      const optionalStringFields = [
+        "needed_by",
+        "notes",
+        "drive_folder_url",
+        "status",
+        "email_message_id",
+        "awarded_vendor_name",
+        "awarded_reply_id",
+        "po_number",
+        "po_notes",
+      ];
+      for (const field of optionalStringFields) {
+        if (
+          row[field] !== undefined &&
+          row[field] !== null &&
+          row[field] !== ""
+        ) {
+          rfqData[field] = String(row[field]);
+        }
+      }
+
+      // Optional number fields
+      if (
+        row["awarded_total_price"] !== undefined &&
+        row["awarded_total_price"] !== null &&
+        row["awarded_total_price"] !== ""
+      ) {
+        rfqData["awarded_total_price"] = parseFloat(row["awarded_total_price"]);
+      }
+      if (
+        row["awarded_lead_time_days"] !== undefined &&
+        row["awarded_lead_time_days"] !== null &&
+        row["awarded_lead_time_days"] !== ""
+      ) {
+        rfqData["awarded_lead_time_days"] = parseInt(
+          row["awarded_lead_time_days"]
+        );
+      }
+
+      // Optional date fields
+      if (
+        row["decision_at"] !== undefined &&
+        row["decision_at"] !== null &&
+        row["decision_at"] !== ""
+      ) {
+        rfqData["decision_at"] = new Date(row["decision_at"]);
+      }
+      if (
+        row["po_date"] !== undefined &&
+        row["po_date"] !== null &&
+        row["po_date"] !== ""
+      ) {
+        rfqData["po_date"] = new Date(row["po_date"]);
+      }
 
       await prisma.rFQ.create({
         data: rfqData,
