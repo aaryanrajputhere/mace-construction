@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend("re_EAhCcRLu_4p4acrps3g84hV8nikSqxBmJ");
 const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
 
 export const sendRFQEmail = async (

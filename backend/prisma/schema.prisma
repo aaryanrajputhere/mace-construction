@@ -31,7 +31,7 @@ model Vendor {
   createdAt DateTime @default(now())
 }
 
-model RFQ {
+model rFQ {
   id                 Int      @id @default(autoincrement())
   rfq_id             String   @unique
   created_at         DateTime @default(now())

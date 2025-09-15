@@ -8,12 +8,12 @@ export const syncRFQs = async (req: Request, res: Response) => {
     const rows = req.body.data; // Expecting array of ARFQ rows from sheet
     console.log("Incoming RFQ rows from sheet:", rows);
 
-    // Delete all rows in ARFQ table only
+    // Delete all rows in RFQ table only
     await prisma.rFQ.deleteMany({});
 
     for (const row of rows) {
-      // Prepare ARFQ data
-      const arfqData = {
+      // Prepare RFQ data
+      const rfqData = {
         rfq_id: row["rfq_id"] || "",
         created_at: row["created_at"]
           ? new Date(row["created_at"])
@@ -45,7 +45,7 @@ export const syncRFQs = async (req: Request, res: Response) => {
       };
 
       await prisma.rFQ.create({
-        data: arfqData,
+        data: rfqData,
       });
     }
 
