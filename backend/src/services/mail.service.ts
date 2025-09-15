@@ -1,14 +1,7 @@
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  service: process.env.SMTP_SERVICE || "gmail",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
 
 export const sendRFQEmail = async (
@@ -18,9 +11,8 @@ export const sendRFQEmail = async (
   vendor: { email: string; name: string },
   driveLinks: string[]
 ) => {
-  // 🔑 Create token per vendor (use name + email for uniqueness)
   const token = jwt.sign(
-    { vendorName: vendor.name, vendorEmail: vendor.email, rfqId }, // payload
+    { vendorName: vendor.name, vendorEmail: vendor.email, rfqId },
     SECRET,
     { expiresIn: "7d" }
   );
@@ -38,13 +30,16 @@ export const sendRFQEmail = async (
 
   console.log("Sending Email to:", vendor.email);
   try {
-    await transporter.sendMail({
-      from: "rfq@maceinfo.com",
+    await resend.emails.send({
+      from: "itsaaryanrajput@gmail.com",
       to: vendor.email,
       subject: `RFQ Request – ${projectInfo.name}, RFQ ID #${rfqId}`,
       html: `
         <p>Hello ${vendor.name},</p>
         <p>We are requesting pricing and lead time for the following materials:</p>
+        <p><strong>Project:</strong> ${projectInfo.name}</p>
+        <p><strong>Site Address:</strong> ${projectInfo.address || ""}</p>
+        <p><strong>Needed
         <p><strong>Project:</strong> ${projectInfo.name}</p>
         <p><strong>Site Address:</strong> ${projectInfo.address || ""}</p>
         <p><strong>Needed By:</strong> ${projectInfo.neededBy || ""}</p>
