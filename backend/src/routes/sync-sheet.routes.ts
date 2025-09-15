@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   syncMaterials,
+  syncRFQs,
   syncVendors,
 } from "../controllers/sync-sheet.controller";
 
@@ -12,4 +13,6 @@ router.post("/materials", syncMaterials);
 // POST /api/vendors
 router.post("/vendors", syncVendors);
 
+// POST /api/rfqs
+router.post("/rfqs", syncRFQs);
 export default router;

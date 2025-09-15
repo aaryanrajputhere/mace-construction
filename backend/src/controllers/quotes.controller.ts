@@ -102,19 +102,18 @@ export const createQuote = async (req: Request, res: Response) => {
     // Send RFQ emails to each vendor with their items
     for (const [vendor, vendorItems] of Object.entries(vendorItemsMap)) {
       const email = vendorEmailLookup[vendor];
-      console.log(email);
-      if (!email) continue; // skip if no email found
+      console.log("sendRFQEmail args:", {
+        rfqId,
+        projectInfo,
+        items: vendorItems,
+        vendor: { email, name: vendor },
+        driveLinks: fileLinks,
+      });
+      if (!email) continue;
 
       await sendRFQEmail(
         rfqId,
-        {
-          name: rfqData.project_name,
-          address: rfqData.project_address,
-          neededBy: rfqData.needed_by,
-          requesterName: rfqData.requester_name,
-          requesterEmail: rfqData.requester_email,
-          requesterPhone: rfqData.requester_phone,
-        },
+        projectInfo,
         vendorItems,
         { email, name: vendor },
         fileLinks

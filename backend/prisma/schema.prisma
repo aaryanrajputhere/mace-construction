@@ -1,3 +1,4 @@
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -30,5 +31,28 @@ model Vendor {
   createdAt DateTime @default(now())
 }
 
-
-
+model RFQ {
+  id                 Int      @id @default(autoincrement())
+  rfq_id             String   @unique
+  created_at         DateTime @default(now())
+  requester_name     String
+  requester_email    String
+  requester_phone    String
+  project_name       String
+  project_address    String
+  needed_by          String?
+  notes              String?
+  items_json         String
+  vendors_json       String
+  drive_folder_url   String?
+  status             String?  // e.g. 'pending', 'awarded', etc.
+  email_message_id   String?
+  decision_at        DateTime?
+  awarded_vendor_name String?
+  awarded_reply_id   String?
+  awarded_total_price Float?
+  awarded_lead_time_days Int?
+  po_number          String?
+  po_date            DateTime?
+  po_notes           String?
+}
