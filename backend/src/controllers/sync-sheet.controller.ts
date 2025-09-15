@@ -13,20 +13,7 @@ export const syncMaterials = async (req: Request, res: Response) => {
     await prisma.material.deleteMany({});
 
     for (const row of rows) {
-      // 1. Find vendors by name
-      const vendorNames = (row.Vendors || "")
-        .split(",")
-        .map((v: string) => v.trim())
-        .filter(Boolean);
-
-      // Find vendors in DB
-      const vendors = await prisma.vendor.findMany({
-        where: {
-          name: { in: vendorNames },
-        },
-      });
-
-      // 2. Prepare material data
+      // Prepare material data, store vendor names as a string
       const materialData = {
         itemName: row.ItemName || "",
         category: row.Category || "",
@@ -34,9 +21,7 @@ export const syncMaterials = async (req: Request, res: Response) => {
         unit: row.Unit || "",
         price: parseFloat(row.Price) || 0,
         image: row.Image || null,
-        vendors: {
-          connect: vendors.map((vendor) => ({ id: vendor.id })),
-        },
+        vendors: row.Vendors || "",
       };
 
       await prisma.material.create({
