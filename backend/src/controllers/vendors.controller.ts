@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { getSheetsClient } from "../utils/googleAuth";
+import { PrismaClient } from "@prisma/client";
 
-const VENDORS_SHEET_ID = process.env.VENDORS_SHEET_ID || "";
-const VENDORS_SHEET_NAME = process.env.VENDORS_SHEET_NAME || "";
+const prisma = new PrismaClient();
 
 const SECRET = process.env.JWT_SECRET || "supersecret";
 
@@ -49,28 +48,8 @@ export const handleVendorReply = (req: Request, res: Response) => {
 
 export const getVendors = async (req: Request, res: Response) => {
   try {
-    const sheets = getSheetsClient();
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: VENDORS_SHEET_ID,
-      range: `${VENDORS_SHEET_NAME}!A:Z`, // Adjust columns if needed
-    });
-
-    const rows = response.data.values;
-
-    if (!rows || rows.length === 0) {
-      return res.json({ success: true, data: [] });
-    }
-
-    const headers = rows[0];
-    const data = rows.slice(1).map((row) => {
-      let obj: { [key: string]: string } = {};
-      headers.forEach((header, index) => {
-        obj[header] = row[index] || "";
-      });
-      return obj;
-    });
-
-    res.json({ success: true, data });
+    const vendors = await prisma.vendor.findMany();
+    res.json({ success: true, data: vendors });
   } catch (error) {
     res
       .status(500)

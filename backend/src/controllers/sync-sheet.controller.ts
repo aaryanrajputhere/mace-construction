@@ -9,24 +9,22 @@ export const syncMaterials = async (req: Request, res: Response) => {
     const rows = req.body.data;
     console.log("Incoming rows from sheet:", rows);
 
-    // Delete all rows in Material and Vendor tables
+    // Delete all rows in Material table only
     await prisma.material.deleteMany({});
-    await prisma.vendor.deleteMany({});
 
     for (const row of rows) {
-      // 1. Upsert vendors
+      // 1. Find vendors by name
       const vendorNames = (row.Vendors || "")
         .split(",")
         .map((v: string) => v.trim())
         .filter(Boolean);
 
-      await Promise.all(
-        vendorNames.map(async (name: string) => {
-          await prisma.vendor.create({
-            data: { name },
-          });
-        })
-      );
+      // Find vendors in DB
+      const vendors = await prisma.vendor.findMany({
+        where: {
+          name: { in: vendorNames },
+        },
+      });
 
       // 2. Prepare material data
       const materialData = {
@@ -36,6 +34,9 @@ export const syncMaterials = async (req: Request, res: Response) => {
         unit: row.Unit || "",
         price: parseFloat(row.Price) || 0,
         image: row.Image || null,
+        vendors: {
+          connect: vendors.map((vendor) => ({ id: vendor.id })),
+        },
       };
 
       await prisma.material.create({
@@ -49,7 +50,6 @@ export const syncMaterials = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: err });
   }
 };
-
 export const syncVendors = async (req: Request, res: Response) => {
   try {
     const rows = req.body.data; // Expecting [{ VendorName, Email, Phone, Notes }, ...]
