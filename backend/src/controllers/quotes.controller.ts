@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { saveRFQFiles } from "../services/drive.service";
 import { generateRFQ } from "../utils/generateRFQ";
 import { addRFQToSheet, RFQData } from "../services/sheets.service";
-import { sendRFQEmails } from "../services/mail.service";
+import { sendRFQEmail } from "../services/mail.service";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -57,12 +57,10 @@ export const createQuote = async (req: Request, res: Response) => {
           });
       }
     });
-    console.log(vendorItemsMap)
 
     // Prepare vendor list as a string
     const vendorsArray = Object.keys(vendorItemsMap);
     const vendors_json = vendorsArray.join(", ");
-    
 
     // 1️⃣ Save RFQ files (creates folder + uploads files)
     const { folderLink, fileLinks } = await saveRFQFiles(files, `RFQ-${rfqId}`);
@@ -107,7 +105,7 @@ export const createQuote = async (req: Request, res: Response) => {
       console.log(email);
       if (!email) continue; // skip if no email found
 
-      await sendRFQEmails(
+      await sendRFQEmail(
         rfqId,
         {
           name: rfqData.project_name,
@@ -118,7 +116,7 @@ export const createQuote = async (req: Request, res: Response) => {
           requesterPhone: rfqData.requester_phone,
         },
         vendorItems, // only items for this vendor
-        [{ email, name: vendor }],
+        { email, name: vendor },
         fileLinks
       );
     }

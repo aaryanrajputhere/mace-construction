@@ -13,32 +13,31 @@ const transporter = nodemailer.createTransport({
 
 const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
 
-export const sendRFQEmails = async (
+export const sendRFQEmail = async (
   rfqId: string,
   projectInfo: any,
   items: any[],
-  vendors: { email: string; name: string }[], // using name + email
+  vendor: { email: string; name: string },
   driveLinks: string[]
 ) => {
-  for (const vendor of vendors) {
-    // 🔑 Create token per vendor (use name + email for uniqueness)
-    const token = jwt.sign(
-      { vendorName: vendor.name, vendorEmail: vendor.email, rfqId }, // payload
-      SECRET,
-      { expiresIn: "7d" }
-    );
+  // 🔑 Create token per vendor (use name + email for uniqueness)
+  const token = jwt.sign(
+    { vendorName: vendor.name, vendorEmail: vendor.email, rfqId }, // payload
+    SECRET,
+    { expiresIn: "7d" }
+  );
 
-    const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;
+  const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;
 
-    const materialsList = items
-      .map(
-        (item, idx) =>
-          `- ${item.name || item.description || `Item ${idx + 1}`}: ${
-            item.size || ""
-          }${item.size ? ", " : ""}${item.qty || ""}`
-      )
-      .join("<br>");
-    console.log("Email sent to : ", vendor.email);
+  const materialsList = items
+    .map(
+      (item, idx) =>
+        `- ${item.name || item.description || `Item ${idx + 1}`}: ${
+          item.size || ""
+        }${item.size ? ", " : ""}${item.qty || ""}`
+    )
+    .join("<br>");
+  try {
     await transporter.sendMail({
       from: "rfq@maceinfo.com",
       to: vendor.email,
@@ -59,5 +58,8 @@ export const sendRFQEmails = async (
         <p>Thank you,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
       `,
     });
+    console.log("Email sent to:", vendor.email);
+  } catch (err) {
+    console.error("Failed to send email to:", vendor.email, err);
   }
 };
