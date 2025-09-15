@@ -8,6 +8,7 @@ import StudCalculator from "./pages/calculators/stud";
 import OSBCalculator from "./pages/calculators/osb";
 import QuoteBuilder from "./pages/quote";
 import LandingPage from "./pages/home";
+import VendorReplyPage from "./pages/vendor-reply";
 const App: React.FC = () => {
   return (
     <div className="min-h-[100dvh] bg-gray-50">
@@ -20,6 +21,10 @@ const App: React.FC = () => {
           <Route path="/calculators/studs" element={<StudCalculator />} />
           <Route path="/calculators/osb" element={<OSBCalculator />} />
           <Route path="/quote" element={<QuoteBuilder />} />
+          <Route
+            path="/vendor-reply/:rfqId/:token"
+            element={<VendorReplyPage />}
+          />
         </Routes>
       </main>
       <Footer />

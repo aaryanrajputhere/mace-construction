@@ -9,6 +9,10 @@ export const syncMaterials = async (req: Request, res: Response) => {
     const rows = req.body.data;
     console.log("Incoming rows from sheet:", rows);
 
+    // Delete all rows in Material and Vendor tables
+    await prisma.material.deleteMany({});
+    await prisma.vendor.deleteMany({});
+
     for (const row of rows) {
       // 1. Upsert vendors
       const vendorNames = (row.Vendors || "")
@@ -18,10 +22,8 @@ export const syncMaterials = async (req: Request, res: Response) => {
 
       await Promise.all(
         vendorNames.map(async (name: string) => {
-          await prisma.vendor.upsert({
-            where: { name },
-            update: {},
-            create: { name },
+          await prisma.vendor.create({
+            data: { name },
           });
         })
       );
@@ -36,30 +38,51 @@ export const syncMaterials = async (req: Request, res: Response) => {
         image: row.Image || null,
       };
 
-      if (row.id) {
-        // Try to update by ID if it exists
-        await prisma.material
-          .update({
-            where: { id: Number(row.id) },
-            data: materialData,
-          })
-          .catch(async () => {
-            // If not found, create without forcing the ID
-            await prisma.material.create({
-              data: materialData,
-            });
-          });
-      } else {
-        // If no ID, just create new
-        await prisma.material.create({
-          data: materialData,
-        });
-      }
+      await prisma.material.create({
+        data: materialData,
+      });
     }
 
     res.json({ success: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: err });
+  }
+};
+
+export const syncVendors = async (req: Request, res: Response) => {
+  try {
+    const rows = req.body.data; // Expecting [{ VendorName, Email, Phone, Notes }, ...]
+    console.log("Incoming vendor rows:", rows);
+
+    if (!rows || rows.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No vendor data received" });
+    }
+
+    // Clear old vendors (optional, depends on your use case)
+    await prisma.vendor.deleteMany({});
+
+    // Insert all vendors
+    const inserted = await prisma.vendor.createMany({
+      data: rows.map((row: any) => ({
+        name: row["Vendor Name"],
+        email: row["Email"],
+        phone: row["Phone"] || null,
+        notes: row["Notes"] || null,
+      })),
+    });
+
+    return res.json({
+      success: true,
+      message: `${inserted.count} vendors synced successfully`,
+    });
+  } catch (error: any) {
+    console.error("Error syncing vendors:", error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
 };

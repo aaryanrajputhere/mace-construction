@@ -17,6 +17,7 @@ model Material {
   price     Float
   image     String?
   createdAt DateTime @default(now())
+  @@unique([category, itemName, size, unit, price])
 }
 
 

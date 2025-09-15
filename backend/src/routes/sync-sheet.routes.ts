@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { syncMaterials } from "../controllers/sync-sheet.controller";
+import {
+  syncMaterials,
+  syncVendors,
+} from "../controllers/sync-sheet.controller";
 
 const router = Router();
 
@@ -7,6 +10,6 @@ const router = Router();
 router.post("/materials", syncMaterials);
 
 // GET /api/vendors
-// router.get("/vendors", syncVendors);
+router.get("/vendors", syncVendors);
 
 export default router;
