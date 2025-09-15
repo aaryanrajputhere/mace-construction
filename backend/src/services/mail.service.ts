@@ -2,9 +2,7 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  service: process.env.SMTP_SERVICE || "gmail",
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -37,6 +35,8 @@ export const sendRFQEmail = async (
         }${item.size ? ", " : ""}${item.qty || ""}`
     )
     .join("<br>");
+
+  console.log("Sending Email to:", vendor.email);
   try {
     await transporter.sendMail({
       from: "rfq@maceinfo.com",

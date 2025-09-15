@@ -115,7 +115,7 @@ export const createQuote = async (req: Request, res: Response) => {
           requesterEmail: rfqData.requester_email,
           requesterPhone: rfqData.requester_phone,
         },
-        vendorItems, // only items for this vendor
+        vendorItems,
         { email, name: vendor },
         fileLinks
       );
