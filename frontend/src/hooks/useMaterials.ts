@@ -38,8 +38,15 @@ export const useMaterials = () => {
         // Assign sequential IDs from 1 to n
         const materialsWithIds = materialsArray.map(
           (material: any, index: number) => ({
-            ...material,
-            id: index + 1, // Sequential IDs starting from 1
+            id: index + 1,
+            Category: material.category,
+            "Item Name": material.itemName,
+            "Size/Option": material.size,
+            Unit: material.unit,
+            Price: material.price,
+            image: material.image,
+            Vendors: material.vendors,
+            // Add other fields as needed
           })
         );
 
