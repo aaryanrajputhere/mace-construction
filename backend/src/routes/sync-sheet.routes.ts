@@ -6,10 +6,10 @@ import {
 
 const router = Router();
 
-// GET /api/materials
+// POST /api/materials
 router.post("/materials", syncMaterials);
 
-// GET /api/vendors
-router.get("/vendors", syncVendors);
+// POST /api/vendors
+router.post("/vendors", syncVendors);
 
 export default router;
