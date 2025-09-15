@@ -15,13 +15,13 @@ export const syncMaterials = async (req: Request, res: Response) => {
     for (const row of rows) {
       // Prepare material data, store vendor names as a string
       const materialData = {
-        itemName: row.ItemName || "",
-        category: row.Category || "",
-        size: row.Size || "",
-        unit: row.Unit || "",
-        price: parseFloat(row.Price) || 0,
-        image: row.Image || null,
-        vendors: row.Vendors || "",
+        itemName: row["Item Name"] || "",
+        category: row["Category"] || "",
+        size: row["Size/Option"] || "",
+        unit: row["Unit"] || "",
+        price: parseFloat(row["Price"]) || 0,
+        image: row["Image"] || null,
+        vendors: row["Vendors"] || "",
       };
 
       await prisma.material.create({

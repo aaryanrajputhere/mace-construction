@@ -4,6 +4,9 @@ import { saveRFQFiles } from "../services/drive.service";
 import { generateRFQ } from "../utils/generateRFQ";
 import { addRFQToSheet, RFQData } from "../services/sheets.service";
 import { sendRFQEmails } from "../services/mail.service";
+import { Prisma, PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const createQuote = async (req: Request, res: Response) => {
   try {
@@ -79,17 +82,22 @@ export const createQuote = async (req: Request, res: Response) => {
 
     const sheetResponse = await addRFQToSheet(rfqData);
 
-    // Prepare vendor email lookup (replace with your actual vendor email mapping)
-    const vendorEmailLookup: Record<string, string> = {
-      "Vendor A": "vendorA@example.com",
-      "Vendor B": "vendorB@example.com",
-      "Vendor C": "vendorC@example.com",
-      "Vendor D": "vendorD@example.com",
-      "Home Depot": "homedepot@example.com",
-      Lowes: "lowes@example.com",
-      Menards: "menards@example.com",
-      // ...add all vendors here
-    };
+    // Fetch all vendors from the database
+    const vendors = await prisma.vendor.findMany({
+      select: {
+        name: true,
+        email: true,
+      },
+    });
+
+    // Create lookup object from vendors array
+    const vendorEmailLookup: Record<string, string> = vendors.reduce(
+      (acc, vendor) => ({
+        ...acc,
+        [vendor.name]: vendor.email,
+      }),
+      {}
+    );
 
     // Send RFQ emails to each vendor with their items
     for (const [vendor, vendorItems] of Object.entries(vendorItemsMap)) {
