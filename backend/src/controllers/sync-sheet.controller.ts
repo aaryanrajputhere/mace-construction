@@ -38,7 +38,6 @@ export const syncMaterials = async (req: Request, res: Response) => {
 export const syncVendors = async (req: Request, res: Response) => {
   try {
     const rows = req.body.data; // Expecting [{ VendorName, Email, Phone, Notes }, ...]
-    console.log("Incoming vendor rows:", rows);
 
     if (!rows || rows.length === 0) {
       return res
@@ -46,7 +45,7 @@ export const syncVendors = async (req: Request, res: Response) => {
         .json({ success: false, message: "No vendor data received" });
     }
 
-    // Clear old vendors (optional, depends on your use case)
+    // Clear old vendors 
     await prisma.vendor.deleteMany({});
 
     // Insert all vendors

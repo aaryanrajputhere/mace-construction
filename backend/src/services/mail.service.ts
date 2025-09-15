@@ -36,7 +36,7 @@ export const sendRFQEmails = async (
           }${item.size ? ", " : ""}${item.qty || ""}`
       )
       .join("<br>");
-
+    console.log("Email sent to : ", vendor.email);
     await transporter.sendMail({
       from: "rfq@maceinfo.com",
       to: vendor.email,
