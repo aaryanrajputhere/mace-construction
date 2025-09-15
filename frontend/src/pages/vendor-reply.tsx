@@ -13,7 +13,7 @@ const VendorReplyPage: React.FC = () => {
     const fetchItems = async () => {
       try {
         const res = await fetch(
-          `https://yourapp.com/api/vendor-items/${rfqId}/${token}`
+          `https://mace-construction-production.up.railway.app/api/vendors/get-items/${rfqId}/${token}`
         );
         const data = await res.json();
         if (res.ok && Array.isArray(data.items)) {

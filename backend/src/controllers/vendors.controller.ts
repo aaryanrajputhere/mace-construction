@@ -1,3 +1,17 @@
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const SECRET = process.env.JWT_SECRET || "supersecret";
+
+interface VendorReplyToken {
+  vendorName: string;
+  vendorEmail: string;
+  rfqId: string;
+}
+
 export const getItems = async (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
   try {
@@ -44,19 +58,6 @@ export const getItems = async (req: Request, res: Response) => {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
-
-const SECRET = process.env.JWT_SECRET || "supersecret";
-
-interface VendorReplyToken {
-  vendorName: string;
-  vendorEmail: string;
-  rfqId: string;
-}
 
 export const handleVendorReply = (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
@@ -91,13 +92,3 @@ export const handleVendorReply = (req: Request, res: Response) => {
   }
 };
 
-export const getVendors = async (req: Request, res: Response) => {
-  try {
-    const vendors = await prisma.vendor.findMany();
-    res.json({ success: true, data: vendors });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch vendors", error });
-  }
-};
