@@ -80,19 +80,6 @@ const VendorReplyPage: React.FC = () => {
     }
   };
 
-  const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({
-    text,
-    children,
-  }) => (
-    <div className="group relative inline-block">
-      {children}
-      <div className="invisible group-hover:visible absolute z-10 px-2 py-1 text-sm text-white bg-gray-800 rounded-md -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-        {text}
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
-      </div>
-    </div>
-  );
-
   if (!rfqId || !token) {
     return <VendorReplyInvalid />;
   }

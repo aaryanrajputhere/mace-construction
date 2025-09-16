@@ -22,9 +22,19 @@ export const sendRFQEmail = async (
   const materialsList = items
     .map(
       (item, idx) =>
-        `- ${item["Item Name"] || item.description || `Item ${idx + 1}`}: ${
-          item.size || ""
-        }${item.size ? ", " : ""}${item.qty || ""}`
+        `- ${
+          item["Item Name"] ||
+          item.name ||
+          item.description ||
+          `Item ${idx + 1}`
+        }: ` +
+        `${item["Size/Option"] || item.size || ""}${
+          item["Size/Option"] || item.size ? ", " : ""
+        }` +
+        `${item["Unit"] || item.unit || ""}${
+          item["Unit"] || item.unit ? ", " : ""
+        }` +
+        `Qty: ${item["Quantity"] || item.qty || ""}`
     )
     .join("<br>");
 
