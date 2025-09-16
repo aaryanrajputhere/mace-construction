@@ -1,10 +1,7 @@
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 
-sgMail.setApiKey(
-  process.env.SENDGRID_API_KEY ||
-    ""
-);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
 
 export const sendRFQEmail = async (
@@ -25,7 +22,7 @@ export const sendRFQEmail = async (
   const materialsList = items
     .map(
       (item, idx) =>
-        `- ${item.name || item.description || `Item ${idx + 1}`}: ${
+        `- ${item["Item Name"] || item.description || `Item ${idx + 1}`}: ${
           item.size || ""
         }${item.size ? ", " : ""}${item.qty || ""}`
     )
@@ -39,8 +36,8 @@ export const sendRFQEmail = async (
     html: `
       <p>Hello ${vendor.name},</p>
       <p>We are requesting pricing and lead time for the following materials:</p>
-      <p><strong>Project:</strong> ${projectInfo.name}</p>
-      <p><strong>Site Address:</strong> ${projectInfo.address || ""}</p>
+      <p><strong>Project:</strong> ${projectInfo.projectName}</p>
+      <p><strong>Site Address:</strong> ${projectInfo.siteAddress || ""}</p>
       <p><strong>Needed By:</strong> ${projectInfo.neededBy || ""}</p>
       <p><strong>Requested Materials:</strong><br>${materialsList}</p>
       <p>Files: ${driveLinks

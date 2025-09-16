@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import VendorReplyHeader from "../components/vendor-reply/VendorReplyHeader";
+import VendorReplyTable from "../components/vendor-reply/VendorReplyTable";
+import VendorReplyMessage from "../components/vendor-reply/VendorReplyMessage";
+import VendorReplyFooter from "../components/vendor-reply/VendorReplyFooter";
+import VendorReplyLoading from "../components/vendor-reply/VendorReplyLoading";
+import VendorReplyInvalid from "../components/vendor-reply/VendorReplyInvalid";
+import VendorReplySubmitButton from "../components/vendor-reply/VendorReplySubmitButton";
 
 const VendorReplyPage: React.FC = () => {
   const { rfqId, token } = useParams<{ rfqId: string; token: string }>();
@@ -7,11 +14,14 @@ const VendorReplyPage: React.FC = () => {
   const [items, setItems] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>([]);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!rfqId || !token) return;
     const fetchItems = async () => {
       try {
+        setIsLoading(true);
         const res = await fetch(
           `https://mace-construction-production.up.railway.app/api/vendors/get-items/${rfqId}/${token}`
         );
@@ -30,6 +40,8 @@ const VendorReplyPage: React.FC = () => {
         }
       } catch (err) {
         setMessage("❌ Failed to fetch items");
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchItems();
@@ -45,6 +57,7 @@ const VendorReplyPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const res = await fetch(
         `https://yourapp.com/vendor-reply/${rfqId}/${token}`,
@@ -62,105 +75,59 @@ const VendorReplyPage: React.FC = () => {
       }
     } catch (err) {
       setMessage("❌ Network error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({
+    text,
+    children,
+  }) => (
+    <div className="group relative inline-block">
+      {children}
+      <div className="invisible group-hover:visible absolute z-10 px-2 py-1 text-sm text-white bg-gray-800 rounded-md -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+        {text}
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+      </div>
+    </div>
+  );
+
   if (!rfqId || !token) {
-    return <p className="text-center mt-10">Invalid or missing link.</p>;
+    return <VendorReplyInvalid />;
+  }
+
+  if (isLoading) {
+    return <VendorReplyLoading />;
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-      <h1 className="text-2xl font-bold mb-4">Submit Your RFQ Reply</h1>
-      <form onSubmit={handleSubmit}>
-        <table className="w-full border mb-6">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border">Item</th>
-              <th className="p-2 border">Size</th>
-              <th className="p-2 border">Unit</th>
-              <th className="p-2 border">Price</th>
-              <th className="p-2 border">Lead Time</th>
-              <th className="p-2 border">Notes</th>
-              <th className="p-2 border">Substitutions</th>
-              <th className="p-2 border">File Link</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => (
-              <tr key={item.id}>
-                <td className="p-2 border">{item.name}</td>
-                <td className="p-2 border">{item.size}</td>
-                <td className="p-2 border">{item.unit}</td>
-                <td className="p-2 border">
-                  <input
-                    type="text"
-                    value={fields[idx].price}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "price", e.target.value)
-                    }
-                    className="w-24 border p-1 rounded"
-                    placeholder="Price"
-                    required
-                  />
-                </td>
-                <td className="p-2 border">
-                  <input
-                    type="text"
-                    value={fields[idx].lead_time}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "lead_time", e.target.value)
-                    }
-                    className="w-24 border p-1 rounded"
-                    placeholder="Lead Time"
-                    required
-                  />
-                </td>
-                <td className="p-2 border">
-                  <input
-                    type="text"
-                    value={fields[idx].notes}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "notes", e.target.value)
-                    }
-                    className="w-32 border p-1 rounded"
-                    placeholder="Notes"
-                  />
-                </td>
-                <td className="p-2 border">
-                  <input
-                    type="text"
-                    value={fields[idx].substitutions}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "substitutions", e.target.value)
-                    }
-                    className="w-32 border p-1 rounded"
-                    placeholder="Substitutions"
-                  />
-                </td>
-                <td className="p-2 border">
-                  <input
-                    type="text"
-                    value={fields[idx].file_link}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "file_link", e.target.value)
-                    }
-                    className="w-32 border p-1 rounded"
-                    placeholder="File Link"
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Submit Reply
-        </button>
-      </form>
-      {message && <p className="mt-4">{message}</p>}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <VendorReplyHeader rfqId={rfqId} />
+
+        {/* Main Form */}
+        <form onSubmit={handleSubmit}>
+          <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 mb-8">
+            <VendorReplyTable
+              items={items}
+              fields={fields}
+              handleFieldChange={handleFieldChange}
+            />
+          </div>
+          {/* Submit Button */}
+          {items.length > 0 && (
+            <VendorReplySubmitButton isSubmitting={isSubmitting} />
+          )}
+        </form>
+
+        {/* Message Display */}
+        <VendorReplyMessage message={message} />
+
+        {/* Footer */}
+        <VendorReplyFooter />
+      </div>
     </div>
   );
 };
