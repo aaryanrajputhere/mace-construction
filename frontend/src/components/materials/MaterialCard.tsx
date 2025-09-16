@@ -4,8 +4,10 @@ function saveQuoteToLocalStorage(item: {
   size: string;
   unit: string;
   price: number;
-  vendor: string;
+  Vendors: string;
   quantity: number;
+  image: string;
+  addedAt: string;
 }) {
   try {
     const existing = JSON.parse(localStorage.getItem("quote") || "[]");
@@ -63,17 +65,17 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
   const [showPopup, setShowPopup] = useState(false);
 
   const [quantity, setQuantity] = useState(1);
-
-  // Vendors is a string, so split by comma and trim
-  const vendors: string[] =
-    material.Vendors && material.Vendors.length > 0
-      ? material.Vendors.split(",").map((v: string) => v.trim())
-      : [];
-
-  const [selectedVendor, setSelectedVendor] = useState(
-    vendors.length > 0 ? vendors[0] : ""
-  );
-
+  console.log(material);
+  // Vendors is now always string[]
+  let vendors: string[] = [];
+  if (Array.isArray(material.Vendors)) {
+    vendors = material.Vendors;
+  } else if (
+    typeof material.Vendors === "string" &&
+    material.Vendors.length > 0
+  ) {
+    vendors = material.Vendors.split(",").map((v: string) => v.trim());
+  }
   const {
     Category,
     "Item Name": name,
@@ -294,31 +296,32 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                 </div>
               </div>
 
-              {/* Vendor Selector */}
+              {/* Vendor List */}
               <div className="mb-8">
                 <div className="flex items-center space-x-3 mb-3">
                   <label className="block text-base font-bold text-gray-800">
-                    Select Vendor
+                    Available Vendors
                   </label>
-                  <Tooltip content="Choose your preferred supplier. Prices may vary between vendors.">
+                  <Tooltip content="All suppliers for this material. Prices may vary between vendors.">
                     <Info className="h-4 w-4 text-gray-400" />
                   </Tooltip>
                 </div>
-                <select
-                  value={selectedVendor}
-                  onChange={(e) => setSelectedVendor(e.target.value)}
-                  className="w-full border-2 border-gray-300 rounded-xl px-4 py-4 min-h-[44px] text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 focus-visible:border-transparent bg-white text-gray-900 font-bold"
-                >
+                <div className="flex flex-wrap gap-2">
                   {vendors.length > 0 ? (
                     vendors.map((vendor: string, index: number) => (
-                      <option key={index} value={vendor}>
+                      <span
+                        key={index}
+                        className="inline-block bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm font-bold text-gray-800"
+                      >
                         {vendor}
-                      </option>
+                      </span>
                     ))
                   ) : (
-                    <option disabled>No vendors available</option>
+                    <span className="text-gray-500 italic">
+                      No vendors available
+                    </span>
                   )}
-                </select>
+                </div>
               </div>
 
               {/* Quantity Selector */}
@@ -375,13 +378,16 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                 className="w-full px-6 py-4 min-h-[44px] bg-gradient-to-r from-[#033159] to-[#00598F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:from-[#022244] hover:to-[#004a7a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 flex items-center justify-center space-x-3 text-base"
                 onClick={() => {
                   const quoteItem = {
+                    id: Date.now(),
                     category: Category,
                     name,
                     size,
                     unit,
                     price: Number(price.toString().replace(/[^0-9.-]/g, "")), // convert string -> number and remove currency symbols
-                    vendor: selectedVendor,
+                    Vendors: material.Vendors,
                     quantity,
+                    image: "",
+                    addedAt: new Date().toLocaleString(),
                   };
 
                   console.log("Added to Quote:", quoteItem);

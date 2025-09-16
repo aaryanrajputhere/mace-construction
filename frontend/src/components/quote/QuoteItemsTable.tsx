@@ -5,7 +5,11 @@ import { useNavigate } from "react-router-dom";
 
 interface QuoteItemsTableProps {
   items: Material[];
-  onUpdateItem: (index: number, field: keyof Material, value: any) => void;
+  onUpdateItem: (
+    index: number,
+    field: keyof Material | string,
+    value: any
+  ) => void;
   onDeleteItem: (index: number) => void;
   calculateItemTotal: (price: string, quantity: string) => number;
   calculateGrandTotal: () => number;
@@ -57,132 +61,145 @@ const QuoteItemsTable: React.FC<QuoteItemsTableProps> = ({
       ) : (
         <>
           <div className="table-container shadow rounded-xl">
-            <table className="w-full mobile-card-table">
-              <thead className="table-sticky-header">
-                <tr className="border-b-2 border-gray-200 bg-white">
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    Item Name
-                  </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    Size/Option
-                  </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    Unit
-                  </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    Price
-                  </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    Quantity
-                  </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    Total
-                  </th>
-                  <th className="text-left py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    Vendors
-                  </th>
-                  <th className="text-center py-4 px-3 font-bold text-gray-800 text-base whitespace-nowrap">
-                    <Tooltip text="Remove item from quote">
-                      <span>Actions</span>
-                    </Tooltip>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
-                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    }`}
-                  >
-                    <td className="py-4 px-3" data-label="Item Name">
-                      <input
-                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                        value={item["Item Name"]}
-                        onChange={(e) =>
-                          onUpdateItem(index, "Item Name", e.target.value)
-                        }
-                        placeholder="Enter item name"
-                      />
-                    </td>
-                    <td className="py-4 px-3" data-label="Size/Option">
-                      <input
-                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                        value={item["Size/Option"]}
-                        onChange={(e) =>
-                          onUpdateItem(index, "Size/Option", e.target.value)
-                        }
-                        placeholder="Enter size/option"
-                      />
-                    </td>
-                    <td className="py-4 px-3" data-label="Unit">
-                      <input
-                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                        value={item.Unit}
-                        onChange={(e) =>
-                          onUpdateItem(index, "Unit", e.target.value)
-                        }
-                        placeholder="Unit"
-                      />
-                    </td>
-                    <td className="py-4 px-3" data-label="Price">
-                      <input
-                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                        value={item.Price}
-                        onChange={(e) =>
-                          onUpdateItem(index, "Price", e.target.value)
-                        }
-                        placeholder="Price"
-                      />
-                    </td>
-                    <td className="py-4 px-3" data-label="Quantity">
-                      <input
-                        type="number"
-                        min="1"
-                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                        value={item.Quantity || "1"}
-                        onChange={(e) =>
-                          onUpdateItem(index, "Quantity", e.target.value)
-                        }
-                        placeholder="1"
-                      />
-                    </td>
-                    <td className="py-4 px-3" data-label="Total">
-                      <div className="px-4 py-3 min-h-[44px] bg-gray-100 rounded-xl border border-gray-200 text-gray-900 font-bold text-base flex items-center">
-                        $
-                        {calculateItemTotal(
-                          item.Price,
-                          item.Quantity || "1"
-                        ).toFixed(2)}
+            <div className="space-y-4">
+              {items.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`border border-gray-200 rounded-2xl p-6 hover:bg-blue-50 transition-colors duration-200 ${
+                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  }`}
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    {/* Left side - Item details */}
+                    <div className="flex-1 space-y-2">
+                      <h3 className="text-lg font-bold text-gray-900">
+                        {item["Item Name"] || "N/A"}
+                      </h3>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-600">
+                        <span className="font-medium">
+                          Unit: {item.Unit || "N/A"}
+                        </span>
+                        <span className="hidden sm:block">•</span>
+                        <span className="font-medium">
+                          Size/Option: {item["Size/Option"] || "N/A"}
+                        </span>
                       </div>
-                    </td>
-                    <td className="py-4 px-3" data-label="Vendors">
-                      <input
-                        className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                        value={item.Vendors}
-                        onChange={(e) =>
-                          onUpdateItem(index, "Vendors", e.target.value)
-                        }
-                        placeholder="Vendors"
-                      />
-                    </td>
-                    <td className="py-4 px-3 text-center" data-label="Actions">
-                      <Tooltip text="Delete this item">
-                        <button
-                          className="min-h-[44px] min-w-[44px] p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-                          aria-label={`Remove ${item["Item Name"]}`}
-                          onClick={() => onDeleteItem(index)}
-                        >
-                          <Trash2 className="h-5 w-5" />
-                          <span className="sr-only">Delete</span>
-                        </button>
-                      </Tooltip>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+
+                    {/* Center - Price and Quantity */}
+                    <div className="flex flex-col sm:flex-row gap-4 lg:gap-8 items-start sm:items-center">
+                      <div className="text-center">
+                        <div className="text-sm text-gray-500 font-medium">
+                          Price
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {item.Price ? `$${item.Price}` : "N/A"}
+                        </div>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="text-sm text-gray-500 font-medium">
+                          Quantity
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {item.Quantity || "1"}
+                        </div>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="text-sm text-gray-500 font-medium">
+                          Total
+                        </div>
+                        <div className="text-lg font-bold text-[#033159]">
+                          $
+                          {calculateItemTotal(
+                            item.Price,
+                            item.Quantity || "1"
+                          ).toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right side - Vendors and Actions */}
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                      {/* Vendors */}
+                      <div className="lg:min-w-[200px]">
+                        <div className="text-sm font-medium text-gray-700 mb-2">
+                          Vendors
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          {typeof item.Vendors === "string" &&
+                          item.Vendors.trim() ? (
+                            item.Vendors.split(",").map(
+                              (vendor: string, vIdx: number) => {
+                                const trimmedVendor = vendor.trim();
+                                const selected = Array.isArray(
+                                  item.selectedVendors
+                                )
+                                  ? item.selectedVendors.includes(trimmedVendor)
+                                  : false;
+                                return (
+                                  <label
+                                    key={vIdx}
+                                    className="flex items-center space-x-2 cursor-pointer"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      className="rounded border-gray-300 text-[#033159] focus:ring-[#033159] h-4 w-4"
+                                      checked={selected}
+                                      onChange={(e) => {
+                                        let updated: string[] = Array.isArray(
+                                          item.selectedVendors
+                                        )
+                                          ? [...item.selectedVendors]
+                                          : [];
+                                        if (e.target.checked) {
+                                          updated.push(trimmedVendor);
+                                        } else {
+                                          updated = updated.filter(
+                                            (v) => v !== trimmedVendor
+                                          );
+                                        }
+                                        onUpdateItem(
+                                          index,
+                                          "selectedVendors",
+                                          updated
+                                        );
+                                      }}
+                                    />
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {trimmedVendor}
+                                    </span>
+                                  </label>
+                                );
+                              }
+                            )
+                          ) : (
+                            <span className="text-sm text-gray-500 italic">
+                              No vendors available
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex justify-end lg:justify-center">
+                        <Tooltip text="Delete this item">
+                          <button
+                            className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 border border-red-200 hover:border-red-300"
+                            aria-label={`Remove ${item["Item Name"]}`}
+                            onClick={() => onDeleteItem(index)}
+                          >
+                            <Trash2 className="h-5 w-5" />
+                            <span className="sr-only">Delete</span>
+                          </button>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Grand Total */}

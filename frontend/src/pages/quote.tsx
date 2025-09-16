@@ -63,7 +63,13 @@ const QuoteBuilder: React.FC = () => {
         {/* Items Section */}
         <QuoteItemsTable
           items={items}
-          onUpdateItem={updateItem}
+          onUpdateItem={
+            updateItem as (
+              index: number,
+              field: keyof (typeof items)[0] | string,
+              value: any
+            ) => void
+          }
           onDeleteItem={deleteItem}
           calculateItemTotal={calculateItemTotal}
           calculateGrandTotal={calculateGrandTotal}

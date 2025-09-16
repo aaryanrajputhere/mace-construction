@@ -93,7 +93,7 @@ const StudCalculator: React.FC = () => {
       unit: "pcs",
       price: price,
       quantity: result.studs,
-      vendors: "Home Depot, Lowes, Menards",
+      vendors: "Home Depot,Lowes,Menards",
       image: "",
       addedAt: new Date().toLocaleString(),
     });

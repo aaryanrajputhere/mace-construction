@@ -8,4 +8,5 @@ export interface Material {
   Vendors: string;
   image?: string;
   Quantity?: string;
+  selectedVendors?: string[];
 }

@@ -42,7 +42,7 @@ export const sendRFQEmail = async (
   const msg = {
     to: vendor.email, // Send to actual vendor
     from: "rfq@maceinfo.com", // Verified sender
-    subject: `RFQ Request – ${projectInfo.name}, RFQ ID #${rfqId}`,
+    subject: `RFQ Request – ${projectInfo.projectName}, RFQ ID #${rfqId}`,
     html: `
       <p>Hello ${vendor.name},</p>
       <p>We are requesting pricing and lead time for the following materials:</p>

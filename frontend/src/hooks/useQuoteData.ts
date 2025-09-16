@@ -32,6 +32,7 @@ export const useQuoteData = () => {
   // Load items from localStorage (from calculators/catalog)
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("quote") || "[]");
+    console.log(stored);
     // Transform localStorage objects to match table fields and assign sequential IDs
     const mapped = stored.map((item: any, index: number) => ({
       id: index + 1,
@@ -40,11 +41,12 @@ export const useQuoteData = () => {
       "Size/Option": item.size || item.option || "",
       Unit: item.unit || "",
       Price: item.price !== undefined ? String(item.price) : "",
-      Vendors: item.vendor || item.vendors || "",
+      Vendors: item["vendors"] || item["Vendors"] || "",
       image: item.image || "",
       Quantity: item.quantity !== undefined ? String(item.quantity) : "1",
     }));
     setItems(mapped);
+    console.log(mapped);
   }, []);
 
   // Add new item
@@ -160,7 +162,7 @@ export const useQuoteData = () => {
     );
     formData.append("items", JSON.stringify(items));
     files.forEach((file) => formData.append("files", file));
-
+    console.log(items);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/quotes/apply`,
