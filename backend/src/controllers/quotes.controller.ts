@@ -79,7 +79,24 @@ export const createQuote = async (req: Request, res: Response) => {
       vendors_json: vendors_json || "",
       drive_folder_url: folderLink || "",
     };
-
+    // 2️⃣b Add RFQ to Prisma DB
+    await prisma.rFQ.create({
+      data: {
+        rfq_id: rfqId,
+        created_at: new Date(),
+        requester_name: projectInfo.requesterName || "",
+        requester_email: projectInfo.requesterEmail || "",
+        requester_phone: String(projectInfo.requesterPhone || ""),
+        project_name: projectInfo.projectName || "",
+        project_address: projectInfo.siteAddress || "",
+        needed_by: projectInfo.neededBy || "",
+        notes: projectInfo.notes || "",
+        items_json: item_json || "",
+        vendors_json: vendors_json || "",
+        drive_folder_url: folderLink || "",
+        // status, email_message_id, decision_at, awarded_vendor_name, etc. can be added as needed
+      },
+    });
     const sheetResponse = await addRFQToSheet(rfqData);
 
     // Fetch all vendors from the database

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import { decode } from "punycode";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +21,7 @@ export const getItems = async (req: Request, res: Response) => {
     if (decoded.rfqId !== rfqId) {
       return res.status(403).json({ error: "Invalid RFQ link" });
     }
-
+    const vendorName = decoded.vendorName;
     // Fetch RFQ record
     const rfq = await prisma.rFQ.findUnique({
       where: { rfq_id: rfqId },
@@ -37,7 +38,6 @@ export const getItems = async (req: Request, res: Response) => {
       return res.status(500).json({ error: "Invalid items_json format" });
     }
 
-    // Map each vendor to their items
     const vendorItemsMap: Record<string, any[]> = {};
     items.forEach((item: any) => {
       if (item.Vendors) {
@@ -50,10 +50,10 @@ export const getItems = async (req: Request, res: Response) => {
       }
     });
 
-    // Get items for this vendor
-    const vendorItems = vendorItemsMap[decoded.vendorName] || [];
-
-    return res.json({ success: true, items: vendorItems });
+    // Prepare vendor list as a string
+    const vendorsArray = Object.keys(vendorItemsMap);
+    const vendors_json = vendorsArray.join(", ");
+    return res.json({ success: true, items: vendors_json });
   } catch (err) {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
@@ -91,4 +91,3 @@ export const handleVendorReply = (req: Request, res: Response) => {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
-
