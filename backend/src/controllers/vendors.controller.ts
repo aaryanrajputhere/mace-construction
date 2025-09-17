@@ -51,11 +51,12 @@ export const getItems = async (req: Request, res: Response) => {
     });
 
     // Prepare vendor list as a string
-    const itemsForVendor = (vendorItemsMap[vendorName] || []).filter(
+    let itemsForVendor = (vendorItemsMap[vendorName] || []).filter(
       (item: any) =>
         Array.isArray(item.selectedVendors) &&
         item.selectedVendors.includes(vendorName)
     );
+    itemsForVendor = itemsForVendor.map(({ selectedVendors, ...rest }) => rest);
 
     return res.json({ success: true, items: itemsForVendor });
   } catch (err) {
