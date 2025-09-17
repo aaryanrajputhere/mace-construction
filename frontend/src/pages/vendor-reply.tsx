@@ -7,7 +7,6 @@ import VendorReplyFooter from "../components/vendor-reply/VendorReplyFooter";
 import VendorReplyLoading from "../components/vendor-reply/VendorReplyLoading";
 import VendorReplyInvalid from "../components/vendor-reply/VendorReplyInvalid";
 import VendorReplySubmitButton from "../components/vendor-reply/VendorReplySubmitButton";
-
 const VendorReplyPage: React.FC = () => {
   const { rfqId, token } = useParams<{ rfqId: string; token: string }>();
 
@@ -22,6 +21,7 @@ const VendorReplyPage: React.FC = () => {
     const fetchItems = async () => {
       try {
         setIsLoading(true);
+        // Call the getItems API from vendors.controller.ts
         const res = await fetch(
           `https://mace-construction-production.up.railway.app/api/vendors/get-items/${rfqId}/${token}`
         );
@@ -37,6 +37,8 @@ const VendorReplyPage: React.FC = () => {
               file_link: "",
             }))
           );
+        } else {
+          setMessage(data.error || "❌ Failed to fetch items");
         }
       } catch (err) {
         setMessage("❌ Failed to fetch items");

@@ -51,9 +51,13 @@ export const getItems = async (req: Request, res: Response) => {
     });
 
     // Prepare vendor list as a string
-    const vendorsArray = Object.keys(vendorItemsMap);
-    const vendors_json = vendorsArray.join(", ");
-    return res.json({ success: true, items: vendors_json });
+    const itemsForVendor = (vendorItemsMap[vendorName] || []).filter(
+      (item: any) =>
+        Array.isArray(item.selectedVendors) &&
+        item.selectedVendors.includes(vendorName)
+    );
+
+    return res.json({ success: true, items: itemsForVendor });
   } catch (err) {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
