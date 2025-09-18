@@ -16,7 +16,7 @@ export const createQuote = async (req: Request, res: Response) => {
     const items = req.body.items ? JSON.parse(req.body.items) : [];
     const item_json = JSON.stringify(items); // <-- stringify the array
     const files = req.files as Express.Multer.File[];
-
+    
     if (!projectInfo || items.length === 0) {
       return res
         .status(400)

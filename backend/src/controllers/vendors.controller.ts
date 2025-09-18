@@ -1,3 +1,4 @@
+import { addVendorReplyToSheet } from "../services/sheets.service";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
@@ -37,7 +38,7 @@ export const getItems = async (req: Request, res: Response) => {
     } catch {
       return res.status(500).json({ error: "Invalid items_json format" });
     }
-
+    console.log(vendorName);
     const vendorItemsMap: Record<string, any[]> = {};
     items.forEach((item: any) => {
       if (item.Vendors) {
@@ -64,32 +65,61 @@ export const getItems = async (req: Request, res: Response) => {
   }
 };
 
-export const handleVendorReply = (req: Request, res: Response) => {
+export const handleVendorReply = async (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
-  const { pricing, leadTime, notes } = req.body; // expecting vendor reply fields
+  const { pricing, leadTime, notes } = req.body;
 
   try {
-    // ✅ Verify token
     const decoded = jwt.verify(token, SECRET) as VendorReplyToken;
 
     if (decoded.rfqId !== rfqId) {
       return res.status(403).json({ error: "Invalid RFQ link" });
     }
 
+    // Fetch vendor details from Prisma using email (not unique, so use findFirst)
+    const vendor = await prisma.vendor.findFirst({
+      where: { email: decoded.vendorEmail },
+      select: { name: true, email: true, phone: true },
+    });
+    if (!vendor) {
+      return res.status(404).json({ error: "Vendor not found" });
+    }
+
     console.log("Vendor Reply Received:", {
       rfqId,
-      vendorName: decoded.vendorName,
-      vendorEmail: decoded.vendorEmail,
+      vendorName: vendor.name,
+      vendorEmail: vendor.email,
+      vendorPhone: vendor.phone,
       pricing,
       leadTime,
       notes,
     });
 
+    // Call addVendorReplyToSheet
+    try {
+      await addVendorReplyToSheet({
+        rfq_id: rfqId,
+        reply_id: `${rfqId}-${vendor.email}-${Date.now()}`,
+        submitted_at: new Date().toISOString(),
+        vendor_name: vendor.name,
+        vendor_email: vendor.email || "",
+        vendor_phone: vendor.phone || "",
+        prices_text: pricing || "",
+        lead_time_days: leadTime || "",
+        notes: notes || "",
+        // Other fields left blank or undefined
+      });
+    } catch (sheetErr) {
+      console.error("Failed to add vendor reply to sheet:", sheetErr);
+      // Continue, but log error
+    }
+
     return res.status(200).json({
       message: "Reply submitted successfully",
       vendor: {
-        name: decoded.vendorName,
-        email: decoded.vendorEmail,
+        name: vendor.name,
+        email: vendor.email,
+        phone: vendor.phone,
       },
     });
   } catch (err) {

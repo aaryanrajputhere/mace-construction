@@ -70,12 +70,18 @@ const VendorReplyPage: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      // For now, only send the first row's fields (assuming one vendor reply per form)
+      const { price, lead_time, notes } = fields[0] || {};
       const res = await fetch(
         `https://mace-construction-production.up.railway.app/api/vendors/vendor-reply/${rfqId}/${token}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: fields }),
+          body: JSON.stringify({
+            pricing: price,
+            leadTime: lead_time,
+            notes: notes,
+          }),
         }
       );
       const data = await res.json();
