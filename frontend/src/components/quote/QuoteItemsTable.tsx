@@ -133,10 +133,10 @@ const QuoteItemsTable: React.FC<QuoteItemsTableProps> = ({
                             item.Vendors.split(",").map(
                               (vendor: string, vIdx: number) => {
                                 const trimmedVendor = vendor.trim();
-                                const selected = Array.isArray(
-                                  item.selectedVendors
-                                )
-                                  ? item.selectedVendors.includes(trimmedVendor)
+                                // Use selectedVendors as is; do not reset on reload
+                                let selectedVendors = item.selectedVendors;
+                                const selected = Array.isArray(selectedVendors)
+                                  ? selectedVendors.includes(trimmedVendor)
                                   : false;
                                 return (
                                   <label
@@ -146,15 +146,67 @@ const QuoteItemsTable: React.FC<QuoteItemsTableProps> = ({
                                     <input
                                       type="checkbox"
                                       className="rounded border-gray-300 text-[#033159] focus:ring-[#033159] h-4 w-4"
-                                      checked={selected}
+                                      checked={(() => {
+                                        // Try to get selectedVendors from localStorage 'selectedVendors' for this item
+                                        try {
+                                          const svObj =
+                                            JSON.parse(
+                                              localStorage.getItem(
+                                                "selectedVendors"
+                                              ) || "{}"
+                                            ) || {};
+                                          // If not present, initialize to all vendors for this item
+                                          if (!svObj[item.id]) {
+                                            const allVendors =
+                                              typeof item.Vendors ===
+                                                "string" && item.Vendors.trim()
+                                                ? item.Vendors.split(",").map(
+                                                    (v) => v.trim()
+                                                  )
+                                                : [];
+                                            svObj[item.id] = allVendors;
+                                            localStorage.setItem(
+                                              "selectedVendors",
+                                              JSON.stringify(svObj)
+                                            );
+                                          }
+                                          if (Array.isArray(svObj[item.id])) {
+                                            return svObj[item.id].includes(
+                                              trimmedVendor
+                                            );
+                                          }
+                                        } catch {}
+                                        // fallback to in-memory selectedVendors
+                                        return selected;
+                                      })()}
                                       onChange={(e) => {
-                                        let updated: string[] = Array.isArray(
-                                          item.selectedVendors
-                                        )
-                                          ? [...item.selectedVendors]
-                                          : [];
+                                        // Always use the latest selectedVendors from localStorage for this item
+                                        let updated: string[] = [];
+                                        try {
+                                          const svObj =
+                                            JSON.parse(
+                                              localStorage.getItem(
+                                                "selectedVendors"
+                                              ) || "{}"
+                                            ) || {};
+                                          if (Array.isArray(svObj[item.id])) {
+                                            updated = [...svObj[item.id]];
+                                          } else if (
+                                            Array.isArray(selectedVendors)
+                                          ) {
+                                            updated = [...selectedVendors];
+                                          }
+                                        } catch {
+                                          if (Array.isArray(selectedVendors)) {
+                                            updated = [...selectedVendors];
+                                          }
+                                        }
                                         if (e.target.checked) {
-                                          updated.push(trimmedVendor);
+                                          if (
+                                            !updated.includes(trimmedVendor)
+                                          ) {
+                                            updated.push(trimmedVendor);
+                                          }
                                         } else {
                                           updated = updated.filter(
                                             (v) => v !== trimmedVendor
@@ -165,6 +217,23 @@ const QuoteItemsTable: React.FC<QuoteItemsTableProps> = ({
                                           "selectedVendors",
                                           updated
                                         );
+                                        console.log("selectedVendors", updated);
+                                        // Update localStorage 'selectedVendors' for this item's id
+                                        try {
+                                          const svObj =
+                                            JSON.parse(
+                                              localStorage.getItem(
+                                                "selectedVendors"
+                                              ) || "{}"
+                                            ) || {};
+                                          svObj[item.id] = updated;
+                                          localStorage.setItem(
+                                            "selectedVendors",
+                                            JSON.stringify(svObj)
+                                          );
+                                        } catch (err) {
+                                          // ignore
+                                        }
                                       }}
                                     />
                                     <span className="text-sm font-medium text-gray-900">

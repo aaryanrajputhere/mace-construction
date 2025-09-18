@@ -57,6 +57,7 @@ const OSBCalculator: React.FC = () => {
       price: 14.95,
       quantity: result,
       vendors: "Home Depot, Lowes",
+      selectedVendors: ["Home Depot", "Lowes"],
       image: "",
       addedAt: new Date().toLocaleString(),
     };

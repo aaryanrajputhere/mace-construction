@@ -1,15 +1,16 @@
-import { 
-  Building, 
-  Edit3, 
-  MapPin, 
-  Calendar, 
-  User, 
-  Mail, 
-  Phone, 
-  FileText, 
-  HelpCircle 
+import {
+  Building,
+  Edit3,
+  MapPin,
+  Calendar,
+  User,
+  Mail,
+  Phone,
+  FileText,
+  HelpCircle,
 } from "lucide-react";
 import Tooltip from "./Tooltip";
+import { useEffect } from "react";
 
 interface ProjectInfoFormProps {
   projectName: string;
@@ -28,6 +29,8 @@ interface ProjectInfoFormProps {
   setNotes: (value: string) => void;
 }
 
+const LOCAL_STORAGE_KEY = "mace_project_info";
+
 const ProjectInfoForm: React.FC<ProjectInfoFormProps> = ({
   projectName,
   setProjectName,
@@ -44,6 +47,46 @@ const ProjectInfoForm: React.FC<ProjectInfoFormProps> = ({
   notes,
   setNotes,
 }) => {
+  // Restore from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.projectName) setProjectName(data.projectName);
+        if (data.siteAddress) setSiteAddress(data.siteAddress);
+        if (data.neededBy) setNeededBy(data.neededBy);
+        if (data.requesterName) setRequesterName(data.requesterName);
+        if (data.requesterEmail) setRequesterEmail(data.requesterEmail);
+        if (data.requesterPhone) setRequesterPhone(data.requesterPhone);
+        if (data.notes) setNotes(data.notes);
+      } catch {}
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  // Save to localStorage whenever any field changes
+  useEffect(() => {
+    const data = {
+      projectName,
+      siteAddress,
+      neededBy,
+      requesterName,
+      requesterEmail,
+      requesterPhone,
+      notes,
+    };
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+  }, [
+    projectName,
+    siteAddress,
+    neededBy,
+    requesterName,
+    requesterEmail,
+    requesterPhone,
+    notes,
+  ]);
+
   return (
     <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       <div className="flex items-center space-x-3 mb-6">

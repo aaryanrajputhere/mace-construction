@@ -94,6 +94,7 @@ const StudCalculator: React.FC = () => {
       price: price,
       quantity: result.studs,
       vendors: "Home Depot,Lowes,Menards",
+      selectedVendors: ["Home Depot", "Lowes", "Menards"],
       image: "",
       addedAt: new Date().toLocaleString(),
     });

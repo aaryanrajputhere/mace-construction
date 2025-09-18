@@ -81,12 +81,23 @@ export const useQuoteData = () => {
   const deleteItem = (index: number) => {
     setItems((prev) => {
       const updated = prev.filter((_, i) => i !== index);
+      // Find the id of the deleted item
+      const deletedItem = prev[index];
       // Re-assign sequential IDs after deletion
       const reIndexed = updated.map((item, i) => ({
         ...item,
         id: i + 1,
       }));
       localStorage.setItem("quote", JSON.stringify(reIndexed));
+      // Remove from selectedVendors in localStorage
+      if (deletedItem && deletedItem.id !== undefined) {
+        try {
+          const svObj =
+            JSON.parse(localStorage.getItem("selectedVendors") || "{}") || {};
+          delete svObj[deletedItem.id];
+          localStorage.setItem("selectedVendors", JSON.stringify(svObj));
+        } catch {}
+      }
       return reIndexed;
     });
   };

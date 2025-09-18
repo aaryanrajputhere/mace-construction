@@ -8,6 +8,7 @@ function saveQuoteToLocalStorage(item: {
   quantity: number;
   image: string;
   addedAt: string;
+  selectedVendors: string[];
 }) {
   try {
     const existing = JSON.parse(localStorage.getItem("quote") || "[]");
@@ -377,6 +378,19 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
               <button
                 className="w-full px-6 py-4 min-h-[44px] bg-gradient-to-r from-[#033159] to-[#00598F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:from-[#022244] hover:to-[#004a7a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 flex items-center justify-center space-x-3 text-base"
                 onClick={() => {
+                  // Always set selectedVendors as all vendors by default
+                  let selectedVendors: string[] = [];
+                  if (Array.isArray(material.Vendors)) {
+                    selectedVendors = material.Vendors;
+                  } else if (
+                    typeof material.Vendors === "string" &&
+                    material.Vendors.length > 0
+                  ) {
+                    selectedVendors = material.Vendors.split(",").map(
+                      (v: string) => v.trim()
+                    );
+                  }
+
                   const quoteItem = {
                     id: Date.now(),
                     category: Category,
@@ -387,6 +401,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                     Vendors: material.Vendors,
                     quantity,
                     image: "",
+                    selectedVendors,
                     addedAt: new Date().toLocaleString(),
                   };
 

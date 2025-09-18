@@ -27,9 +27,18 @@ const VendorReplyPage: React.FC = () => {
         );
         const data = await res.json();
         if (res.ok && Array.isArray(data.items)) {
-          setItems(data.items);
+          // Convert Vendors to string[] if it's a string
+          const normalizedItems = data.items.map((item: any) => ({
+            ...item,
+            Vendors: Array.isArray(item.Vendors)
+              ? item.Vendors
+              : typeof item.Vendors === "string"
+              ? item.Vendors.split(",").map((v: string) => v.trim())
+              : [],
+          }));
+          setItems(normalizedItems);
           setFields(
-            data.items.map(() => ({
+            normalizedItems.map(() => ({
               price: "",
               lead_time: "",
               notes: "",
@@ -62,7 +71,7 @@ const VendorReplyPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const res = await fetch(
-        `https://yourapp.com/vendor-reply/${rfqId}/${token}`,
+        `https://mace-construction-production.up.railway.app/api/vendors/vendor-reply/${rfqId}/${token}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

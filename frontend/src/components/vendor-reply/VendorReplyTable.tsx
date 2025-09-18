@@ -76,24 +76,24 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                 key={item.id}
                 className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
                   idx % 2 === 0 ? "bg-gray-50" : "bg-white"
-                }`}
+                } h-[110px] align-top`}
               >
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <div className="font-bold text-gray-900 text-base">
-                    {item.name}
+                    {item["Item Name"]}
                   </div>
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <div className="text-gray-700 text-base">
-                    {item.size || "-"}
+                    {item["Size/Option"] || "-"}
                   </div>
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <div className="text-gray-700 text-base font-medium">
-                    {item.unit || "-"}
+                    {item["Unit"] || "-"}
                   </div>
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
                       $
@@ -106,54 +106,53 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                       onChange={(e) =>
                         handleFieldChange(idx, "price", e.target.value)
                       }
-                      className="w-full pl-8 pr-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                      className="w-full pl-8 pr-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
                       placeholder="0.00"
                       required
                     />
                   </div>
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <input
-                    type="text"
+                    type="date"
                     value={fields[idx]?.lead_time || ""}
                     onChange={(e) =>
                       handleFieldChange(idx, "lead_time", e.target.value)
                     }
-                    className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                    placeholder="e.g. 2-3 weeks"
+                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
                     required
                   />
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <textarea
                     value={fields[idx]?.notes || ""}
                     onChange={(e) =>
                       handleFieldChange(idx, "notes", e.target.value)
                     }
-                    className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
+                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
                     placeholder="Additional notes..."
-                    rows={1}
+                    rows={2}
                   />
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <textarea
                     value={fields[idx]?.substitutions || ""}
                     onChange={(e) =>
                       handleFieldChange(idx, "substitutions", e.target.value)
                     }
-                    className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
+                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
                     placeholder="Alternative products..."
-                    rows={1}
+                    rows={2}
                   />
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-6 px-3">
                   <input
                     type="url"
                     value={fields[idx]?.file_link || ""}
                     onChange={(e) =>
                       handleFieldChange(idx, "file_link", e.target.value)
                     }
-                    className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
                     placeholder="https://..."
                   />
                 </td>
