@@ -4,6 +4,7 @@ import VendorReplyHeader from "../components/vendor-reply/VendorReplyHeader";
 import VendorReplyTable from "../components/vendor-reply/VendorReplyTable";
 import VendorReplyMessage from "../components/vendor-reply/VendorReplyMessage";
 import VendorReplyFooter from "../components/vendor-reply/VendorReplyFooter";
+import VendorReplySummary from "../components/vendor-reply/VendorReplySummary";
 import VendorReplyLoading from "../components/vendor-reply/VendorReplyLoading";
 import VendorReplyInvalid from "../components/vendor-reply/VendorReplyInvalid";
 import VendorReplySubmitButton from "../components/vendor-reply/VendorReplySubmitButton";
@@ -15,6 +16,9 @@ const VendorReplyPage: React.FC = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deliveryCharges, setDeliveryCharges] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [summaryNotes, setSummaryNotes] = useState("");
 
   useEffect(() => {
     if (!rfqId || !token) return;
@@ -81,6 +85,9 @@ const VendorReplyPage: React.FC = () => {
             pricing: price,
             leadTime: lead_time,
             notes: notes,
+            deliveryCharges,
+            discount,
+            summaryNotes,
           }),
         }
       );
@@ -120,6 +127,18 @@ const VendorReplyPage: React.FC = () => {
               handleFieldChange={handleFieldChange}
             />
           </div>
+          {/* Summary Section */}
+          <VendorReplySummary
+            fields={fields}
+            deliveryCharges={deliveryCharges}
+            discount={discount}
+            notes={summaryNotes}
+            onChange={(field, value) => {
+              if (field === "deliveryCharges") setDeliveryCharges(value);
+              else if (field === "discount") setDiscount(value);
+              else if (field === "notes") setSummaryNotes(value);
+            }}
+          />
           {/* Submit Button */}
           {items.length > 0 && (
             <VendorReplySubmitButton isSubmitting={isSubmitting} />

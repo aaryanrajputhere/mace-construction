@@ -1,6 +1,6 @@
 // App.tsx
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Materials from "./pages/materials";
@@ -10,9 +10,12 @@ import QuoteBuilder from "./pages/quote";
 import LandingPage from "./pages/home";
 import VendorReplyPage from "./pages/vendor-reply";
 const App: React.FC = () => {
+  const location = useLocation();
+  // Hide header/footer on vendor-reply route
+  const isVendorReply = /^\/vendor-reply\//.test(location.pathname);
   return (
     <div className="min-h-[100dvh] bg-gray-50">
-      <Header />
+      {!isVendorReply && <Header />}
       {/* Container with consistent padding */}
       <main className="container py-10 space-scale-lg">
         <Routes>
@@ -27,7 +30,7 @@ const App: React.FC = () => {
           />
         </Routes>
       </main>
-      <Footer />
+      {!isVendorReply && <Footer />}
     </div>
   );
 };

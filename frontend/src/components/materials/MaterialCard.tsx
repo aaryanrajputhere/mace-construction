@@ -65,7 +65,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number | string>(1);
   console.log(material);
   // Vendors is now always string[]
   let vendors: string[] = [];
@@ -89,7 +89,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
   // Calculate total price
   const calculateTotal = (): number => {
     const priceNum = parseFloat(String(price).replace(/[^0-9.-]/g, "")) || 0;
-    return priceNum * quantity;
+    return priceNum * Number(quantity);
   };
 
   return (
@@ -338,18 +338,39 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                 <div className="flex items-center justify-center space-x-6 bg-gray-50 rounded-xl p-4">
                   <button
                     className="w-12 min-h-[44px] border-2 border-gray-300 rounded-xl text-xl font-bold hover:bg-gray-100 hover:border-[#033159] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 transition-all duration-200 text-gray-700"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={() =>
+                      setQuantity(Math.max(1, Number(quantity) - 1))
+                    }
                     aria-label="Decrease quantity"
+                    type="button"
                   >
                     –
                   </button>
-                  <span className="text-2xl font-bold text-gray-900 min-w-[4rem] text-center">
-                    {quantity}
-                  </span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || isNaN(Number(val))) {
+                        setQuantity(""); // allow empty input
+                      } else {
+                        setQuantity(Math.max(1, Number(val)));
+                      }
+                    }}
+                    onBlur={() => {
+                      if (!quantity || isNaN(Number(quantity))) {
+                        setQuantity(1);
+                      }
+                    }}
+                    className="text-2xl font-bold text-gray-900 min-w-[6rem] text-center bg-white border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#033159]"
+                    style={{ width: "7rem" }}
+                  />
                   <button
                     className="w-12 min-h-[44px] border-2 border-gray-300 rounded-xl text-xl font-bold hover:bg-gray-100 hover:border-[#033159] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#033159] focus-visible:ring-offset-2 transition-all duration-200 text-gray-700"
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() => setQuantity(Number(quantity) + 1)}
                     aria-label="Increase quantity"
+                    type="button"
                   >
                     +
                   </button>
@@ -399,7 +420,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                     unit,
                     price: Number(price.toString().replace(/[^0-9.-]/g, "")), // convert string -> number and remove currency symbols
                     Vendors: material.Vendors,
-                    quantity,
+                    quantity: Number(quantity),
                     image: "",
                     selectedVendors,
                     addedAt: new Date().toLocaleString(),
