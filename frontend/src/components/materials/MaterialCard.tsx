@@ -350,6 +350,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                     type="number"
                     min={1}
                     value={quantity}
+                    inputMode="numeric"
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === "" || isNaN(Number(val))) {
@@ -363,7 +364,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                         setQuantity(1);
                       }
                     }}
-                    className="text-2xl font-bold text-gray-900 min-w-[6rem] text-center bg-white border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#033159]"
+                    className="text-2xl font-bold text-gray-900 min-w-[6rem] text-center bg-white border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#033159] no-spinner"
                     style={{ width: "7rem" }}
                   />
                   <button
@@ -494,6 +495,16 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
 
     .animate-slide-up {
       animation: slide-up 0.3s ease-out forwards;
+    }
+
+    /* Hide number input spinners for all browsers */
+    input.no-spinner::-webkit-outer-spin-button,
+    input.no-spinner::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input.no-spinner[type=number] {
+      -moz-appearance: textfield;
     }
   `}
       </style>

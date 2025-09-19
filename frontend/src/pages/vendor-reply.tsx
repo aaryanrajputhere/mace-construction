@@ -148,6 +148,23 @@ const VendorReplyPage: React.FC = () => {
         {/* Message Display */}
         <VendorReplyMessage message={message} />
 
+        {/* Custom Footer */}
+        <div className="mt-10 mb-4 text-center">
+          <div className="text-base font-medium text-gray-700 mb-2">
+            Need help?{" "}
+            <a
+              href="mailto:rfq@maceinfo.com"
+              className="text-[#033159] underline"
+            >
+              Contact rfq@maceinfo.com
+            </a>
+          </div>
+          <div className="text-xs text-gray-500 font-medium">
+            Privacy note: Your reply will be visible only to the customer and
+            Mace admin.
+          </div>
+        </div>
+
         {/* Footer */}
         <VendorReplyFooter />
       </div>

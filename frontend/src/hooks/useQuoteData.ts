@@ -34,16 +34,17 @@ export const useQuoteData = () => {
     const stored = JSON.parse(localStorage.getItem("quote") || "[]");
     console.log(stored);
     // Transform localStorage objects to match table fields and assign sequential IDs
-    const mapped = stored.map((item: any, index: number) => ({
-      id: index + 1,
-      Category: item.category || "",
-      "Item Name": item.name || "",
-      "Size/Option": item.size || item.option || "",
-      Unit: item.unit || "",
-      Price: item.price !== undefined ? String(item.price) : "",
+    const mapped = stored.map((item: any) => ({
+      id: item["id"] || item.id,
+      Category: item.category || item.Category || "",
+      "Item Name": item.name || item["Item Name"] || "",
+      "Size/Option": item.size || item.option || item["Size/Option"] || "",
+      Unit: item.unit || item.Unit || "",
+      Price: item.price !== undefined ? String(item.price) : (item.Price !== undefined ? String(item.Price) : ""),
       Vendors: item["vendors"] || item["Vendors"] || "",
       image: item.image || "",
-      Quantity: item.quantity !== undefined ? String(item.quantity) : "1",
+      Quantity: item.quantity !== undefined ? String(item.quantity) : (item.Quantity !== undefined ? String(item.Quantity) : "1"),
+      selectedVendors: item.selectedVendors || [],
     }));
     setItems(mapped);
     console.log(mapped);
@@ -81,24 +82,8 @@ export const useQuoteData = () => {
   const deleteItem = (index: number) => {
     setItems((prev) => {
       const updated = prev.filter((_, i) => i !== index);
-      // Find the id of the deleted item
-      const deletedItem = prev[index];
-      // Re-assign sequential IDs after deletion
-      const reIndexed = updated.map((item, i) => ({
-        ...item,
-        id: i + 1,
-      }));
-      localStorage.setItem("quote", JSON.stringify(reIndexed));
-      // Remove from selectedVendors in localStorage
-      if (deletedItem && deletedItem.id !== undefined) {
-        try {
-          const svObj =
-            JSON.parse(localStorage.getItem("selectedVendors") || "{}") || {};
-          delete svObj[deletedItem.id];
-          localStorage.setItem("selectedVendors", JSON.stringify(svObj));
-        } catch {}
-      }
-      return reIndexed;
+      localStorage.setItem("quote", JSON.stringify(updated));
+      return updated;
     });
   };
 
