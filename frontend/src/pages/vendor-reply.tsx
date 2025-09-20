@@ -70,6 +70,14 @@ const VendorReplyPage: React.FC = () => {
     });
   };
 
+  const handleFileChange = (idx: number, file: File | null) => {
+    setFields((prev) => {
+      const updated = [...prev];
+      updated[idx].file_link = file ? file.name : "";
+      return updated;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -117,7 +125,6 @@ const VendorReplyPage: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <VendorReplyHeader rfqId={rfqId} />
-
         {/* Main Form */}
         <form onSubmit={handleSubmit}>
           <div className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 mb-8">
@@ -125,6 +132,7 @@ const VendorReplyPage: React.FC = () => {
               items={items}
               fields={fields}
               handleFieldChange={handleFieldChange}
+              handleFileChange={handleFileChange}
             />
           </div>
           {/* Summary Section */}
@@ -141,7 +149,9 @@ const VendorReplyPage: React.FC = () => {
           />
           {/* Submit Button */}
           {items.length > 0 && (
-            <VendorReplySubmitButton isSubmitting={isSubmitting} />
+            <div className="mt-8">
+              <VendorReplySubmitButton isSubmitting={isSubmitting} />
+            </div>
           )}
         </form>
 

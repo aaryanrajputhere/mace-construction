@@ -5,12 +5,14 @@ interface VendorReplyTableProps {
   items: any[];
   fields: any[];
   handleFieldChange: (idx: number, field: string, value: string) => void;
+  handleFileChange: (idx: number, file: File | null) => void;
 }
 
 const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
   items,
   fields,
   handleFieldChange,
+  handleFileChange,
 }) => {
   if (items.length === 0) {
     return (
@@ -24,243 +26,287 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
     );
   }
   return (
-    <div className="table-container shadow rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full table-fixed min-w-[900px] sm:min-w-full">
-          <thead className="bg-gradient-to-r from-[#033159] to-[#00598F] text-white">
-            <tr>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[11%] align-middle">
-                <div className="flex items-center space-x-2">
-                  <Package className="h-4 w-4" />
-                  <span>item name</span>
-                </div>
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[8%] align-middle">
-                size/option
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[7%] align-middle">
-                unit
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[7%] align-middle">
-                qty requested
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[12%] align-middle">
-                your price
-                <br />
-                (per unit)
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[12%] align-middle">
-                lead time
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[13%] align-middle">
-                substitution /<br />
-                alt product
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[10%] align-middle">
-                file upload
-              </th>
-              <th className="text-left py-4 px-3 font-bold text-sm w-[20%] align-middle">
-                notes
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => (
-              <tr
-                key={item.id}
-                className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
-                  idx % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } h-[110px] align-top`}
-              >
-                {/* item name */}
-                <td className="py-6 px-3 break-words max-w-[120px]">
-                  <div className="font-bold text-gray-900 text-base">
-                    {item["Item Name"]}
-                  </div>
-                </td>
-                {/* size/option */}
-                <td className="py-6 px-3 break-words max-w-[80px]">
-                  <div className="text-gray-700 text-base">
-                    {item["Size/Option"] || "-"}
-                  </div>
-                </td>
-                {/* unit */}
-                <td className="py-6 px-3 break-words max-w-[60px]">
-                  <div className="text-gray-700 text-base font-medium">
-                    {item["Unit"] || "-"}
-                  </div>
-                </td>
-                {/* qty requested */}
-                <td className="py-6 px-3 break-words max-w-[60px]">
-                  <div className="text-gray-700 text-base font-medium">
-                    {item["Quantity"] || "-"}
-                  </div>
-                </td>
-                {/* your price (per unit) - editable, required */}
-                <td className="py-6 px-3 min-w-[120px]">
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
-                      $
-                    </span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={fields[idx]?.price || ""}
-                      onChange={(e) =>
-                        handleFieldChange(idx, "price", e.target.value)
-                      }
-                      className="w-full pl-8 pr-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-                </td>
-                {/* lead time - editable, required */}
-                <td className="py-6 px-3 min-w-[120px]">
-                  <input
-                    type="date"
-                    value={fields[idx]?.lead_time || ""}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "lead_time", e.target.value)
-                    }
-                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                    required
-                  />
-                </td>
-                {/* substitution / alt product - editable */}
-                <td className="py-6 px-3 min-w-[140px]">
-                  <textarea
-                    value={fields[idx]?.substitutions || ""}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "substitutions", e.target.value)
-                    }
-                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
-                    placeholder="Alternative products..."
-                    rows={2}
-                  />
-                </td>
-                {/* file upload - editable */}
-                <td className="py-6 px-3 min-w-[100px]">
-                  <input
-                    type="url"
-                    value={fields[idx]?.file_link || ""}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "file_link", e.target.value)
-                    }
-                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
-                    placeholder="https://..."
-                  />
-                </td>
-                {/* notes - editable */}
-                <td
-                  className="py-6 px-3 min-w-[180px]"
-                  style={{ minWidth: "180px", width: "100%" }}
-                >
-                  <textarea
-                    value={fields[idx]?.notes || ""}
-                    onChange={(e) =>
-                      handleFieldChange(idx, "notes", e.target.value)
-                    }
-                    className="w-full px-4 py-5 min-h-[56px] border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
-                    placeholder="Additional notes..."
-                    rows={2}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="w-full">
+      {/* Desktop Table - Hidden on mobile */}
+      <div className="hidden lg:block">
+        <div className="table-container shadow rounded-xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full table-fixed min-w-[1400px]">
+              <thead className="bg-gradient-to-r from-[#033159] to-[#00598F] text-white">
+                <tr>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[12%] align-middle">
+                    <div className="flex items-center space-x-2">
+                      <Package className="h-4 w-4" />
+                      <span>Item Name</span>
+                    </div>
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[9%] align-middle">
+                    Size/Option
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[7%] align-middle">
+                    Unit
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[7%] align-middle">
+                    Qty Requested
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[11%] align-middle">
+                    Your Price
+                    <br />
+                    (per unit)
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[11%] align-middle">
+                    Lead Time
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[12%] align-middle">
+                    Substitution /<br />
+                    Alt Product
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[15%] align-middle">
+                    File Upload
+                  </th>
+                  <th className="text-left py-5 px-4 font-bold text-sm w-[16%] align-middle">
+                    Notes
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, idx) => (
+                  <tr
+                    key={item.id}
+                    className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
+                      idx % 2 === 0 ? "bg-gray-50" : "bg-white"
+                    } h-[140px] align-top`}
+                  >
+                    <td className="py-8 px-4 break-words">
+                      <div className="font-bold text-gray-900 text-base">
+                        {item["Item Name"]}
+                      </div>
+                    </td>
+                    <td className="py-8 px-4 break-words">
+                      <div className="text-gray-700 text-base">
+                        {item["Size/Option"] || "-"}
+                      </div>
+                    </td>
+                    <td className="py-8 px-4 break-words">
+                      <div className="text-gray-700 text-base font-medium">
+                        {item["Unit"] || "-"}
+                      </div>
+                    </td>
+                    <td className="py-8 px-4 break-words">
+                      <div className="text-gray-700 text-base font-medium">
+                        {item["Quantity"] || "-"}
+                      </div>
+                    </td>
+                    <td className="py-8 px-4">
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
+                          $
+                        </span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={fields[idx]?.price || ""}
+                          onChange={(e) =>
+                            handleFieldChange(idx, "price", e.target.value)
+                          }
+                          className="w-full pl-8 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                          placeholder="0.00"
+                          required
+                        />
+                      </div>
+                    </td>
+                    <td className="py-8 px-4">
+                      <input
+                        type="date"
+                        value={fields[idx]?.lead_time || ""}
+                        onChange={(e) =>
+                          handleFieldChange(idx, "lead_time", e.target.value)
+                        }
+                        className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                        required
+                      />
+                    </td>
+                    <td className="py-8 px-4">
+                      <textarea
+                        value={fields[idx]?.substitutions || ""}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            idx,
+                            "substitutions",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
+                        placeholder="Alternative products..."
+                        rows={2}
+                      />
+                    </td>
+                    <td className="py-8 px-4">
+                      <div className="space-y-3">
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
+                          onChange={(e) =>
+                            handleFileChange(idx, e.target.files?.[0] || null)
+                          }
+                          className="w-full text-sm text-gray-500 file:mr-3 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-[#033159] file:to-[#00598F] file:text-white hover:file:from-[#022244] hover:file:to-[#004a7a] file:cursor-pointer file:transition-all file:duration-300"
+                        />
+                        {fields[idx]?.file && (
+                          <div className="text-xs text-green-600 font-medium bg-green-50 p-2 rounded-lg border border-green-200">
+                            ✓ {fields[idx].file.name}
+                          </div>
+                        )}
+                        <div className="text-xs text-gray-500 leading-relaxed">
+                          PDF, DOC, XLS, JPG, PNG
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-8 px-4">
+                      <textarea
+                        value={fields[idx]?.notes || ""}
+                        onChange={(e) =>
+                          handleFieldChange(idx, "notes", e.target.value)
+                        }
+                        className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
+                        placeholder="Additional notes..."
+                        rows={2}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-      {/* Responsive stacked view for mobile */}
-      <div className="block md:hidden mt-6">
+
+      {/* Mobile Card View - Shown on mobile and tablet */}
+      <div className="block lg:hidden space-y-6">
         {items.map((item, idx) => (
           <div
             key={item.id}
-            className="mb-6 bg-white rounded-xl shadow border border-gray-200 p-4"
+            className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300"
           >
-            <div className="mb-2 flex items-center font-bold text-gray-900 text-base">
-              <Package className="h-4 w-4 mr-2" />
-              {item["Item Name"]}
+            {/* Header */}
+            <div className="mb-6 pb-4 border-b border-gray-200">
+              <div className="flex items-center font-bold text-gray-900 text-lg mb-2">
+                <Package className="h-5 w-5 mr-3 text-[#033159]" />
+                {item["Item Name"]}
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                <div>
+                  <span className="font-semibold">Size/Option:</span>
+                  <div className="mt-1">{item["Size/Option"] || "-"}</div>
+                </div>
+                <div>
+                  <span className="font-semibold">Unit:</span>
+                  <div className="mt-1">{item["Unit"] || "-"}</div>
+                </div>
+                <div className="col-span-2">
+                  <span className="font-semibold">Qty Requested:</span>
+                  <div className="mt-1 text-lg font-bold text-[#033159]">
+                    {item["Quantity"] || "-"}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">Size/Option:</span>{" "}
-              {item["Size/Option"] || "-"}
-            </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">Unit:</span> {item["Unit"] || "-"}
-            </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">Qty Requested:</span>{" "}
-              {item["Quantity"] || "-"}
-            </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">Your Price (per unit):</span>{" "}
-              <span className="relative">
-                <span className="absolute left-0 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
-                  $
-                </span>
+
+            {/* Required Fields */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Your Price (per unit) *
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-lg">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={fields[idx]?.price || ""}
+                    onChange={(e) =>
+                      handleFieldChange(idx, "price", e.target.value)
+                    }
+                    className="w-full pl-10 pr-4 py-4 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Lead Time *
+                </label>
                 <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={fields[idx]?.price || ""}
+                  type="date"
+                  value={fields[idx]?.lead_time || ""}
                   onChange={(e) =>
-                    handleFieldChange(idx, "price", e.target.value)
+                    handleFieldChange(idx, "lead_time", e.target.value)
                   }
-                  className="pl-6 pr-2 py-2 border border-gray-300 rounded-lg w-32 text-gray-900 font-medium"
-                  placeholder="0.00"
+                  className="w-full px-4 py-4 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium"
                   required
                 />
-              </span>
-            </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">Lead Time:</span>{" "}
-              <input
-                type="date"
-                value={fields[idx]?.lead_time || ""}
-                onChange={(e) =>
-                  handleFieldChange(idx, "lead_time", e.target.value)
-                }
-                className="px-2 py-2 border border-gray-300 rounded-lg w-36 text-gray-900 font-medium"
-                required
-              />
-            </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">Substitution/Alt Product:</span>{" "}
-              <textarea
-                value={fields[idx]?.substitutions || ""}
-                onChange={(e) =>
-                  handleFieldChange(idx, "substitutions", e.target.value)
-                }
-                className="w-full px-2 py-2 border border-gray-300 rounded-lg text-gray-900 font-medium resize-none"
-                placeholder="Alternative products..."
-                rows={2}
-              />
-            </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">File Upload:</span>{" "}
-              <input
-                type="url"
-                value={fields[idx]?.file_link || ""}
-                onChange={(e) =>
-                  handleFieldChange(idx, "file_link", e.target.value)
-                }
-                className="w-full px-2 py-2 border border-gray-300 rounded-lg text-gray-900 font-medium"
-                placeholder="https://..."
-              />
-            </div>
-            <div className="mb-2 text-gray-700 text-sm">
-              <span className="font-bold">Notes:</span>{" "}
-              <textarea
-                value={fields[idx]?.notes || ""}
-                onChange={(e) =>
-                  handleFieldChange(idx, "notes", e.target.value)
-                }
-                className="w-full px-2 py-2 border border-gray-300 rounded-lg text-gray-900 font-medium resize-none"
-                placeholder="Additional notes..."
-                rows={2}
-              />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Substitution/Alternative Product
+                </label>
+                <textarea
+                  value={fields[idx]?.substitutions || ""}
+                  onChange={(e) =>
+                    handleFieldChange(idx, "substitutions", e.target.value)
+                  }
+                  className="w-full px-4 py-4 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium resize-none"
+                  placeholder="Alternative products or substitutions..."
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  File Upload
+                </label>
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
+                    onChange={(e) =>
+                      handleFileChange(idx, e.target.files?.[0] || null)
+                    }
+                    className="w-full text-base text-gray-600 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-base file:font-semibold file:bg-gradient-to-r file:from-[#033159] file:to-[#00598F] file:text-white hover:file:from-[#022244] hover:file:to-[#004a7a] file:cursor-pointer file:transition-all file:duration-300"
+                  />
+                  {fields[idx]?.file && (
+                    <div className="flex items-center p-3 bg-green-50 rounded-xl border border-green-200">
+                      <div className="text-sm text-green-700 font-medium">
+                        ✓ {fields[idx].file.name}
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-xs text-gray-500">
+                    Accepted formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, GIF
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Notes
+                </label>
+                <textarea
+                  value={fields[idx]?.notes || ""}
+                  onChange={(e) =>
+                    handleFieldChange(idx, "notes", e.target.value)
+                  }
+                  className="w-full px-4 py-4 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium resize-none"
+                  placeholder="Additional notes, specifications, or comments..."
+                  rows={3}
+                />
+              </div>
             </div>
           </div>
         ))}
