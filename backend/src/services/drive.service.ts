@@ -33,7 +33,21 @@ const createDriveFolder = async (
 };
 
 /**
- * Upload files into a Shared Drive folder
+ * Set file permissions to be accessible with link only
+ */
+const makeFileAccessibleWithLink = async (fileId: string): Promise<void> => {
+  await drive.permissions.create({
+    fileId,
+    requestBody: {
+      role: "reader",
+      type: "anyone",
+    },
+    supportsAllDrives: true,
+  });
+};
+
+/**
+ * Upload files into a Shared Drive folder and make them accessible with link
  */
 const uploadFilesToFolder = async (
   files: Express.Multer.File[],
@@ -56,6 +70,10 @@ const uploadFilesToFolder = async (
     });
 
     const fileId = response.data.id!;
+
+    // Make file accessible with link only
+    await makeFileAccessibleWithLink(fileId);
+
     const link = `https://drive.google.com/file/d/${fileId}/view`;
     links.push(link);
   }
@@ -86,3 +104,78 @@ export const saveRFQFiles = async (
   return { folderLink, fileLinks };
 };
 
+/**
+ * Upload files for vendor reply with structured folder hierarchy
+ */
+const uploadVendorReplyFiles = async (
+  itemFiles: { [itemId: string]: Express.Multer.File[] },
+  itemFolderIds: { [itemId: string]: string }
+): Promise<{ [itemId: string]: string[] }> => {
+  const result: { [itemId: string]: string[] } = {};
+
+  for (const [itemId, files] of Object.entries(itemFiles)) {
+    if (files.length > 0 && itemFolderIds[itemId]) {
+      const fileLinks = await uploadFilesToFolder(files, itemFolderIds[itemId]);
+      result[itemId] = fileLinks;
+    } else {
+      result[itemId] = [];
+    }
+  }
+
+  return result;
+};
+
+/**
+ * Create vendor reply folder structure and upload files
+ * Creates: vendor-replies/Reply-{replyId}/Item-{itemId}/ for each item with files
+ */
+export const saveVendorReplyFiles = async (
+  replyId: string,
+  itemFiles: { [itemId: string]: Express.Multer.File[] }
+): Promise<{
+  replyFolderLink: string;
+  itemFolderLinks: { [itemId: string]: string };
+  itemFileLinks: { [itemId: string]: string[] };
+}> => {
+  // ✅ Parent folder for vendor replies (should be created in your Drive)
+  const VENDOR_REPLIES_FOLDER_ID = process.env.VENDOR_REPLIES_FOLDER_ID || "";
+
+  // Create main reply folder
+  const replyFolderId = await createDriveFolder(
+    `Reply-${replyId}`,
+    VENDOR_REPLIES_FOLDER_ID
+  );
+  const replyFolderLink = `https://drive.google.com/drive/folders/${replyFolderId}`;
+
+  // Make reply folder accessible with link
+  await makeFileAccessibleWithLink(replyFolderId);
+
+  // Create item subfolders for items that have files
+  const itemFolderIds: { [itemId: string]: string } = {};
+  const itemFolderLinks: { [itemId: string]: string } = {};
+
+  for (const itemId of Object.keys(itemFiles)) {
+    if (itemFiles[itemId].length > 0) {
+      const itemFolderId = await createDriveFolder(
+        `Item-${itemId}`,
+        replyFolderId
+      );
+      itemFolderIds[itemId] = itemFolderId;
+      itemFolderLinks[
+        itemId
+      ] = `https://drive.google.com/drive/folders/${itemFolderId}`;
+
+      // Make item folder accessible with link
+      await makeFileAccessibleWithLink(itemFolderId);
+    }
+  }
+
+  // Upload files to respective item folders
+  const itemFileLinks = await uploadVendorReplyFiles(itemFiles, itemFolderIds);
+
+  return {
+    replyFolderLink,
+    itemFolderLinks,
+    itemFileLinks,
+  };
+};
