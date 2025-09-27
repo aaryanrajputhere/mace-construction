@@ -31,6 +31,11 @@ export interface VendorReplyData {
 
 export const addVendorReplyToSheet = async (reply: VendorReplyData) => {
   try {
+    // Check if required environment variables are set
+    if (!VENDOR_REPLY_SHEET_ID) {
+      throw new Error("VENDOR_REPLY_SHEET_ID environment variable is not set");
+    }
+
     const sheets = getSheetsClient();
     const values = [
       [
@@ -53,6 +58,13 @@ export const addVendorReplyToSheet = async (reply: VendorReplyData) => {
         reply.decided_at,
       ],
     ];
+
+    console.log("Adding to sheet:", {
+      spreadsheetId: VENDOR_REPLY_SHEET_ID,
+      sheetName: VENDOR_REPLY_SHEET_NAME,
+      range: `${VENDOR_REPLY_SHEET_NAME}!A:Q`
+    });
+
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId: VENDOR_REPLY_SHEET_ID,
       range: `${VENDOR_REPLY_SHEET_NAME}!A:Q`, // 17 columns
