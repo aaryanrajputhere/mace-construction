@@ -32,19 +32,7 @@ const createDriveFolder = async (
   return response.data.id!;
 };
 
-/**
- * Set file permissions to be accessible with link only
- */
-const makeFileAccessibleWithLink = async (fileId: string): Promise<void> => {
-  await drive.permissions.create({
-    fileId,
-    requestBody: {
-      role: "reader",
-      type: "anyone",
-    },
-    supportsAllDrives: true,
-  });
-};
+
 
 /**
  * Upload files into a Shared Drive folder and make them accessible with link
@@ -71,8 +59,8 @@ const uploadFilesToFolder = async (
 
     const fileId = response.data.id!;
 
-    // Make file accessible with link only
-    await makeFileAccessibleWithLink(fileId);
+    // Note: Permissions are inherited from parent folder in Shared Drives
+    // No need to set individual file permissions
 
     const link = `https://drive.google.com/file/d/${fileId}/view`;
     links.push(link);
@@ -147,9 +135,6 @@ export const saveVendorReplyFiles = async (
   );
   const replyFolderLink = `https://drive.google.com/drive/folders/${replyFolderId}`;
 
-  // Make reply folder accessible with link
-  await makeFileAccessibleWithLink(replyFolderId);
-
   // Create item subfolders for items that have files
   const itemFolderIds: { [itemId: string]: string } = {};
   const itemFolderLinks: { [itemId: string]: string } = {};
@@ -164,9 +149,6 @@ export const saveVendorReplyFiles = async (
       itemFolderLinks[
         itemId
       ] = `https://drive.google.com/drive/folders/${itemFolderId}`;
-
-      // Make item folder accessible with link
-      await makeFileAccessibleWithLink(itemFolderId);
     }
   }
 
