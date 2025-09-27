@@ -73,6 +73,7 @@ const VendorReplyPage: React.FC = () => {
   const handleFileChange = (idx: number, file: File | null) => {
     setFields((prev) => {
       const updated = [...prev];
+      updated[idx].file = file; // Store the actual File object
       updated[idx].file_link = file ? file.name : "";
       return updated;
     });
@@ -82,26 +83,42 @@ const VendorReplyPage: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // For now, only send the first row's fields (assuming one vendor reply per form)
-      const { price, lead_time, notes } = fields[0] || {};
+      // Create FormData for file uploads
+      const formData = new FormData();
+      
+      // Prepare itemReplies with all the data
+      const itemReplies = items.map((item, index) => ({
+        itemId: item.id || `item-${index}`,
+        pricing: fields[index]?.price || "",
+        leadTime: fields[index]?.lead_time || "",
+        notes: fields[index]?.notes || "",
+        substitutions: fields[index]?.substitutions || "",
+      }));
+
+      // Add JSON data to FormData
+      formData.append('itemReplies', JSON.stringify(itemReplies));
+      formData.append('deliveryCharges', deliveryCharges);
+      formData.append('discount', discount);
+      formData.append('summaryNotes', summaryNotes);
+      
+      // Add files to FormData
+      fields.forEach((field, index) => {
+        if (field?.file) {
+          formData.append(`files_${index}`, field.file);
+        }
+      });
+
       const res = await fetch(
         `https://mace-construction-production.up.railway.app/api/vendors/vendor-reply/${rfqId}/${token}`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            pricing: price,
-            leadTime: lead_time,
-            notes: notes,
-            deliveryCharges,
-            discount,
-            summaryNotes,
-          }),
+          body: formData, // Use FormData instead of JSON
+          // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
         }
       );
       const data = await res.json();
       if (res.ok) {
-        setMessage("✅ Reply submitted successfully!");
+        setMessage(`✅ Reply submitted successfully! ${data.itemsProcessed || 0} items processed.`);
       } else {
         setMessage(`❌ Error: ${data.error || "Submission failed"}`);
       }

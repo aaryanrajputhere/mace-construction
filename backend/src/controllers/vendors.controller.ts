@@ -83,12 +83,22 @@ export const getItems = async (req: Request, res: Response) => {
 
 export const handleVendorReply = async (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
-  const {
-    itemReplies,
-    deliveryCharges,
-    discount,
-    summaryNotes,
-  }: VendorReplyRequest = req.body;
+
+  // Parse JSON data from FormData
+  let itemReplies: any[] = [];
+  try {
+    itemReplies = req.body.itemReplies ? JSON.parse(req.body.itemReplies) : [];
+  } catch (parseErr) {
+    console.error("Error parsing itemReplies:", parseErr);
+    return res.status(400).json({ error: "Invalid itemReplies format" });
+  }
+
+  const deliveryCharges = req.body.deliveryCharges || "";
+  const discount = req.body.discount || "";
+  const summaryNotes = req.body.summaryNotes || "";
+
+  // Handle uploaded files
+  const files = (req.files as Express.Multer.File[]) || [];
 
   try {
     const decoded = jwt.verify(token, SECRET) as VendorReplyToken;
@@ -102,6 +112,7 @@ export const handleVendorReply = async (req: Request, res: Response) => {
       where: { email: decoded.vendorEmail },
       select: { name: true, email: true, phone: true },
     });
+
     if (!vendor) {
       return res.status(404).json({ error: "Vendor not found" });
     }
@@ -123,13 +134,22 @@ export const handleVendorReply = async (req: Request, res: Response) => {
     // Process files if any exist
     let driveLinks: { [itemId: string]: string[] } = {};
     let replyFolderLink = "";
-    console.log(itemReplies);
-    // Extract files from itemReplies for drive upload
+    console.log("Parsed itemReplies:", itemReplies);
+    console.log("Received files:", files);
+
+    // Extract files and map them to items for drive upload
     const itemFiles: { [itemId: string]: Express.Multer.File[] } = {};
-    if (itemReplies) {
-      itemReplies.forEach((reply) => {
-        if (reply.files && reply.files.length > 0) {
-          itemFiles[reply.itemId] = reply.files;
+    if (files && files.length > 0) {
+      // Group files by item index based on field names like 'files_0', 'files_1', etc.
+      files.forEach((file) => {
+        if (file.fieldname && file.fieldname.startsWith("files_")) {
+          const itemIndex = parseInt(file.fieldname.split("_")[1]);
+          const itemId = itemReplies[itemIndex]?.itemId || `item-${itemIndex}`;
+
+          if (!itemFiles[itemId]) {
+            itemFiles[itemId] = [];
+          }
+          itemFiles[itemId].push(file);
         }
       });
     }
