@@ -3,7 +3,7 @@ import { saveVendorReplyFiles } from "../services/drive.service";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-  
+
 const prisma = new PrismaClient();
 
 const SECRET = process.env.JWT_SECRET || "supersecret";
@@ -115,7 +115,6 @@ export const handleVendorReply = async (req: Request, res: Response) => {
       vendorName: vendor.name,
       vendorEmail: vendor.email,
       vendorPhone: vendor.phone,
-      itemRepliesCount: itemReplies?.length || 0,
       deliveryCharges,
       discount,
       summaryNotes,
@@ -124,7 +123,7 @@ export const handleVendorReply = async (req: Request, res: Response) => {
     // Process files if any exist
     let driveLinks: { [itemId: string]: string[] } = {};
     let replyFolderLink = "";
-
+    console.log(itemReplies);
     // Extract files from itemReplies for drive upload
     const itemFiles: { [itemId: string]: Express.Multer.File[] } = {};
     if (itemReplies) {

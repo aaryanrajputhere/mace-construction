@@ -14,6 +14,7 @@ export const sendRFQEmail = async (
   const token = jwt.sign(
     { vendorName: vendor.name, vendorEmail: vendor.email, rfqId },
     SECRET,
+    { expiresIn: '7d' }
   );
 
   const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;

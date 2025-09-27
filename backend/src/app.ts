@@ -9,6 +9,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) => {
+  return res.send("Server Is Up & Running");
+});
 app.use("/api/quotes", quoteRoutes);
 app.use("/api/materials", materialRoutes);
 app.use("/api/vendors", vendorRoutes);

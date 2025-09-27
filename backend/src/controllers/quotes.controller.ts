@@ -5,6 +5,7 @@ import { generateRFQ } from "../utils/generateRFQ";
 import { addRFQToSheet, RFQData } from "../services/sheets.service";
 import { sendRFQEmail } from "../services/mail.service";
 import { PrismaClient } from "@prisma/client";
+import { Console } from "console";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +17,7 @@ export const createQuote = async (req: Request, res: Response) => {
     const items = req.body.items ? JSON.parse(req.body.items) : [];
     const item_json = JSON.stringify(items); // <-- stringify the array
     const files = req.files as Express.Multer.File[];
-    
+
     if (!projectInfo || items.length === 0) {
       return res
         .status(400)
@@ -44,7 +45,8 @@ export const createQuote = async (req: Request, res: Response) => {
     }
 
     const rfqId = generateRFQ();
-
+    console.log("-".repeat(100));
+    console.log(`RFQ Initiated ${rfqId}`);
     // Map each vendor to their items
     const vendorItemsMap: Record<string, any[]> = {};
     items.forEach((item: any) => {

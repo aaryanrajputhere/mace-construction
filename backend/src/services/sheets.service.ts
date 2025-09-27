@@ -15,7 +15,7 @@ export interface VendorReplyData {
   submitted_at: string;
   vendor_name: string;
   vendor_email: string;
-  vendor_phone : string;
+  vendor_phone: string;
   prices_text: string;
   price_subtotal?: string;
   taxes?: string;
@@ -31,11 +31,6 @@ export interface VendorReplyData {
 
 export const addVendorReplyToSheet = async (reply: VendorReplyData) => {
   try {
-    // Check if required environment variables are set
-    if (!VENDOR_REPLY_SHEET_ID) {
-      throw new Error("VENDOR_REPLY_SHEET_ID environment variable is not set");
-    }
-
     const sheets = getSheetsClient();
     const values = [
       [
@@ -62,7 +57,7 @@ export const addVendorReplyToSheet = async (reply: VendorReplyData) => {
     console.log("Adding to sheet:", {
       spreadsheetId: VENDOR_REPLY_SHEET_ID,
       sheetName: VENDOR_REPLY_SHEET_NAME,
-      range: `${VENDOR_REPLY_SHEET_NAME}!A:Q`
+      range: `${VENDOR_REPLY_SHEET_NAME}!A:Q`,
     });
 
     const response = await sheets.spreadsheets.values.append({
