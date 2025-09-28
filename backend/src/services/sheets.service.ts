@@ -44,6 +44,8 @@ export const addVendorReplyToSheet = async (reply: VendorReplyData) => {
         reply.vendor_phone,
         reply.prices_text,
         reply.price_subtotal,
+        reply.discount,
+        reply.delivery_charges,
         reply.taxes,
         reply.total_price,
         reply.lead_time_days,
@@ -59,12 +61,12 @@ export const addVendorReplyToSheet = async (reply: VendorReplyData) => {
     console.log("Adding to sheet:", {
       spreadsheetId: VENDOR_REPLY_SHEET_ID,
       sheetName: VENDOR_REPLY_SHEET_NAME,
-      range: `${VENDOR_REPLY_SHEET_NAME}!A:Q`,
+      range: `${VENDOR_REPLY_SHEET_NAME}!A:S`,
     });
 
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId: VENDOR_REPLY_SHEET_ID,
-      range: `${VENDOR_REPLY_SHEET_NAME}!A:Q`, // 17 columns
+      range: `${VENDOR_REPLY_SHEET_NAME}!A:S`, // 19 columns
       valueInputOption: "USER_ENTERED",
       requestBody: { values },
     });

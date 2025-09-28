@@ -296,7 +296,10 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                   />
                   {fields[idx]?.file && (
                     <div className="flex items-center p-3 bg-green-50 rounded-xl border border-green-200">
-                      <div className="text-sm text-green-700 font-medium">
+                      <div
+                        className="text-sm text-green-700 font-medium truncate max-w-full"
+                        title={fields[idx].file.name}
+                      >
                         ✓ {fields[idx].file.name}
                       </div>
                     </div>
