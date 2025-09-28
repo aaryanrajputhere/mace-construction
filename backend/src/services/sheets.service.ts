@@ -20,6 +20,7 @@ export interface VendorReplyData {
   price_subtotal?: string;
   discount?: string;
   taxes?: string;
+  delivery_charges?: string;
   total_price?: string;
   lead_time_days?: string;
   delivery_date?: string;

@@ -219,13 +219,16 @@ export const handleVendorReply = async (req: Request, res: Response) => {
           vendor_email: vendor.email || "",
           vendor_phone: vendor.phone || "",
           prices_text: JSON.stringify(consolidatedItems, null, 2),
-          lead_time_days: itemReplies[0]?.leadTime || "", // Use first item's lead time or overall
+          price_subtotal: totalPrice.toFixed(2),
+          discount: discount,
+          delivery_charges: deliveryChargesNum.toFixed(2),
+          taxes: "",
+          total_price: finalTotal.toFixed(2),
+          lead_time_days: "",
+          delivery_date: "",
           notes: summaryNotes || "",
           substitutions: "", // Consolidated in prices_text
           file_link: replyFolderLink,
-          price_subtotal: totalPrice.toFixed(2),
-          taxes: deliveryChargesNum.toFixed(2), // Using taxes field for delivery charges
-          total_price: finalTotal.toFixed(2),
         });
       } catch (sheetErr) {
         console.error(
