@@ -167,34 +167,71 @@ export const handleVendorReply = async (req: Request, res: Response) => {
       }
     }
 
-    // Add each item reply to the sheet
+    // Consolidate all item replies into a single JSON structure
     if (itemReplies && itemReplies.length > 0) {
-      for (const itemReply of itemReplies) {
-        try {
-          await addVendorReplyToSheet({
-            rfq_id: rfqId,
-            reply_id: `${replyId}-item-${itemReply.itemId}`,
-            submitted_at: new Date().toISOString(),
-            vendor_name: vendor.name,
-            vendor_email: vendor.email || "",
-            vendor_phone: vendor.phone || "",
-            prices_text: itemReply.pricing || "",
-            lead_time_days: itemReply.leadTime || "",
-            notes: itemReply.notes || "",
-            substitutions: itemReply.substitutions || "",
-            file_link: replyFolderLink,
-            // Summary fields (could be duplicated across items or handled separately)
-            price_subtotal: deliveryCharges || "",
-            taxes: discount || "",
-            total_price: summaryNotes || "",
-          });
-        } catch (sheetErr) {
-          console.error(
-            `Failed to add item ${itemReply.itemId} to sheet:`,
-            sheetErr
-          );
-          // Continue with other items
+      try {
+        // Get original items data to merge with vendor replies
+        const rfq = await prisma.rFQ.findUnique({
+          where: { rfq_id: rfqId },
+        });
+
+        let originalItems: any[] = [];
+        if (rfq) {
+          try {
+            originalItems = JSON.parse(rfq.items_json);
+          } catch {
+            console.error("Failed to parse original items JSON");
+          }
         }
+
+        // Create consolidated items JSON with vendor responses
+        const consolidatedItems = itemReplies.map((itemReply, index) => {
+          const originalItem = originalItems[index] || {};
+
+          return {
+            name: originalItem["Item Name"] || `Item ${index + 1}`,
+            size: originalItem["Size/Option"] || "",
+            unit: originalItem["Unit"] || "",
+            qtyRequested: originalItem["Quantity"] || "",
+            unitPrice: itemReply.pricing || "",
+            leadTime: itemReply.leadTime || "",
+            substitutions: itemReply.substitutions || "",
+            notes: itemReply.notes || "",
+          };
+        });
+
+        // Calculate totals
+        const totalPrice = itemReplies.reduce((sum, item) => {
+          const price = parseFloat(item.pricing || "0");
+          return sum + (isNaN(price) ? 0 : price);
+        }, 0);
+
+        const deliveryChargesNum = parseFloat(deliveryCharges || "0");
+        const discountNum = parseFloat(discount || "0");
+        const finalTotal = totalPrice + deliveryChargesNum - discountNum;
+
+        // Add single consolidated entry to sheet
+        await addVendorReplyToSheet({
+          rfq_id: rfqId,
+          reply_id: replyId,
+          submitted_at: new Date().toISOString(),
+          vendor_name: vendor.name,
+          vendor_email: vendor.email || "",
+          vendor_phone: vendor.phone || "",
+          prices_text: JSON.stringify(consolidatedItems, null, 2),
+          lead_time_days: itemReplies[0]?.leadTime || "", // Use first item's lead time or overall
+          notes: summaryNotes || "",
+          substitutions: "", // Consolidated in prices_text
+          file_link: replyFolderLink,
+          price_subtotal: totalPrice.toFixed(2),
+          taxes: deliveryChargesNum.toFixed(2), // Using taxes field for delivery charges
+          total_price: finalTotal.toFixed(2),
+        });
+      } catch (sheetErr) {
+        console.error(
+          "Failed to add consolidated vendor reply to sheet:",
+          sheetErr
+        );
       }
     } else {
       // Fallback: add a single entry if no itemReplies provided (backward compatibility)
@@ -229,6 +266,7 @@ export const handleVendorReply = async (req: Request, res: Response) => {
       itemsProcessed: itemReplies?.length || 0,
       filesUploaded: Object.values(driveLinks).flat().length,
       replyFolderLink,
+      consolidatedReply: true, // Indicates this is a single consolidated entry
     });
   } catch (err) {
     console.error("Error in handleVendorReply:", err);

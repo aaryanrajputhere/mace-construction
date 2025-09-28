@@ -32,8 +32,6 @@ const createDriveFolder = async (
   return response.data.id!;
 };
 
-
-
 /**
  * Upload files into a Shared Drive folder and make them accessible with link
  */

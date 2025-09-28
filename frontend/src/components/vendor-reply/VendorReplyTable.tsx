@@ -31,40 +31,39 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
       <div className="hidden lg:block">
         <div className="table-container shadow rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full table-fixed min-w-[1400px]">
+            <table className="w-full table-fixed min-w-[1000px]">
               <thead className="bg-gradient-to-r from-[#033159] to-[#00598F] text-white">
                 <tr>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[12%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[15%] align-middle">
                     <div className="flex items-center space-x-2">
                       <Package className="h-4 w-4" />
                       <span>Item Name</span>
                     </div>
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[9%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[10%] align-middle">
                     Size/Option
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[7%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[6%] align-middle">
                     Unit
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[7%] align-middle">
-                    Qty Requested
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[6%] align-middle">
+                    Qty
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[11%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[10%] align-middle">
                     Your Price
                     <br />
                     (per unit)
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[11%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[10%] align-middle">
                     Lead Time
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[12%] align-middle">
-                    Substitution /<br />
-                    Alt Product
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[12%] align-middle">
+                    Substitution
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[15%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[13%] align-middle">
                     File Upload
                   </th>
-                  <th className="text-left py-5 px-4 font-bold text-sm w-[16%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[18%] align-middle">
                     Notes
                   </th>
                 </tr>
@@ -77,27 +76,39 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                       idx % 2 === 0 ? "bg-gray-50" : "bg-white"
                     } h-[140px] align-top`}
                   >
-                    <td className="py-8 px-4 break-words">
-                      <div className="font-bold text-gray-900 text-base">
+                    <td className="py-6 px-3">
+                      <div
+                        className="font-bold text-gray-900 text-sm break-words overflow-hidden leading-tight"
+                        title={item["Item Name"]}
+                      >
                         {item["Item Name"]}
                       </div>
                     </td>
-                    <td className="py-8 px-4 break-words">
-                      <div className="text-gray-700 text-base">
+                    <td className="py-6 px-3">
+                      <div
+                        className="text-gray-700 text-sm break-words overflow-hidden leading-tight"
+                        title={item["Size/Option"] || "-"}
+                      >
                         {item["Size/Option"] || "-"}
                       </div>
                     </td>
-                    <td className="py-8 px-4 break-words">
-                      <div className="text-gray-700 text-base font-medium">
+                    <td className="py-6 px-3">
+                      <div
+                        className="text-gray-700 text-sm font-medium break-words overflow-hidden leading-tight"
+                        title={item["Unit"] || "-"}
+                      >
                         {item["Unit"] || "-"}
                       </div>
                     </td>
-                    <td className="py-8 px-4 break-words">
-                      <div className="text-gray-700 text-base font-medium">
+                    <td className="py-6 px-3">
+                      <div
+                        className="text-gray-700 text-sm font-medium break-words overflow-hidden leading-tight"
+                        title={item["Quantity"] || "-"}
+                      >
                         {item["Quantity"] || "-"}
                       </div>
                     </td>
-                    <td className="py-8 px-4">
+                    <td className="py-6 px-3">
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
                           $
@@ -110,24 +121,24 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                           onChange={(e) =>
                             handleFieldChange(idx, "price", e.target.value)
                           }
-                          className="w-full pl-8 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                          className="w-full pl-7 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-sm"
                           placeholder="0.00"
                           required
                         />
                       </div>
                     </td>
-                    <td className="py-8 px-4">
+                    <td className="py-6 px-3">
                       <input
                         type="date"
                         value={fields[idx]?.lead_time || ""}
                         onChange={(e) =>
                           handleFieldChange(idx, "lead_time", e.target.value)
                         }
-                        className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base"
+                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-sm"
                         required
                       />
                     </td>
-                    <td className="py-8 px-4">
+                    <td className="py-6 px-3">
                       <textarea
                         value={fields[idx]?.substitutions || ""}
                         onChange={(e) =>
@@ -137,12 +148,12 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
-                        placeholder="Alternative products..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-sm resize-none"
+                        placeholder="Alternatives..."
                         rows={2}
                       />
                     </td>
-                    <td className="py-8 px-4">
+                    <td className="py-6 px-3">
                       <div className="space-y-3">
                         <input
                           type="file"
@@ -150,26 +161,29 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                           onChange={(e) =>
                             handleFileChange(idx, e.target.files?.[0] || null)
                           }
-                          className="w-full text-sm text-gray-500 file:mr-3 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-[#033159] file:to-[#00598F] file:text-white hover:file:from-[#022244] hover:file:to-[#004a7a] file:cursor-pointer file:transition-all file:duration-300"
+                          className="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gradient-to-r file:from-[#033159] file:to-[#00598F] file:text-white hover:file:from-[#022244] hover:file:to-[#004a7a] file:cursor-pointer file:transition-all file:duration-300"
                         />
                         {fields[idx]?.file && (
-                          <div className="text-xs text-green-600 font-medium bg-green-50 p-2 rounded-lg border border-green-200">
+                          <div
+                            className="text-xs text-green-600 font-medium bg-green-50 p-1.5 rounded border border-green-200 mt-1 truncate"
+                            title={fields[idx].file.name}
+                          >
                             ✓ {fields[idx].file.name}
                           </div>
                         )}
-                        <div className="text-xs text-gray-500 leading-relaxed">
+                        <div className="text-xs text-gray-500 mt-1">
                           PDF, DOC, XLS, JPG, PNG
                         </div>
                       </div>
                     </td>
-                    <td className="py-8 px-4">
+                    <td className="py-6 px-3">
                       <textarea
                         value={fields[idx]?.notes || ""}
                         onChange={(e) =>
                           handleFieldChange(idx, "notes", e.target.value)
                         }
-                        className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-base resize-none"
-                        placeholder="Additional notes..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#033159] focus:border-transparent transition-all duration-200 text-gray-900 font-medium text-sm resize-none"
+                        placeholder="Notes..."
                         rows={2}
                       />
                     </td>

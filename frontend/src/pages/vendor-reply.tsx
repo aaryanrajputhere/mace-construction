@@ -8,6 +8,8 @@ import VendorReplySummary from "../components/vendor-reply/VendorReplySummary";
 import VendorReplyLoading from "../components/vendor-reply/VendorReplyLoading";
 import VendorReplyInvalid from "../components/vendor-reply/VendorReplyInvalid";
 import VendorReplySubmitButton from "../components/vendor-reply/VendorReplySubmitButton";
+import VendorReplySuccess from "../components/vendor-reply/VendorReplySuccess";
+
 const VendorReplyPage: React.FC = () => {
   const { rfqId, token } = useParams<{ rfqId: string; token: string }>();
 
@@ -16,6 +18,11 @@ const VendorReplyPage: React.FC = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submissionData, setSubmissionData] = useState<{
+    itemsProcessed: number;
+    filesUploaded: number;
+  }>({ itemsProcessed: 0, filesUploaded: 0 });
   const [deliveryCharges, setDeliveryCharges] = useState("");
   const [discount, setDiscount] = useState("");
   const [summaryNotes, setSummaryNotes] = useState("");
@@ -85,7 +92,7 @@ const VendorReplyPage: React.FC = () => {
     try {
       // Create FormData for file uploads
       const formData = new FormData();
-      
+
       // Prepare itemReplies with all the data
       const itemReplies = items.map((item, index) => ({
         itemId: item.id || `item-${index}`,
@@ -96,11 +103,11 @@ const VendorReplyPage: React.FC = () => {
       }));
 
       // Add JSON data to FormData
-      formData.append('itemReplies', JSON.stringify(itemReplies));
-      formData.append('deliveryCharges', deliveryCharges);
-      formData.append('discount', discount);
-      formData.append('summaryNotes', summaryNotes);
-      
+      formData.append("itemReplies", JSON.stringify(itemReplies));
+      formData.append("deliveryCharges", deliveryCharges);
+      formData.append("discount", discount);
+      formData.append("summaryNotes", summaryNotes);
+
       // Add files to FormData
       fields.forEach((field, index) => {
         if (field?.file) {
@@ -118,7 +125,11 @@ const VendorReplyPage: React.FC = () => {
       );
       const data = await res.json();
       if (res.ok) {
-        setMessage(`✅ Reply submitted successfully! ${data.itemsProcessed || 0} items processed.`);
+        setSubmissionData({
+          itemsProcessed: data.itemsProcessed || 0,
+          filesUploaded: data.filesUploaded || 0,
+        });
+        setIsSubmitted(true);
       } else {
         setMessage(`❌ Error: ${data.error || "Submission failed"}`);
       }
@@ -135,6 +146,15 @@ const VendorReplyPage: React.FC = () => {
 
   if (isLoading) {
     return <VendorReplyLoading />;
+  }
+
+  if (isSubmitted) {
+    return (
+      <VendorReplySuccess
+        itemsProcessed={submissionData.itemsProcessed}
+        filesUploaded={submissionData.filesUploaded}
+      />
+    );
   }
 
   return (
