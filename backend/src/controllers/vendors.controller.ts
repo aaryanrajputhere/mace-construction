@@ -213,6 +213,8 @@ export const handleVendorReply = async (req: Request, res: Response) => {
         console.log("Delivery Charges:", deliveryChargesNum);
         console.log("Discount:", discountNum);
         console.log("Final Total:", finalTotal);
+        console.log("Summary Notes to be saved:", summaryNotes);
+
         // Add single consolidated entry to sheet
         await addVendorReplyToSheet({
           rfq_id: rfqId,
@@ -223,7 +225,7 @@ export const handleVendorReply = async (req: Request, res: Response) => {
           vendor_phone: vendor.phone || "",
           prices_text: JSON.stringify(consolidatedItems, null, 2),
           price_subtotal: totalPrice.toFixed(2),
-          discount: discount.toFixed(2),
+          discount: discountNum.toFixed(2),
           delivery_charges: deliveryChargesNum.toFixed(2),
           taxes: "",
           total_price: finalTotal.toFixed(2),
