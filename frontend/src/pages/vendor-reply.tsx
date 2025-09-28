@@ -49,12 +49,13 @@ const VendorReplyPage: React.FC = () => {
           }));
           setItems(normalizedItems);
           setFields(
-            normalizedItems.map(() => ({
+            normalizedItems.map((item: any) => ({
               price: "",
               lead_time: "",
               notes: "",
               substitutions: "",
               file_link: "",
+              quantity: item["Quantity"] || "",
             }))
           );
         } else {

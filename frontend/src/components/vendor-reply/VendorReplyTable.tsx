@@ -54,7 +54,7 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                     <br />
                     (per unit)
                   </th>
-                  <th className="text-left py-5 px-3 font-bold text-sm w-[10%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[12%] align-middle">
                     Lead Time
                   </th>
                   <th className="text-left py-5 px-3 font-bold text-sm w-[12%] align-middle">
@@ -63,7 +63,7 @@ const VendorReplyTable: React.FC<VendorReplyTableProps> = ({
                   <th className="text-left py-5 px-3 font-bold text-sm w-[13%] align-middle">
                     File Upload
                   </th>
-                  <th className="text-left py-5 px-3 font-bold text-sm w-[18%] align-middle">
+                  <th className="text-left py-5 px-3 font-bold text-sm w-[16%] align-middle">
                     Notes
                   </th>
                 </tr>

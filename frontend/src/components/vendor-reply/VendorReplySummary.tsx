@@ -15,7 +15,10 @@ const calculateTotal = (
 ) => {
   const subtotal = fields.reduce((sum, row) => {
     const price = parseFloat(row.price || "0");
-    return sum + (isNaN(price) ? 0 : price);
+    const quantity = parseFloat(row.quantity || "1");
+    const lineTotal =
+      (isNaN(price) ? 0 : price) * (isNaN(quantity) ? 1 : quantity);
+    return sum + lineTotal;
   }, 0);
   const delivery = parseFloat(deliveryCharges || "0");
   const disc = parseFloat(discount || "0");
@@ -31,7 +34,11 @@ const VendorReplySummary: React.FC<VendorReplySummaryProps> = ({
 }) => {
   const subtotal = fields.reduce((sum, row) => {
     const price = parseFloat(row.price || "0");
-    return sum + (isNaN(price) ? 0 : price);
+    const quantity = parseFloat(row.quantity || "1");
+
+    const lineTotal = price * quantity;
+
+    return sum + lineTotal;
   }, 0);
   const total = calculateTotal(fields, deliveryCharges, discount);
 

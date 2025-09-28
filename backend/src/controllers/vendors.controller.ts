@@ -201,9 +201,10 @@ export const handleVendorReply = async (req: Request, res: Response) => {
         });
 
         // Calculate totals
-        const totalPrice = itemReplies.reduce((sum, item) => {
+        const totalPrice = itemReplies.reduce((sum, item, index) => {
           const price = parseFloat(item.pricing || "0");
-          return sum + (isNaN(price) ? 0 : price);
+          const quantity = parseFloat(originalItems[index]?.["Quantity"] || "0");
+          return sum + (isNaN(price) || isNaN(quantity) ? 0 : price * quantity);
         }, 0);
 
         const deliveryChargesNum = parseFloat(deliveryCharges || "0");
