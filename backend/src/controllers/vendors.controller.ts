@@ -209,7 +209,10 @@ export const handleVendorReply = async (req: Request, res: Response) => {
         const deliveryChargesNum = parseFloat(deliveryCharges || "0");
         const discountNum = parseFloat(discount || "0");
         const finalTotal = totalPrice + deliveryChargesNum - discountNum;
-
+        
+        console.log('Delivery Charges:', deliveryChargesNum);
+        console.log('Discount:', discountNum);
+        console.log('Final Total:', finalTotal);
         // Add single consolidated entry to sheet
         await addVendorReplyToSheet({
           rfq_id: rfqId,
@@ -229,6 +232,8 @@ export const handleVendorReply = async (req: Request, res: Response) => {
           notes: summaryNotes || "",
           substitutions: "", // Consolidated in prices_text
           file_link: replyFolderLink,
+          review_status: "",
+          decided_at: "",
         });
       } catch (sheetErr) {
         console.error(
