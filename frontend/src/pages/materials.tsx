@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { Material } from "../types/materials";
 import { useMaterials } from "../hooks/useMaterials";
+import type { FilterOptions } from "../hooks/useMaterials";
 import SearchBar from "../components/materials/SearchBar";
 import Sidebar from "../components/materials/Sidebar";
 import MaterialCard from "../components/materials/MaterialCard";
@@ -36,18 +37,77 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({
         </div>
       </div>
     );
+
+  if (materials.length === 0) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="text-center p-8 bg-gray-50 rounded-xl border border-gray-200">
+          <p className="text-gray-600 font-medium mb-2">No materials found</p>
+          <p className="text-gray-500 text-sm">
+            Try adjusting your search or filters
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-      {materials.map((material) => (
-      <MaterialCard key={material.id} material={material} />
-      ))}
+    <div>
+      <div className="mb-4 flex justify-between items-center">
+        <p className="text-gray-600 font-medium">
+          Showing {materials.length} material{materials.length !== 1 ? "s" : ""}
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+        {materials.map((material) => (
+          <MaterialCard key={material.id} material={material} />
+        ))}
+      </div>
     </div>
   );
 };
 
 const MaterialsPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { materials, loading, error } = useMaterials();
+  const [filters, setFilters] = useState<FilterOptions>({
+    searchTerm: "",
+    category: "",
+    sortBy: "",
+    availability: "",
+    priceRange: "",
+  });
+
+  const { materials, loading, error } = useMaterials(filters);
+
+  // Calculate category counts from all materials (not filtered)
+  const { materials: allMaterials } = useMaterials({
+    searchTerm: "",
+    category: "",
+    sortBy: "",
+    availability: "",
+    priceRange: "",
+  });
+
+  const calculateCategoryCounts = (): Record<string, number> => {
+    const counts: Record<string, number> = {};
+    allMaterials.forEach((material) => {
+      if (material.Category) {
+        counts[material.Category] = (counts[material.Category] || 0) + 1;
+      }
+    });
+    return counts;
+  };
+
+  const categoryCounts = calculateCategoryCounts();
+  const totalCount = allMaterials.length;
+
+  const handleFiltersChange = (newFilters: Omit<FilterOptions, "category">) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  };
+
+  const handleCategoryChange = (category: string | null) => {
+    setFilters((prev) => ({ ...prev, category: category || "" }));
+  };
 
   return (
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 px-4 xl:px-8 lg:px-16">
@@ -67,13 +127,18 @@ const MaterialsPage: React.FC = () => {
             isSidebarOpen ? "block" : "hidden"
           } xl:block rounded-lg bg-white shadow-md xl:shadow-none`}
         >
-          <Sidebar />
+          <Sidebar
+            onCategoryChange={handleCategoryChange}
+            activeCategory={filters.category || null}
+            categoryCounts={categoryCounts}
+            totalCount={totalCount}
+          />
         </div>
       </div>
 
       {/* Main content */}
       <div className="flex-1 space-y-4">
-        <SearchBar />
+        <SearchBar onFiltersChange={handleFiltersChange} />
         <MaterialsGrid
           materials={materials}
           loading={loading}

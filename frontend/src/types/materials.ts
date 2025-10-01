@@ -9,4 +9,5 @@ export interface Material {
   image?: string;
   Quantity?: string;
   selectedVendors?: string[];
+  createdAt?: string;
 }

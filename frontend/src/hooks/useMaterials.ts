@@ -1,8 +1,17 @@
 import { useState, useEffect } from "react";
 import type { Material } from "../types/materials";
 
-export const useMaterials = () => {
+export interface FilterOptions {
+  searchTerm?: string;
+  category?: string;
+  sortBy?: string;
+  availability?: string;
+  priceRange?: string;
+}
+
+export const useMaterials = (filters?: FilterOptions) => {
   const [materials, setMaterials] = useState<Material[]>([]);
+  const [allMaterials, setAllMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,15 +55,18 @@ export const useMaterials = () => {
             Price: material.price,
             image: material.image,
             Vendors: material.vendors,
+            createdAt: material.createdAt,
             // Add other fields as needed
           })
         );
 
+        setAllMaterials(materialsWithIds);
         setMaterials(materialsWithIds);
       } catch (err) {
         console.error("Error fetching materials:", err);
         setError(err instanceof Error ? err.message : "An error occurred");
         setMaterials([]); // Set empty array on error
+        setAllMaterials([]);
       } finally {
         setLoading(false);
       }
@@ -62,6 +74,88 @@ export const useMaterials = () => {
 
     fetchMaterials();
   }, []);
+
+  // Filter and sort materials when filters change
+  useEffect(() => {
+    if (!filters || allMaterials.length === 0) {
+      setMaterials(allMaterials);
+      return;
+    }
+
+    let filteredMaterials = [...allMaterials];
+
+    // Apply search filter
+    if (filters.searchTerm && filters.searchTerm.trim()) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      filteredMaterials = filteredMaterials.filter(
+        (material) =>
+          material["Item Name"]?.toLowerCase().includes(searchLower) ||
+          material.Category?.toLowerCase().includes(searchLower) ||
+          material["Size/Option"]?.toLowerCase().includes(searchLower) ||
+          (Array.isArray(material.Vendors)
+            ? material.Vendors.some((vendor: string) =>
+                vendor.toLowerCase().includes(searchLower)
+              )
+            : material.Vendors?.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Apply category filter
+    if (filters.category && filters.category.trim()) {
+      filteredMaterials = filteredMaterials.filter(
+        (material) => material.Category === filters.category
+      );
+    }
+
+    // Apply price range filter
+    if (filters.priceRange && filters.priceRange !== "") {
+      filteredMaterials = filteredMaterials.filter((material) => {
+        const price =
+          parseFloat(String(material.Price).replace(/[^0-9.-]/g, "")) || 0;
+
+        switch (filters.priceRange) {
+          case "0-50":
+            return price <= 50;
+          case "50-100":
+            return price > 50 && price <= 100;
+          case "100-500":
+            return price > 100 && price <= 500;
+          case "500+":
+            return price > 500;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply sorting
+    if (filters.sortBy && filters.sortBy !== "") {
+      filteredMaterials.sort((a, b) => {
+        switch (filters.sortBy) {
+          case "price-asc":
+            const priceA =
+              parseFloat(String(a.Price).replace(/[^0-9.-]/g, "")) || 0;
+            const priceB =
+              parseFloat(String(b.Price).replace(/[^0-9.-]/g, "")) || 0;
+            return priceA - priceB;
+          case "price-desc":
+            const priceDescA =
+              parseFloat(String(a.Price).replace(/[^0-9.-]/g, "")) || 0;
+            const priceDescB =
+              parseFloat(String(b.Price).replace(/[^0-9.-]/g, "")) || 0;
+            return priceDescB - priceDescA;
+          case "name-asc":
+            return (a["Item Name"] || "").localeCompare(b["Item Name"] || "");
+          case "name-desc":
+            return (b["Item Name"] || "").localeCompare(a["Item Name"] || "");
+          default:
+            return 0;
+        }
+      });
+    }
+
+    setMaterials(filteredMaterials);
+  }, [filters, allMaterials]);
 
   return { materials, loading, error };
 };

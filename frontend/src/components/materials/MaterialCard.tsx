@@ -84,6 +84,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
     Unit: unit,
     Price: price,
     image,
+    createdAt,
   } = material;
 
   // Calculate total price
@@ -295,6 +296,20 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                     {price}
                   </span>
                 </div>
+                {createdAt && (
+                  <div className="flex justify-between">
+                    <span className="font-bold text-gray-700">Added:</span>
+                    <span className="font-bold text-gray-600 text-sm">
+                      {new Date(createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Vendor List */}

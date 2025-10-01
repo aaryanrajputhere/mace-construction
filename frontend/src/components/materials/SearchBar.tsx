@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   X,
   SlidersHorizontal,
   ChevronDown,
   TrendingUp,
-  Package,
-  CheckCircle,
-  XCircle,
   RotateCcw,
   Filter,
   ChevronUp,
@@ -15,6 +12,15 @@ import {
   HelpCircle,
   Lightbulb,
 } from "lucide-react";
+
+interface SearchFilterBarProps {
+  onFiltersChange: (filters: {
+    searchTerm: string;
+    sortBy: string;
+    availability: string;
+    priceRange: string;
+  }) => void;
+}
 
 const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
   content,
@@ -41,13 +47,14 @@ const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
   );
 };
 
-const SearchFilterBar = () => {
+const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
+  onFiltersChange,
+}) => {
   // Search state
   const [searchValue, setSearchValue] = useState("");
 
   // Filter state
   const [sortBy, setSortBy] = useState("");
-  const [filterBy, setFilterBy] = useState("");
   const [priceRange, setPriceRange] = useState("");
   const [isClearing, setIsClearing] = useState(false);
 
@@ -64,13 +71,6 @@ const SearchFilterBar = () => {
     { value: "newest", label: "Newest First" },
   ];
 
-  const availabilityOptions = [
-    { value: "", label: "All Items" },
-    { value: "available", label: "✅ In Stock", icon: CheckCircle },
-    { value: "low-stock", label: "⚠️ Low Stock", icon: Package },
-    { value: "out-of-stock", label: "❌ Out of Stock", icon: XCircle },
-  ];
-
   const priceRanges = [
     { value: "", label: "Any Price Range" },
     { value: "0-50", label: "Under $50" },
@@ -79,36 +79,39 @@ const SearchFilterBar = () => {
     { value: "500+", label: "$500+" },
   ];
 
-  const hasActiveFilters = sortBy || filterBy || priceRange;
-  const activeFiltersCount = [sortBy, filterBy, priceRange].filter(
-    Boolean
-  ).length;
+  const hasActiveFilters = sortBy || priceRange;
+  const activeFiltersCount = [sortBy, priceRange].filter(Boolean).length;
+
+  // Call onFiltersChange whenever any filter changes
+  useEffect(() => {
+    onFiltersChange({
+      searchTerm: searchValue,
+      sortBy,
+      availability: "",
+      priceRange,
+    });
+  }, [searchValue, sortBy, priceRange, onFiltersChange]);
 
   const handleSearch = () => {
-    if (searchValue.trim()) {
-      console.log("Searching for:", searchValue);
-    }
+    // Search is handled automatically by useEffect
+    console.log("Searching for:", searchValue);
   };
 
   const clearAllFilters = () => {
     setIsClearing(true);
     setTimeout(() => {
       setSortBy("");
-      setFilterBy("");
       setPriceRange("");
       setIsClearing(false);
     }, 150);
   };
 
-  type FilterType = "sort" | "availability" | "price";
+  type FilterType = "sort" | "price";
 
   const clearIndividualFilter = (filterType: FilterType): void => {
     switch (filterType) {
       case "sort":
         setSortBy("");
-        break;
-      case "availability":
-        setFilterBy("");
         break;
       case "price":
         setPriceRange("");
@@ -226,7 +229,7 @@ const SearchFilterBar = () => {
         <div className="border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
           <div className="p-6 sm:p-8">
             {/* Filter Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               {/* Sort By */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -254,44 +257,6 @@ const SearchFilterBar = () => {
                     }}
                   >
                     {sortOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none p-1 bg-gray-100 rounded-lg">
-                    <ChevronDown className="h-5 w-5 text-gray-700" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Availability Filter */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <label
-                    className="block text-sm sm:text-base font-bold text-gray-900"
-                    style={{
-                      fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
-                    }}
-                  >
-                    Availability
-                  </label>
-                  <Tooltip content="Filter by stock status. In Stock items are ready to ship immediately, Low Stock may have limited quantities available.">
-                    <div className="p-1 bg-gray-200 rounded-full">
-                      <Info className="h-4 w-4 text-gray-600" />
-                    </div>
-                  </Tooltip>
-                </div>
-                <div className="relative">
-                  <select
-                    value={filterBy}
-                    onChange={(e) => setFilterBy(e.target.value)}
-                    className="w-full pl-4 pr-12 py-4 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base transition-all duration-200 outline-none hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 appearance-none cursor-pointer font-semibold text-gray-900 shadow-sm focus:shadow-md"
-                    style={{
-                      fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
-                    }}
-                  >
-                    {availabilityOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -409,28 +374,6 @@ const SearchFilterBar = () => {
                           onClick={() => clearIndividualFilter("sort")}
                           className="ml-1 p-1.5 rounded-full hover:bg-blue-300 transition-colors duration-150 outline-none focus:ring-1 focus:ring-blue-500"
                           aria-label="Clear sort filter"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </Tooltip>
-                    </div>
-                  )}
-
-                  {filterBy && (
-                    <div className="inline-flex items-center pl-4 pr-2 py-3 rounded-full text-sm font-bold bg-gradient-to-r from-green-100 to-green-200 text-green-900 group shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]">
-                      <Package className="h-4 w-4 mr-2" />
-                      <span className="mr-2">
-                        {
-                          availabilityOptions.find(
-                            (opt) => opt.value === filterBy
-                          )?.label
-                        }
-                      </span>
-                      <Tooltip content="Remove availability filter">
-                        <button
-                          onClick={() => clearIndividualFilter("availability")}
-                          className="ml-1 p-1.5 rounded-full hover:bg-green-300 transition-colors duration-150 outline-none focus:ring-1 focus:ring-green-500"
-                          aria-label="Clear availability filter"
                         >
                           <X className="h-4 w-4" />
                         </button>

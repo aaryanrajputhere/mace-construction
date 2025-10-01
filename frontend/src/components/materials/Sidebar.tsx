@@ -1,37 +1,46 @@
 import React, { useState } from "react";
 import {
   Building2,
-  Hammer,
   Home,
   Shield,
   Wrench,
-  Zap,
   Paintbrush,
-  HardHat,
   ChevronRight,
   Filter,
 } from "lucide-react";
 
 const categories = [
-  { name: "Lumber & Panels", icon: Building2, count: 45 },
-  { name: "Concrete & Masonry", icon: Building2, count: 28 },
-  { name: "Roofing", icon: Home, count: 15 },
-  { name: "Insulation", icon: Shield, count: 12 },
-  { name: "Drywall & Finishes", icon: Paintbrush, count: 22 },
-  { name: "Fasteners & Adhesives", icon: Wrench, count: 38 },
-  { name: "Plumbing", icon: Wrench, count: 29 },
-  { name: "Electrical", icon: Zap, count: 41 },
-  { name: "Doors & Windows", icon: Home, count: 16 },
-  { name: "Paint & Coatings", icon: Paintbrush, count: 33 },
-  { name: "Equipment", icon: Hammer, count: 27 },
-  { name: "Hand Tools", icon: Hammer, count: 19 },
-  { name: "Power Tools", icon: Hammer, count: 25 },
-  { name: "Safety Gear", icon: HardHat, count: 14 },
+  { name: "Lumber", icon: Building2 },
+  { name: "Panels", icon: Building2 },
+  { name: "Exterior", icon: Home },
+  { name: "Treated Lumber", icon: Building2 },
+  { name: "Insulation", icon: Shield },
+  { name: "Fasteners", icon: Wrench },
+  { name: "Concrete", icon: Building2 },
+  { name: "Roofing", icon: Home },
+  { name: "Drywall", icon: Paintbrush },
 ];
 
-const Sidebar: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+interface SidebarProps {
+  onCategoryChange: (category: string | null) => void;
+  activeCategory?: string | null;
+  categoryCounts?: Record<string, number>;
+  totalCount?: number;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
+  onCategoryChange,
+  activeCategory: propActiveCategory,
+  categoryCounts = {},
+  totalCount = 0,
+}) => {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+
+  const handleCategoryClick = (categoryName: string) => {
+    const newCategory =
+      propActiveCategory === categoryName ? null : categoryName;
+    onCategoryChange(newCategory);
+  };
 
   return (
     <div className="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden max-w-sm mx-auto sm:max-w-none">
@@ -56,7 +65,7 @@ const Sidebar: React.FC = () => {
         <ul className="space-y-1">
           {categories.map((category) => {
             const Icon = category.icon;
-            const isActive = activeCategory === category.name;
+            const isActive = propActiveCategory === category.name;
             const isHovered = hoveredCategory === category.name;
 
             return (
@@ -67,9 +76,7 @@ const Sidebar: React.FC = () => {
                       ? "bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-600 shadow-md transform scale-[1.02]"
                       : "hover:bg-gray-50 hover:transform hover:scale-[1.01] active:scale-[0.99]"
                   }`}
-                  onClick={() =>
-                    setActiveCategory(isActive ? null : category.name)
-                  }
+                  onClick={() => handleCategoryClick(category.name)}
                   onMouseEnter={() => setHoveredCategory(category.name)}
                   onMouseLeave={() => setHoveredCategory(null)}
                 >
@@ -118,7 +125,7 @@ const Sidebar: React.FC = () => {
                       }`}
                       style={{ fontFamily: "Helvetica Neue, sans-serif" }}
                     >
-                      {category.count}
+                      {categoryCounts[category.name] || 0}
                     </span>
                     <div
                       className={`p-1 rounded-full transition-all duration-300 ${
@@ -165,7 +172,7 @@ const Sidebar: React.FC = () => {
                 fontFamily: "Helvetica Neue, sans-serif",
               }}
             >
-              {categories.reduce((sum, cat) => sum + cat.count, 0)}
+              {totalCount}
             </span>
           </div>
         </div>
