@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+// Don't set the API key globally - set it in each function
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
 
 export const sendRFQEmail = async (
@@ -11,60 +12,252 @@ export const sendRFQEmail = async (
   vendor: { email: string; name: string },
   driveLinks: string[]
 ) => {
-  const token = jwt.sign(
-    { vendorName: vendor.name, vendorEmail: vendor.email, rfqId },
-    SECRET,
-    { expiresIn: '7d' }
+  console.log(
+    `🔍 sendRFQEmail called for vendor: ${vendor.email}, rfqId: ${rfqId}`
   );
 
-  const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;
+  try {
+    // Check if SendGrid API key is available and set it
+    const apiKey = process.env.SENDGRID_API_KEY;
+    console.log(`🔑 SendGrid API Key available: ${apiKey ? "Yes" : "No"}`);
 
-  const materialsList = items
-    .map(
-      (item, idx) =>
-        `- ${
-          item["Item Name"] ||
-          item.name ||
-          item.description ||
-          `Item ${idx + 1}`
-        }: ` +
-        `${item["Size/Option"] || item.size || ""}${
-          item["Size/Option"] || item.size ? ", " : ""
-        }` +
-        `${item["Unit"] || item.unit || ""}${
-          item["Unit"] || item.unit ? ", " : ""
-        }` +
-        `Qty: ${item["Quantity"] || item.qty || ""}`
-    )
-    .join("<br>");
+    if (!apiKey) {
+      throw new Error("SendGrid API key not found in environment variables");
+    }
 
-  console.log("Sending Email to:", vendor.email);
-  const msg = {
-    to: vendor.email, // Send to actual vendor
-    from: "rfq@maceinfo.com", // Verified sender
-    subject: `RFQ Request – ${projectInfo.projectName}, RFQ ID #${rfqId}`,
-    html: `
-      <p>Hello ${vendor.name},</p>
-      <p>We are requesting pricing and lead time for the following materials:</p>
-      <p><strong>Project:</strong> ${projectInfo.projectName}</p>
-      <p><strong>Site Address:</strong> ${projectInfo.siteAddress || ""}</p>
-      <p><strong>Needed By:</strong> ${projectInfo.neededBy || ""}</p>
-      <p><strong>Requested Materials:</strong><br>${materialsList}</p>
-      <p>Files: ${driveLinks
-        .map((l) => `<a href="${l}">File</a>`)
-        .join(", ")}</p>
-      <p>Please submit your pricing and lead time using your secure vendor link below:<br>
-      <a href="${secureLink}">Submit Your Reply</a></p>
-      <p>This link is unique to you and will expire in 7 days.</p>
-      <p>Thank you,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
-    `,
-  };
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent");
-    })
-    .catch((error) => {
-      console.error(error);
+    sgMail.setApiKey(apiKey);
+    console.log(`✅ SendGrid API key set for RFQ email`);
+
+    const token = jwt.sign(
+      { vendorName: vendor.name, vendorEmail: vendor.email, rfqId },
+      SECRET,
+      { expiresIn: "7d" }
+    );
+
+    const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;
+
+    const materialsList = items
+      .map(
+        (item, idx) =>
+          `- ${
+            item["Item Name"] ||
+            item.name ||
+            item.description ||
+            `Item ${idx + 1}`
+          }: ` +
+          `${item["Size/Option"] || item.size || ""}${
+            item["Size/Option"] || item.size ? ", " : ""
+          }` +
+          `${item["Unit"] || item.unit || ""}${
+            item["Unit"] || item.unit ? ", " : ""
+          }` +
+          `Qty: ${item["Quantity"] || item.qty || ""}`
+      )
+      .join("<br>");
+
+    console.log("Sending Email to:", vendor.email);
+    const msg = {
+      to: vendor.email, // Send to actual vendor
+      from: "rfq@maceinfo.com", // Verified sender
+      subject: `RFQ Request – ${projectInfo.projectName}, RFQ ID #${rfqId}`,
+      html: `
+        <p>Hello ${vendor.name},</p>
+        <p>We are requesting pricing and lead time for the following materials:</p>
+        <p><strong>Project:</strong> ${projectInfo.projectName}</p>
+        <p><strong>Site Address:</strong> ${projectInfo.siteAddress || ""}</p>
+        <p><strong>Needed By:</strong> ${projectInfo.neededBy || ""}</p>
+        <p><strong>Requested Materials:</strong><br>${materialsList}</p>
+        <p>Files: ${driveLinks
+          .map((l) => `<a href="${l}">File</a>`)
+          .join(", ")}</p>
+        <p>Please submit your pricing and lead time using your secure vendor link below:<br>
+        <a href="${secureLink}">Submit Your Reply</a></p>
+        <p>This link is unique to you and will expire in 7 days.</p>
+        <p>Thank you,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
+      `,
+    };
+
+    const result = await sgMail.send(msg);
+    console.log(
+      "✅ RFQ Email sent successfully to:",
+      vendor.email,
+      result[0]?.statusCode
+    );
+  } catch (error) {
+    console.error("❌ Error sending RFQ email to:", vendor.email, error);
+    throw error;
+  }
+};
+
+export const rfqAward = async (email: string, rfqId: string) => {
+  console.log(`🔍 rfqAward called with email: ${email}, rfqId: ${rfqId}`);
+
+  try {
+    // Check if SendGrid API key is available
+    const apiKey = process.env.SENDGRID_API_KEY;
+    console.log(`🔑 SendGrid API Key available: ${apiKey ? "Yes" : "No"}`);
+
+    if (!apiKey) {
+      throw new Error("SendGrid API key not found in environment variables");
+    }
+
+    // Set SendGrid API key
+    sgMail.setApiKey(apiKey);
+    console.log(`✅ SendGrid API key set successfully`);
+
+    const token = jwt.sign({ email, rfqId }, SECRET, { expiresIn: "7d" });
+    console.log(`🎟️ JWT token generated: ${token.substring(0, 20)}...`);
+
+    // Generate JWT token with email and rfqId using utility function
+    const secureLink = `https://mace-construction.vercel.app/award/${rfqId}/${token}`;
+    console.log(`🔗 Secure link generated: ${secureLink}`);
+
+    // Email content
+    const msg = {
+      to: email,
+      from: "rfq@maceinfo.com",
+      subject: `RFQ Award Access - RFQ ID #${rfqId}`,
+      html: `
+        <p>Hello,</p>
+        <p>You have been granted access to award RFQ #${rfqId}.</p>
+        <p>Please use the secure link below to access the award interface:</p>
+        <p><a href="${secureLink}" style="background-color: #033159; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Access Award Interface</a></p>
+        <p>Or copy and paste this link: ${secureLink}</p>
+        <p>This link is secure and will expire in 7 days.</p>
+        <p>Thank you,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
+      `,
+    };
+
+    console.log(`📧 Email message prepared for: ${email}`);
+    console.log(`📧 Email subject: ${msg.subject}`);
+
+    // Send email
+    console.log(`🚀 Attempting to send email via SendGrid...`);
+    const result = await sgMail.send(msg);
+    console.log(`✅ Email sent successfully!`, result[0]?.statusCode);
+    console.log(`Award access email sent to ${email} for RFQ ${rfqId}`);
+
+    return {
+      success: true,
+      message: `Award access email sent to ${email}`,
+    };
+  } catch (error) {
+    console.error("❌ Error sending award access email:", error);
+    console.error("❌ Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      code: (error as any)?.code,
+      response: (error as any)?.response?.body,
     });
+    throw error;
+  }
+};
+
+export const sendReplyConfirmation = async (
+  email: string,
+  rfqId: string,
+  replyId: string
+) => {
+  console.log(
+    `🔍 sendReplyConfirmation called with email: ${email}, rfqId: ${rfqId}, replyId: ${replyId}`
+  );
+
+  try {
+    // Check if SendGrid API key is available
+    const apiKey = process.env.SENDGRID_API_KEY;
+    if (!apiKey) {
+      throw new Error("SendGrid API key not found in environment variables");
+    }
+
+    // Set SendGrid API key
+    sgMail.setApiKey(apiKey);
+    console.log(`✅ SendGrid API key set for reply confirmation`);
+
+    // Email content
+    const msg = {
+      to: email,
+      from: "rfq@maceinfo.com",
+      subject: `Reply Confirmation - RFQ ID #${rfqId}`,
+      html: `
+        <p>Hello,</p>
+        <p>Thank you for submitting your reply for RFQ #${rfqId}.</p>
+        <p><strong>Reply ID:</strong> ${replyId}</p>
+        <p>Your reply has been submitted successfully and is now under review.</p>
+        <p>You will be notified by email if you have been awarded this RFQ.</p>
+        <p>Thank you for your participation in our RFQ process.</p>
+        <p>Best regards,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
+      `,
+    };
+
+    console.log(`📧 Reply confirmation email prepared for: ${email}`);
+
+    // Send email
+    const result = await sgMail.send(msg);
+    console.log(
+      `✅ Reply confirmation email sent successfully!`,
+      result[0]?.statusCode
+    );
+    console.log(
+      `Reply confirmation email sent to ${email} for RFQ ${rfqId}, Reply ${replyId}`
+    );
+
+    return {
+      success: true,
+      message: `Reply confirmation email sent to ${email}`,
+    };
+  } catch (error) {
+    console.error("❌ Error sending reply confirmation email:", error);
+    console.error("❌ Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      code: (error as any)?.code,
+      response: (error as any)?.response?.body,
+    });
+    throw error;
+  }
+};
+
+// Test function to verify SendGrid configuration
+export const testSendGridConnection = async (testEmail: string) => {
+  console.log(`🧪 Testing SendGrid connection with email: ${testEmail}`);
+
+  try {
+    const apiKey = process.env.SENDGRID_API_KEY;
+    console.log(`🔑 SendGrid API Key available: ${apiKey ? "Yes" : "No"}`);
+
+    if (!apiKey) {
+      throw new Error("SendGrid API key not found in environment variables");
+    }
+
+    sgMail.setApiKey(apiKey);
+
+    const msg = {
+      to: testEmail,
+      from: "rfq@maceinfo.com",
+      subject: "Test Email - SendGrid Configuration",
+      html: `
+        <p>Hello,</p>
+        <p>This is a test email to verify that SendGrid is working correctly.</p>
+        <p>If you receive this email, the configuration is working!</p>
+        <p>Timestamp: ${new Date().toISOString()}</p>
+        <p>Best regards,<br>Maceinfo System</p>
+      `,
+    };
+
+    const result = await sgMail.send(msg);
+    console.log(`✅ Test email sent successfully!`, result[0]?.statusCode);
+
+    return {
+      success: true,
+      message: `Test email sent to ${testEmail}`,
+      statusCode: result[0]?.statusCode,
+    };
+  } catch (error) {
+    console.error("❌ Error sending test email:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown error",
+      error,
+    };
+  }
 };

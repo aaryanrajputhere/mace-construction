@@ -1,5 +1,6 @@
 import { addVendorReplyToSheet } from "../services/sheets.service";
 import { saveVendorReplyFiles } from "../services/drive.service";
+import { sendReplyConfirmation } from "../services/mail.service";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
@@ -203,7 +204,9 @@ export const handleVendorReply = async (req: Request, res: Response) => {
         // Calculate totals
         const totalPrice = itemReplies.reduce((sum, item, index) => {
           const price = parseFloat(item.pricing || "0");
-          const quantity = parseFloat(originalItems[index]?.["Quantity"] || "0");
+          const quantity = parseFloat(
+            originalItems[index]?.["Quantity"] || "0"
+          );
           return sum + (isNaN(price) || isNaN(quantity) ? 0 : price * quantity);
         }, 0);
 
@@ -266,6 +269,17 @@ export const handleVendorReply = async (req: Request, res: Response) => {
       }
     }
 
+    // Send confirmation email to vendor
+    let confirmationEmailSent = false;
+    try {
+      await sendReplyConfirmation(vendor.email || "", rfqId, replyId);
+      console.log(`Confirmation email sent to vendor: ${vendor.email}`);
+      confirmationEmailSent = true;
+    } catch (emailErr) {
+      console.error("Failed to send confirmation email:", emailErr);
+      // Don't fail the reply submission if email fails
+    }
+
     return res.status(200).json({
       message: "Reply submitted successfully",
       vendor: {
@@ -278,6 +292,7 @@ export const handleVendorReply = async (req: Request, res: Response) => {
       filesUploaded: Object.values(driveLinks).flat().length,
       replyFolderLink,
       consolidatedReply: true, // Indicates this is a single consolidated entry
+      confirmationEmailSent,
     });
   } catch (err) {
     console.error("Error in handleVendorReply:", err);

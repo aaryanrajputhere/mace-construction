@@ -18,6 +18,9 @@ export const syncRFQs = async (req: Request, res: Response) => {
         created_at: row["created_at"]
           ? new Date(row["created_at"])
           : new Date(),
+        updated_at: row["updated_at"]
+          ? new Date(row["updated_at"])
+          : new Date(),
         requester_name: row["requester_name"] || "",
         requester_email: row["requester_email"] || "",
         requester_phone:

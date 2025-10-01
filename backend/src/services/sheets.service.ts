@@ -1,5 +1,6 @@
 // src/services/sheets.service.ts
 import { getSheetsClient } from "../utils/googleAuth";
+import sgMail from "@sendgrid/mail";
 
 const RFQ_SHEET_ID = process.env.RFQ_SHEET_ID || "";
 const RFQ_SHEET_NAME = process.env.RFQ_SHEET_NAME || "RFQs";
@@ -136,3 +137,4 @@ export const addRFQToSheet = async (rfq: RFQData) => {
     throw error;
   }
 };
+

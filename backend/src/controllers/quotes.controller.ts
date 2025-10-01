@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { saveRFQFiles } from "../services/drive.service";
 import { generateRFQ } from "../utils/generateRFQ";
 import { addRFQToSheet, RFQData } from "../services/sheets.service";
-import { sendRFQEmail } from "../services/mail.service";
+import { sendRFQEmail, rfqAward } from "../services/mail.service";
 import { PrismaClient } from "@prisma/client";
 import { Console } from "console";
 
@@ -139,6 +139,29 @@ export const createQuote = async (req: Request, res: Response) => {
       );
     }
 
+    // Send award access email to the requester
+    let awardEmailSent = false;
+    console.log(
+      `🎯 Starting award email process for: ${projectInfo.requesterEmail}`
+    );
+    try {
+      console.log(`📬 Calling rfqAward function...`);
+      const result = await rfqAward(projectInfo.requesterEmail, rfqId);
+      console.log(`✅ rfqAward result:`, result);
+      console.log(
+        `Award access email sent to requester: ${projectInfo.requesterEmail}`
+      );
+      awardEmailSent = true;
+    } catch (error) {
+      console.error(`❌ Failed to send award email to requester:`, error);
+      console.error(`❌ Error type:`, typeof error);
+      console.error(
+        `❌ Error message:`,
+        error instanceof Error ? error.message : error
+      );
+      // Don't fail the entire request if award email fails
+    }
+
     // 5️⃣ Respond with Drive + Sheet info and email confirmation
     res.status(201).json({
       success: true,
@@ -148,6 +171,7 @@ export const createQuote = async (req: Request, res: Response) => {
       sheetUpdated: true,
       sheetResponse,
       emailsSent: true,
+      awardEmailSent,
       // vendorCount: vendors.length,
     });
   } catch (err: any) {
