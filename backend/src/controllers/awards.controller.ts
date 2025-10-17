@@ -37,13 +37,6 @@ export const getVendorReplyItems = async (
 
     console.log("[awards] Decoded token:", { tokenEmail, tokenRfqId });
 
-    // Ensure token rfq matches route rfq
-    if (tokenRfqId && tokenRfqId !== rfq_id) {
-      console.error(
-        `[awards] Token RFQ (${tokenRfqId}) does not match requested RFQ (${rfq_id})`
-      );
-      return res.status(403).json({ error: "Token does not match RFQ ID" });
-    }
 
     // Try to resolve vendor name from vendor table using email
     let vendorName: string | null = null;
