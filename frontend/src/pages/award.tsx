@@ -1,6 +1,6 @@
 import { useVendorItemReply } from "../hooks/useVendorReplyItems";
 import { useParams } from "react-router-dom";
-import mapVendorRepliesToAwardItems from "../utils/awardMap";
+import transformVendorReplies from "../utils/awardMap";
 import AwardTable from "../components/award/AwardTable";
 import { useState } from "react";
 
@@ -31,8 +31,7 @@ export default function Award(props: AwardProps) {
   if (!vendorReplies || vendorReplies.length === 0)
     return <p>No vendor replies found.</p>;
 
-  const items = mapVendorRepliesToAwardItems(vendorReplies as any);
-  console.log(items);
+  const items = transformVendorReplies(vendorReplies as any);
   const onAward = async (_itemId: number | string, vendorName: string) => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;

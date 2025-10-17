@@ -1,13 +1,16 @@
+/**
+ * Converts backend vendor reply data into grouped item structure.
+ */
 interface VendorReply {
   id: number;
   rfq_id: string;
   reply_id: string;
   item_name: string;
   size?: string;
-  unit: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
+  unit?: string;
+  quantity?: number;
+  unit_price?: number;
+  total_price?: number;
   discount?: number;
   delivery_charge?: number;
   lead_time?: string;
@@ -19,11 +22,6 @@ interface VendorReply {
   vendor_email: string;
 }
 
-interface BackendResponse {
-  success: boolean;
-  data: VendorReply[];
-}
-
 interface VendorQuote {
   vendorName: string;
   leadTime?: string;
@@ -31,8 +29,8 @@ interface VendorQuote {
   notes?: string;
 }
 
-interface ItemWithQuotes {
-  id: string | number;
+interface ItemWithVendors {
+  id: number;
   itemName: string;
   requestedPrice?: string;
   quantity?: number;
@@ -41,44 +39,37 @@ interface ItemWithQuotes {
 }
 
 /**
- * Converts backend vendor reply data into grouped item structure.
+ * Converts a flat array of vendor replies into structured items grouped by item_name.
  */
 export function transformVendorReplies(
-  response: BackendResponse
-): ItemWithQuotes[] {
-  if (!response.success || !Array.isArray(response.data)) return [];
+  replies: VendorReply[]
+): ItemWithVendors[] {
+  const grouped: Record<string, ItemWithVendors> = {};
 
-  // Group items by `item_name`
-  const grouped = response.data.reduce((acc, reply) => {
-    const key = reply.item_name;
-    if (!acc[key]) {
-      acc[key] = {
-        id: reply.id,
+  for (const reply of replies) {
+    // If we haven’t seen this item yet, create a new entry
+    if (!grouped[reply.item_name]) {
+      grouped[reply.item_name] = {
+        id: Object.keys(grouped).length + 1,
         itemName: reply.item_name,
-        requestedPrice: reply.unit_price?.toFixed(2),
+        requestedPrice: reply.total_price?.toFixed(2) ?? undefined,
         quantity: reply.quantity,
         unit: reply.unit,
         vendors: [],
       };
     }
 
-    acc[key].vendors.push({
+    // Push the vendor info into the item’s vendor list
+    grouped[reply.item_name].vendors.push({
       vendorName: reply.vendor_name,
       leadTime: reply.lead_time
-        ? new Date(reply.lead_time).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })
+        ? new Date(reply.lead_time).toLocaleDateString()
         : undefined,
       quotedPrice: reply.unit_price?.toFixed(2),
-      notes: reply.substitutions || "",
+      notes: reply.substitutions || undefined,
     });
-    console.log("Processing reply for item:", reply.item_name, "from vendor:", reply.vendor_name);
-    return acc;
-  }, {} as Record<string, ItemWithQuotes>);
+  }
 
-  // Convert to array
   return Object.values(grouped);
 }
 
