@@ -36,14 +36,37 @@ export interface ItemWithQuotes {
 }
 
 export function mapVendorRepliesToAwardItems(
-  rows: BackendVendorReplyItem[] | null | undefined
+  maybeRows: BackendVendorReplyItem[] | null | undefined | any
 ): ItemWithQuotes[] {
+  // Accept flexible shapes: array, { data: [...] }, { vendorReplies: [...] }, or wrapped response
+  let rows: BackendVendorReplyItem[] | null | undefined = undefined;
+
+  if (!maybeRows) return [];
+
+  if (Array.isArray(maybeRows)) {
+    rows = maybeRows as BackendVendorReplyItem[];
+  } else if (Array.isArray(maybeRows.data)) {
+    rows = maybeRows.data as BackendVendorReplyItem[];
+  } else if (Array.isArray(maybeRows.vendorReplies)) {
+    rows = maybeRows.vendorReplies as BackendVendorReplyItem[];
+  } else if (Array.isArray(maybeRows.result)) {
+    // some APIs use `result`
+    rows = maybeRows.result as BackendVendorReplyItem[];
+  } else {
+    // Not an expected shape
+    return [];
+  }
+
   if (!rows || rows.length === 0) return [];
 
   const map = new Map<string, ItemWithQuotes>();
 
   const formatPrice = (p?: number) =>
-    typeof p === "number" ? (p % 1 === 0 ? String(p) : p.toFixed(2)) : undefined;
+    typeof p === "number"
+      ? p % 1 === 0
+        ? String(p)
+        : p.toFixed(2)
+      : undefined;
 
   for (const r of rows) {
     const key = `${r.item_name}||${r.size ?? ""}||${r.unit ?? ""}`;
@@ -61,10 +84,10 @@ export function mapVendorRepliesToAwardItems(
     }
 
     const item = map.get(key)!;
-
     const notesParts: string[] = [];
     if (r.discount != null) notesParts.push(`Discount: ${r.discount}`);
-    if (r.delivery_charge != null) notesParts.push(`Delivery: ${r.delivery_charge}`);
+    if (r.delivery_charge != null)
+      notesParts.push(`Delivery: ${r.delivery_charge}`);
     if (r.substitutions) notesParts.push(`Subs: ${r.substitutions}`);
 
     const notes = notesParts.length ? notesParts.join(" • ") : undefined;

@@ -32,22 +32,25 @@ export default function Award(props: AwardProps) {
     return <p>No vendor replies found.</p>;
 
   const items = mapVendorRepliesToAwardItems(vendorReplies as any);
-
+  console.log(items);
   const onAward = async (_itemId: number | string, vendorName: string) => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
-      const res = await fetch(`${backendUrl}/api/awards/awardItem/${rfq_id}/${token}`, {
-        method: "POST",
-      });
+      const res = await fetch(
+        `${backendUrl}/api/awards/awardItem/${rfq_id}/${token}`,
+        {
+          method: "POST",
+        }
+      );
 
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to award item");
       }
 
-  const data = await res.json();
-  const updatedCount = data.updated ?? data.count ?? data.updatedCount ?? 0;
-  setAwardedMessage(`Awarded ${vendorName} (updated: ${updatedCount})`);
+      const data = await res.json();
+      const updatedCount = data.updated ?? data.count ?? data.updatedCount ?? 0;
+      setAwardedMessage(`Awarded ${vendorName} (updated: ${updatedCount})`);
       // Note: backend currently updates all items for that vendor/rfq. Adjust UI as needed.
     } catch (err: any) {
       setAwardedMessage(`Error awarding: ${err.message}`);
