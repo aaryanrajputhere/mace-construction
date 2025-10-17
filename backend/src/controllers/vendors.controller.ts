@@ -241,6 +241,51 @@ export const handleVendorReply = async (req: Request, res: Response) => {
           review_status: "",
           decided_at: "",
         });
+        // Also persist each item reply in the VendorReplyItem model (Prisma)
+        try {
+          const vendorReplyItems = itemReplies.map(
+            (itemReply: any, index: number) => {
+              const originalItem = originalItems[index] || {};
+              const itemId = itemReply.itemId || `item-${index}`;
+              const quantity = parseInt(originalItem["Quantity"] || "0") || 0;
+              const unitPrice = parseFloat(itemReply.pricing || "0") || 0;
+              const totalPrice = +(unitPrice * quantity);
+
+              // file links for this item (if uploaded)
+              const fileLinksForItem = driveLinks[itemId] || [];
+
+              return {
+                rfq_id: rfqId,
+                reply_id: replyId,
+                item_name: originalItem["Item Name"] || `Item ${index + 1}`,
+                size: originalItem["Size/Option"] || "",
+                unit: originalItem["Unit"] || "",
+                quantity: quantity,
+                unit_price: unitPrice,
+                total_price: totalPrice,
+                discount: isNaN(discountNum) ? undefined : discountNum,
+                delivery_charge: isNaN(deliveryChargesNum)
+                  ? undefined
+                  : deliveryChargesNum,
+                lead_time: itemReply.leadTime || "",
+                substitutions: itemReply.substitutions || "",
+                file_link:
+                  fileLinksForItem.length > 0
+                    ? fileLinksForItem.join(",")
+                    : null,
+                vendor_name: vendor.name,
+              };
+            }
+          );
+
+          // Use createMany for bulk insert (skips duplicates by default in older prisma, ensure model exists)
+          await prisma.vendorReplyItem.createMany({ data: vendorReplyItems });
+          console.log(
+            `Inserted ${vendorReplyItems.length} VendorReplyItem records for reply ${replyId}`
+          );
+        } catch (dbErr) {
+          console.error("Failed to persist VendorReplyItem records:", dbErr);
+        }
       } catch (sheetErr) {
         console.error(
           "Failed to add consolidated vendor reply to sheet:",

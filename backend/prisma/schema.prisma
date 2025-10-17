@@ -56,3 +56,23 @@ model rFQ {
   po_date            DateTime?
   po_notes           String?
 }
+
+model VendorReplyItem {
+  id               Int      @id @default(autoincrement())
+  rfq_id           String
+  reply_id         String
+  item_name       String
+  size            String
+  unit            String
+  quantity        Int
+  unit_price      Float
+  total_price     Float
+  discount        Float?
+  delivery_charge Float?
+  lead_time      String
+  substitutions  String?
+  file_link      String?
+  vendor_name     String
+  created_at      DateTime @default(now())
+  status         String? @default("pending") 
+}

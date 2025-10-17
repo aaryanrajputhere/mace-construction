@@ -9,6 +9,7 @@ import OSBCalculator from "./pages/calculators/osb";
 import QuoteBuilder from "./pages/quote";
 import LandingPage from "./pages/home";
 import VendorReplyPage from "./pages/vendor-reply";
+import Award from "./pages/award";
 const App: React.FC = () => {
   const location = useLocation();
   // Hide header/footer on vendor-reply route
@@ -28,6 +29,7 @@ const App: React.FC = () => {
             path="/vendor-reply/:rfqId/:token"
             element={<VendorReplyPage />}
           />
+          <Route path="/award" element={<Award />} />
         </Routes>
       </main>
       {!isVendorReply && <Footer />}
