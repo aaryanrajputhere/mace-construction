@@ -95,7 +95,9 @@ export const awardItem = async (
   res: Response
 ) => {
   const { rfq_id, token } = req.params;
-  console.log(`awardItem called for rfq_id=${rfq_id}`);
+  const { item_name } = req.body; // <-- take item_name from request body
+  console.log(`awardItem called for rfq_id=${rfq_id} item_name=${item_name}`);
+
   try {
     const secret = process.env.SECRET || process.env.JWT_SECRET;
     if (!secret) {
@@ -143,13 +145,15 @@ export const awardItem = async (
     }
 
     console.log(
-      `[awards] Updating vendorReplyItem rows to status=awarded for rfq_id=${rfq_id} vendor_name=${
+      `[awards] Updating vendorReplyItem rows to status=awarded for rfq_id=${rfq_id}, item_name=${item_name}, vendor_name=${
         vendorName || ""
-      } vendor_email=${!vendorName ? tokenEmail : ""}`
+      }, vendor_email=${!vendorName ? tokenEmail : ""}`
     );
+
     const updateResult = await prisma.vendorReplyItem.updateMany({
       where: {
         rfq_id,
+        item_name: item_name || undefined, // filter by item_name
         vendor_name: vendorName || undefined,
         vendor_email: !vendorName ? tokenEmail : undefined,
       },
@@ -157,7 +161,6 @@ export const awardItem = async (
     });
 
     console.log(`[awards] updateMany result: ${JSON.stringify(updateResult)}`);
-
     return res.json({ success: true, updated: updateResult.count });
   } catch (err) {
     console.error("[awards] JWT verification failed or error occurred:", err);
