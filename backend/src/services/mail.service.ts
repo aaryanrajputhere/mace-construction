@@ -217,6 +217,7 @@ export const sendReplyConfirmation = async (
   }
 };
 
+
 // Test function to verify SendGrid configuration
 export const testSendGridConnection = async (testEmail: string) => {
   console.log(`🧪 Testing SendGrid connection with email: ${testEmail}`);
