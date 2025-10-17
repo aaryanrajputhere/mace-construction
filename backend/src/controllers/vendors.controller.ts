@@ -33,6 +33,7 @@ interface VendorReplyRequest {
 
 export const getItems = async (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
+  console.log(`🔍 getItems called for rfqId: ${rfqId}`);
   try {
     // Validate token
     const decoded = jwt.verify(token, SECRET) as VendorReplyToken;
@@ -55,7 +56,7 @@ export const getItems = async (req: Request, res: Response) => {
     } catch {
       return res.status(500).json({ error: "Invalid items_json format" });
     }
-    console.log(vendorName);
+    console.log("Vendor Identified:", vendorName);
     const vendorItemsMap: Record<string, any[]> = {};
     items.forEach((item: any) => {
       if (item.Vendors) {
