@@ -29,7 +29,7 @@ const App: React.FC = () => {
             path="/vendor-reply/:rfqId/:token"
             element={<VendorReplyPage />}
           />
-          <Route path="/award" element={<Award />} />
+          <Route path="/award/:rfq_id/:token" element={<Award />} />
         </Routes>
       </main>
       {!isVendorReply && <Footer />}

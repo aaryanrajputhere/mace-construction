@@ -1,11 +1,25 @@
 import { useVendorItemReply } from "../hooks/useVendorReplyItems";
+import { useParams } from "react-router-dom";
 
 interface AwardProps {
-  rfq_id: string;
-  token: string;
+  rfq_id?: string;
+  token?: string;
 }
 
-export default function Award({ rfq_id, token }: AwardProps) {
+export default function Award(props: AwardProps) {
+  const params = useParams();
+  const rfq_id = props.rfq_id || (params as any).rfq_id || "";
+  const token = props.token || (params as any).token || "";
+
+  if (!rfq_id || !token) {
+    return (
+      <div className="p-6 max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Award Vendors</h1>
+        <p className="text-sm text-gray-600">Missing RFQ ID or access token.</p>
+      </div>
+    );
+  }
+
   const { vendorReplies, loading, error } = useVendorItemReply(rfq_id, token);
 
   if (loading) return <p>Loading vendor replies...</p>;
