@@ -1,4 +1,3 @@
-import AwardTable from "../components/award/AwardTable";
 import { useVendorItemReply } from "../hooks/useVendorReplyItems";
 
 interface AwardProps {
