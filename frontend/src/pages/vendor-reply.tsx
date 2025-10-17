@@ -34,7 +34,7 @@ const VendorReplyPage: React.FC = () => {
         setIsLoading(true);
         // Call the getItems API from vendors.controller.ts
         const res = await fetch(
-          `https://mace-construction-production.up.railway.app/api/vendors/get-items/${rfqId}/${token}`
+          `https://mace-construction-production-82bc.up.railway.app/api/vendors/get-items/${rfqId}/${token}`
         );
         const data = await res.json();
         if (res.ok && Array.isArray(data.items)) {
@@ -117,7 +117,7 @@ const VendorReplyPage: React.FC = () => {
       });
 
       const res = await fetch(
-        `https://mace-construction-production.up.railway.app/api/vendors/vendor-reply/${rfqId}/${token}`,
+        `https://mace-construction-production-82bc.up.railway.app/api/vendors/vendor-reply/${rfqId}/${token}`,
         {
           method: "POST",
           body: formData, // Use FormData instead of JSON
