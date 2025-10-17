@@ -3,7 +3,7 @@ import sgMail from "@sendgrid/mail";
 
 // Don't set the API key globally - set it in each function
 // sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
-const SECRET = process.env.JWT_SECRET || "supersecret"; // put in env
+const SECRET = process.env.SECRET;
 
 export const sendRFQEmail = async (
   rfqId: string,
@@ -28,9 +28,14 @@ export const sendRFQEmail = async (
     sgMail.setApiKey(apiKey);
     console.log(`✅ SendGrid API key set for RFQ email`);
 
+    if (!SECRET) {
+      throw new Error("JWT secret not found in environment variables");
+    }
+    const secret = SECRET;
+
     const token = jwt.sign(
       { vendorName: vendor.name, vendorEmail: vendor.email, rfqId },
-      SECRET,
+      secret,
       { expiresIn: "7d" }
     );
 
@@ -105,7 +110,11 @@ export const rfqAward = async (email: string, rfqId: string) => {
     sgMail.setApiKey(apiKey);
     console.log(`✅ SendGrid API key set successfully`);
 
-    const token = jwt.sign({ email, rfqId }, SECRET);
+    if (!SECRET) {
+      throw new Error("JWT secret not found in environment variables");
+    }
+
+    const token = jwt.sign({ email, rfqId }, SECRET, { expiresIn: "7d" });
     console.log(`🎟️ JWT token generated: ${token.substring(0, 20)}...`);
 
     // Generate JWT token with email and rfqId using utility function
@@ -217,7 +226,6 @@ export const sendReplyConfirmation = async (
   }
 };
 
-
 // Test function to verify SendGrid configuration
 export const testSendGridConnection = async (testEmail: string) => {
   console.log(`🧪 Testing SendGrid connection with email: ${testEmail}`);
@@ -260,5 +268,55 @@ export const testSendGridConnection = async (testEmail: string) => {
       message: error instanceof Error ? error.message : "Unknown error",
       error,
     };
+  }
+};
+
+export const sendAwardNotification = async (email: string, rfqId: string) => {
+  console.log(
+    `🔍 sendAwardNotification called with email: ${email}, rfqId: ${rfqId}`
+  );
+  try {
+    // Check if SendGrid API key is available and set it
+    const apiKey = process.env.SENDGRID_API_KEY;
+    console.log(`🔑 SendGrid API Key available: ${apiKey ? "Yes" : "No"}`);
+    if (!apiKey) {
+      throw new Error("SendGrid API key not found in environment variables");
+    }
+    sgMail.setApiKey(apiKey);
+    console.log(`✅ SendGrid API key set for award notification`);
+    // Email content
+    const msg = {
+      to: email,
+      from: "rfq@maceinfo.com",
+      subject: `Congratulations! You've Been Awarded RFQ ID #${rfqId}`,
+      html: `
+        <p>Hello,</p>
+        <p>We are pleased to inform you that you have been awarded RFQ #${rfqId}.</p>
+        <p>Please log in to your vendor portal to view the details and next steps.</p>
+        <p>Thank you for your participation in our RFQ process.</p>
+        <p>Best regards,<br>Maceinfo RFQ System<br>rfq@maceinfo.com</p>
+      `,
+    };
+    console.log(`📧 Award notification email prepared for: ${email}`);
+    // Send email
+    const result = await sgMail.send(msg);
+    console.log(
+      `✅ Award notification email sent successfully!`,
+      result[0]?.statusCode
+    );
+    console.log(`Award notification email sent to ${email} for RFQ ${rfqId}`);
+    return {
+      success: true,
+      message: `Award notification email sent to ${email} for RFQ ${rfqId}`,
+    };
+  } catch (error) {
+    console.error("❌ Error sending award notification email:", error);
+    console.error("❌ Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      code: (error as any)?.code,
+      response: (error as any)?.response?.body,
+    });
+    throw error;
   }
 };
