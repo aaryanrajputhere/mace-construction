@@ -15,7 +15,6 @@ export default function Award({ rfq_id, token }: AwardProps) {
 
   // Map vendorReplies into the structure expected by AwardTable
 
-
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Award Vendors</h1>

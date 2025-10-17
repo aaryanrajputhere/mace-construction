@@ -34,7 +34,7 @@ export const sendRFQEmail = async (
       { expiresIn: "7d" }
     );
 
-    const secureLink = `https://mace-construction.vercel.app/vendor-reply/${rfqId}/${token}`;
+    const secureLink = `https://maceinfo.com/vendor-reply/${rfqId}/${token}`;
 
     const materialsList = items
       .map(
@@ -109,7 +109,7 @@ export const rfqAward = async (email: string, rfqId: string) => {
     console.log(`🎟️ JWT token generated: ${token.substring(0, 20)}...`);
 
     // Generate JWT token with email and rfqId using utility function
-    const secureLink = `https://mace-construction.vercel.app/award/${rfqId}/${token}`;
+    const secureLink = `https://maceinfo.com/award/${rfqId}/${token}`;
     console.log(`🔗 Secure link generated: ${secureLink}`);
 
     // Email content
