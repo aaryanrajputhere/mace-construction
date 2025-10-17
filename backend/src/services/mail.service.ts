@@ -105,7 +105,7 @@ export const rfqAward = async (email: string, rfqId: string) => {
     sgMail.setApiKey(apiKey);
     console.log(`✅ SendGrid API key set successfully`);
 
-    const token = jwt.sign({ email, rfqId }, SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ email, rfqId }, SECRET);
     console.log(`🎟️ JWT token generated: ${token.substring(0, 20)}...`);
 
     // Generate JWT token with email and rfqId using utility function

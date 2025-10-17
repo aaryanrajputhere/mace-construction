@@ -4,7 +4,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 interface VendorReplyToken {
-  vendorEmail: string;
+  email: string;
+  rfqId?: string;
 }
 
 interface VendorReplyParams {
@@ -26,11 +27,47 @@ export const getVendorReplyItems = async (
     }
 
     const decoded = jwt.verify(token, secret) as VendorReplyToken;
-    const vendor_email = decoded.vendorEmail;
+    const tokenEmail = decoded.email;
+    const tokenRfqId =
+      decoded.rfqId || (decoded as any).rfqId || (decoded as any).rfq_id;
 
-    const vendorReplies = await prisma.vendorReplyItem.findMany({
-      where: { vendor_email, rfq_id },
-    });
+    // Ensure token rfq matches route rfq
+    if (tokenRfqId && tokenRfqId !== rfq_id) {
+      console.error(
+        `Token RFQ (${tokenRfqId}) does not match requested RFQ (${rfq_id})`
+      );
+      return res.status(403).json({ error: "Token does not match RFQ ID" });
+    }
+
+    // Try to resolve vendor name from vendor table using email
+    let vendorName: string | null = null;
+    if (tokenEmail) {
+      try {
+        const vendor = await prisma.vendor.findFirst({
+          where: { email: tokenEmail },
+        });
+        if (vendor) vendorName = vendor.name;
+      } catch (err) {
+        console.error("Error looking up vendor by email:", err);
+      }
+    }
+
+    // Query vendorReplyItem by vendor_name (preferred) or vendor_email as fallback
+    let vendorReplies;
+    if (vendorName) {
+      vendorReplies = await prisma.vendorReplyItem.findMany({
+        where: { vendor_name: vendorName, rfq_id },
+      });
+    } else if (tokenEmail) {
+      // fallback if model stores vendor_email
+      vendorReplies = await prisma.vendorReplyItem.findMany({
+        where: { vendor_email: tokenEmail, rfq_id },
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ error: "Token does not contain vendor email" });
+    }
 
     return res.json({ success: true, vendorReplies });
   } catch (err) {
