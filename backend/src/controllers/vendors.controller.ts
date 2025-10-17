@@ -24,12 +24,6 @@ interface ItemReply {
   files?: Express.Multer.File[];
 }
 
-interface VendorReplyRequest {
-  itemReplies: ItemReply[];
-  deliveryCharges: string;
-  discount: string;
-  summaryNotes: string;
-}
 
 export const getItems = async (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
@@ -258,6 +252,7 @@ export const handleVendorReply = async (req: Request, res: Response) => {
               return {
                 rfq_id: rfqId,
                 reply_id: replyId,
+                vendor_email: vendor.email || "",
                 item_name: originalItem["Item Name"] || `Item ${index + 1}`,
                 size: originalItem["Size/Option"] || "",
                 unit: originalItem["Unit"] || "",

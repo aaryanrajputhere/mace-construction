@@ -61,6 +61,7 @@ model VendorReplyItem {
   id               Int      @id @default(autoincrement())
   rfq_id           String
   reply_id         String
+  vendor_email     String
   item_name       String
   size            String
   unit            String
