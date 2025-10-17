@@ -22,8 +22,13 @@ interface UseVendorItemReplyResult {
  * @param rfq_id - The RFQ ID
  * @param token - The JWT token from the vendor email link
  */
-export function useVendorItemReply(rfq_id: string, token: string): UseVendorItemReplyResult {
-  const [vendorReplies, setVendorReplies] = useState<VendorReplyItem[] | null>(null);
+export function useVendorItemReply(
+  rfq_id: string,
+  token: string
+): UseVendorItemReplyResult {
+  const [vendorReplies, setVendorReplies] = useState<VendorReplyItem[] | null>(
+    null
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +41,9 @@ export function useVendorItemReply(rfq_id: string, token: string): UseVendorItem
 
       try {
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const res = await fetch(`${backendUrl}/api/vendor-reply-items/${rfq_id}/${token}`);
+        const res = await fetch(
+          `${backendUrl}/api/awards/getVendorReplyItems/${rfq_id}/${token}`
+        );
 
         const data = await res.json();
 
