@@ -1,13 +1,11 @@
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 
 model Material {
   id        Int      @id @default(autoincrement())
@@ -17,8 +15,9 @@ model Material {
   unit      String
   price     Float
   image     String?
-  vendors   String?  
   createdAt DateTime @default(now())
+  vendors   String?
+
   @@unique([category, itemName, size, unit, price])
 }
 
@@ -32,36 +31,35 @@ model Vendor {
 }
 
 model rFQ {
-  id                 Int      @id @default(autoincrement())
-  rfq_id             String   @unique
-  created_at         DateTime @default(now())
-  requester_name     String
-  requester_email    String
-  requester_phone    String
-  project_name       String
-  project_address    String
-  needed_by          String?
-  notes              String?
-  items_json         String
-  vendors_json       String
-  drive_folder_url   String?
-  status             String?  // e.g. 'pending', 'awarded', etc.
-  email_message_id   String?
-  decision_at        DateTime?
-  awarded_vendor_name String?
-  awarded_reply_id   String?
-  awarded_total_price Float?
+  id                     Int       @id @default(autoincrement())
+  rfq_id                 String    @unique
+  created_at             DateTime  @default(now())
+  requester_name         String
+  requester_email        String
+  requester_phone        String
+  project_name           String
+  project_address        String
+  needed_by              String?
+  notes                  String?
+  items_json             String
+  vendors_json           String
+  drive_folder_url       String?
+  status                 String?
+  email_message_id       String?
+  decision_at            DateTime?
+  awarded_vendor_name    String?
+  awarded_reply_id       String?
+  awarded_total_price    Float?
   awarded_lead_time_days Int?
-  po_number          String?
-  po_date            DateTime?
-  po_notes           String?
+  po_number              String?
+  po_date                DateTime?
+  po_notes               String?
 }
 
 model VendorReplyItem {
-  id               Int      @id @default(autoincrement())
-  rfq_id           String
-  reply_id         String
-  vendor_email     String
+  id              Int      @id @default(autoincrement())
+  rfq_id          String
+  reply_id        String
   item_name       String
   size            String
   unit            String
@@ -70,10 +68,11 @@ model VendorReplyItem {
   total_price     Float
   discount        Float?
   delivery_charge Float?
-  lead_time      String
-  substitutions  String?
-  file_link      String?
+  lead_time       String
+  substitutions   String?
+  file_link       String?
   vendor_name     String
   created_at      DateTime @default(now())
-  status         String? @default("pending") 
+  status          String?  @default("pending")
+  vendor_email    String
 }

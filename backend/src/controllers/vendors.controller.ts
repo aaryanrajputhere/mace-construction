@@ -24,7 +24,6 @@ interface ItemReply {
   files?: Express.Multer.File[];
 }
 
-
 export const getItems = async (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
   console.log(`🔍 getItems called for rfqId: ${rfqId}`);
@@ -220,7 +219,6 @@ export const handleVendorReply = async (req: Request, res: Response) => {
           reply_id: replyId,
           submitted_at: new Date().toISOString(),
           vendor_name: vendor.name,
-          vendor_email: vendor.email || "",
           vendor_phone: vendor.phone || "",
           prices_text: JSON.stringify(consolidatedItems, null, 2),
           price_subtotal: totalPrice.toFixed(2),
@@ -235,6 +233,7 @@ export const handleVendorReply = async (req: Request, res: Response) => {
           file_link: replyFolderLink,
           review_status: "",
           decided_at: "",
+          vendor_email: vendor.email || "",
         });
         // Also persist each item reply in the VendorReplyItem model (Prisma)
         try {
