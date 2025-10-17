@@ -51,7 +51,7 @@ export function useVendorItemReply(
           throw new Error(data.error || "Failed to fetch vendor replies");
         }
 
-        setVendorReplies(data.vendorReplies || []);
+        setVendorReplies(data.data || []);
       } catch (err: any) {
         setError(err.message);
       } finally {
