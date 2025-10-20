@@ -118,7 +118,7 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                                       onClick={() =>
                                         onAward && onAward(it.id, v.vendorName)
                                       }
-                                      className="ml-2 inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition"
+                                      className="ml-2 inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition"
                                     >
                                       Award
                                     </button>
