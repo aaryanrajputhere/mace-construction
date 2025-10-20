@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import type { Material } from "../types/materials";
 import { useMaterials } from "../hooks/useMaterials";
 import type { FilterOptions } from "../hooks/useMaterials";
@@ -101,13 +101,16 @@ const MaterialsPage: React.FC = () => {
   const categoryCounts = calculateCategoryCounts();
   const totalCount = allMaterials.length;
 
-  const handleFiltersChange = (newFilters: Omit<FilterOptions, "category">) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
-  };
+  const handleFiltersChange = useCallback(
+    (newFilters: Omit<FilterOptions, "category">) => {
+      setFilters((prev) => ({ ...prev, ...newFilters }));
+    },
+    []
+  );
 
-  const handleCategoryChange = (category: string | null) => {
+  const handleCategoryChange = useCallback((category: string | null) => {
     setFilters((prev) => ({ ...prev, category: category || "" }));
-  };
+  }, []);
 
   return (
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 px-4 xl:px-8 lg:px-16">

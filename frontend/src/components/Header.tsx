@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Header = () => {
-  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<"Calculators" | null>(
     null
@@ -34,7 +33,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="bg-white shadow-lg border-b-2 border-gray-200 font-['Helvetica Neue'] sticky top-0 z-50">
+  <header className="bg-white shadow-lg border-b-2 border-gray-200 font-['Helvetica Neue'] sticky top-0 z-60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 sm:h-20">
           {/* Logo */}
@@ -124,13 +123,14 @@ const Header = () => {
           </nav>
           {/* CTA + Mobile Button */}
           <div className="flex items-center space-x-3 sm:space-x-4">
-            <button
-              onClick={() => navigate("/quote")}
+            <Link
+              to="/quote"
+              onClick={() => console.log('[Header] Get Quote clicked')}
               className="hidden md:inline-flex items-center px-5 lg:px-6 py-3 text-sm lg:text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <span className="mr-2">💬</span>
               Get Quote
-            </button>
+            </Link>
 
             <button
               onClick={toggleMobileMenu}
@@ -198,16 +198,17 @@ const Header = () => {
               </a>
 
               <div className="pt-4">
-                <button
+                <Link
+                  to="/quote"
                   onClick={() => {
-                    navigate("/quote");
+                    console.log('[Header] Mobile Get Quote clicked');
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full flex items-center justify-center px-5 py-4 text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span className="mr-2">💬</span>
                   Get Quote
-                </button>
+                </Link>
               </div>
             </div>
           </div>
