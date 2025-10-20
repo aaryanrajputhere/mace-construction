@@ -37,7 +37,8 @@ export default function Award(props: AwardProps) {
     const item = items.find(
       (it: any) => it.id === _itemId || String(it.id) === String(_itemId)
     );
-    const item_name = item?.itemName;
+    // prefer rawItemName (original backend item_name) if available
+    const item_name = item?.rawItemName ?? item?.itemName;
 
     if (!item_name) {
       setAwardedMessage(

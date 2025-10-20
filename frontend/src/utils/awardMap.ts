@@ -27,6 +27,8 @@ interface VendorQuote {
   leadTime?: string;
   quotedPrice?: string;
   notes?: string;
+  status?: string;
+  replyId?: number | string;
 }
 
 interface ItemWithVendors {
@@ -35,7 +37,9 @@ interface ItemWithVendors {
   requestedPrice?: string;
   quantity?: number;
   unit?: string;
+  rawItemName?: string;
   vendors: VendorQuote[];
+  
 }
 
 /**
@@ -67,7 +71,11 @@ export function transformVendorReplies(
         : undefined,
       quotedPrice: reply.unit_price?.toFixed(2),
       notes: reply.substitutions || undefined,
+      status: reply.status,
+      replyId: reply.id,
     });
+    // ensure we keep the raw original item_name (useful when posting back to backend)
+    grouped[reply.item_name].rawItemName = reply.item_name;
   }
 
   return Object.values(grouped);

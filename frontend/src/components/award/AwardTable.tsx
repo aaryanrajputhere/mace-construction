@@ -6,6 +6,7 @@ interface VendorQuote {
   leadTime?: string; // date string or days
   quotedPrice?: string; // per unit
   notes?: string;
+  status?: string;
 }
 
 interface ItemWithQuotes {
@@ -114,14 +115,34 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                                     )}
                                   </div>
                                   <div>
-                                    <button
-                                      onClick={() =>
-                                        onAward && onAward(it.id, v.vendorName)
-                                      }
-                                      className="ml-2 inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition"
-                                    >
-                                      Award
-                                    </button>
+                                    {(() => {
+                                      const isAwarded = v.status === "awarded";
+                                      // base styles (no bg color here)
+                                      const btnBase =
+                                        "ml-2 inline-flex items-center px-3 py-2 text-white rounded-lg text-sm font-semibold transition";
+                                      // color depends solely on status
+                                      const btnColor = isAwarded
+                                        ? "bg-green-600 hover:bg-green-700"
+                                        : "bg-blue-600 hover:bg-blue-700";
+                                      const isDisabled = isAwarded;
+                                      const disabledClass = isDisabled
+                                        ? "opacity-80 cursor-not-allowed"
+                                        : "cursor-pointer";
+
+                                      return (
+                                        <button
+                                          onClick={() =>
+                                            !isDisabled &&
+                                            onAward &&
+                                            onAward(it.id, v.vendorName)
+                                          }
+                                          className={`${btnBase} ${btnColor} ${disabledClass}`}
+                                          disabled={isDisabled}
+                                        >
+                                          {isAwarded ? "Awarded" : "Award"}
+                                        </button>
+                                      );
+                                    })()}
                                   </div>
                                 </div>
                               </div>
@@ -180,14 +201,31 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                         <div className="font-bold text-[#033159]">
                           {v.quotedPrice ? `$${v.quotedPrice}` : "-"}
                         </div>
-                        <button
-                          onClick={() =>
-                            onAward && onAward(it.id, v.vendorName)
-                          }
-                          className="ml-2 inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition"
-                        >
-                          Award
-                        </button>
+                        {(() => {
+                          const isAwarded = v.status === "awarded";
+                          const btnBase =
+                            "ml-2 inline-flex items-center px-3 py-2 text-white rounded-lg text-sm font-semibold transition";
+                          const btnColor = isAwarded
+                            ? "bg-green-600 hover:bg-green-700"
+                            : "bg-blue-600 hover:bg-blue-700";
+                          const isDisabled = isAwarded;
+                          const disabledClass = isDisabled
+                            ? "opacity-80 cursor-not-allowed"
+                            : "cursor-pointer";
+                          return (
+                            <button
+                              onClick={() =>
+                                !isDisabled &&
+                                onAward &&
+                                onAward(it.id, v.vendorName)
+                              }
+                              className={`${btnBase} ${btnColor} ${disabledClass}`}
+                              disabled={isDisabled}
+                            >
+                              {isAwarded ? "Awarded" : "Award"}
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
                     <div className="text-sm text-gray-600">
