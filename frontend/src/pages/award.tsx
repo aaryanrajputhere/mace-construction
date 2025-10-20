@@ -33,26 +33,42 @@ export default function Award(props: AwardProps) {
 
   const items = transformVendorReplies(vendorReplies as any);
   const onAward = async (_itemId: number | string, vendorName: string) => {
+    // find the mapped item to extract the original item_name
+    const item = items.find(
+      (it: any) => it.id === _itemId || String(it.id) === String(_itemId)
+    );
+    const item_name = item?.itemName;
+
+    if (!item_name) {
+      setAwardedMessage(
+        `Error awarding: could not find item for id ${_itemId}`
+      );
+      return;
+    }
+
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
       const res = await fetch(
         `${backendUrl}/api/awards/awardItem/${rfq_id}/${token}`,
         {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ item_name, vendor_name: vendorName }),
         }
       );
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Failed to award item");
       }
 
-      const data = await res.json();
       const updatedCount = data.updated ?? data.count ?? data.updatedCount ?? 0;
-      setAwardedMessage(`Awarded ${vendorName} (updated: ${updatedCount})`);
-      // Note: backend currently updates all items for that vendor/rfq. Adjust UI as needed.
+      setAwardedMessage(
+        `Awarded ${vendorName} for ${item_name} (updated: ${updatedCount})`
+      );
     } catch (err: any) {
-      setAwardedMessage(`Error awarding: ${err.message}`);
+      setAwardedMessage(`Error awarding: ${err?.message ?? String(err)}`);
     }
   };
 

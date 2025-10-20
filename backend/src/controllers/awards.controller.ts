@@ -95,75 +95,86 @@ export const awardItem = async (
   res: Response
 ) => {
   const { rfq_id, token } = req.params;
-  const { item_name } = req.body; // <-- take item_name from request body
+  const { item_name, vendor_name } = req.body;
+
   console.log(`awardItem called for rfq_id=${rfq_id} item_name=${item_name}`);
 
   try {
     const secret = process.env.SECRET || process.env.JWT_SECRET;
     if (!secret) {
-      console.error(
-        "[awards] JWT secret is not configured in environment variables."
-      );
+      console.error("[awards] Missing JWT secret in environment.");
       return res.status(500).json({ error: "Server configuration error" });
     }
 
+    // Verify and decode JWT
     console.log("[awards] Verifying token (truncated):", token?.slice?.(0, 16));
     const decoded = jwt.verify(token, secret) as VendorReplyToken;
     const tokenEmail = decoded.email;
-    const tokenRfqId =
-      decoded.rfqId || (decoded as any).rfqId || (decoded as any).rfq_id;
+    const tokenRfqId = decoded.rfqId || (decoded as any).rfq_id;
 
-    console.log("[awards] Decoded token:", { tokenEmail, tokenRfqId });
+    console.log("[awards] Decoded token payload:", { tokenEmail, tokenRfqId });
 
-    // Ensure token rfq matches route rfq
+    // Ensure token RFQ matches the route RFQ
     if (tokenRfqId && tokenRfqId !== rfq_id) {
       console.error(
-        `[awards] Token RFQ (${tokenRfqId}) does not match requested RFQ (${rfq_id})`
+        `[awards] Token RFQ (${tokenRfqId}) does not match request RFQ (${rfq_id})`
       );
       return res.status(403).json({ error: "Token does not match RFQ ID" });
     }
 
-    // Try to resolve vendor name from vendor table using email
-    let vendorName: string | null = null;
-    if (tokenEmail) {
+    // Resolve vendor name (optional if already passed in body)
+    let resolvedVendorName = vendor_name || null;
+
+    if (!resolvedVendorName && tokenEmail) {
       try {
         console.log(`[awards] Looking up vendor by email: ${tokenEmail}`);
         const vendor = await prisma.vendor.findFirst({
           where: { email: tokenEmail },
         });
         if (vendor) {
-          vendorName = vendor.name;
-          console.log(`[awards] Resolved vendor name: ${vendorName}`);
+          resolvedVendorName = vendor.name;
+          console.log(`[awards] Resolved vendor name: ${resolvedVendorName}`);
         } else {
-          console.log(
-            "[awards] No vendor found for email; using vendor_email fallback."
+          console.warn(
+            "[awards] No vendor found by email; will use vendor_email fallback."
           );
         }
-      } catch (err) {
-        console.error("[awards] Error looking up vendor by email:", err);
+      } catch (lookupErr) {
+        console.error("[awards] Vendor lookup error:", lookupErr);
       }
     }
 
+    // Update vendorReplyItem
     console.log(
-      `[awards] Updating vendorReplyItem rows to status=awarded for rfq_id=${rfq_id}, item_name=${item_name}, vendor_name=${
-        vendorName || ""
-      }, vendor_email=${!vendorName ? tokenEmail : ""}`
+      `[awards] Updating vendorReplyItem: rfq_id=${rfq_id}, item_name=${item_name}, vendor_name=${
+        resolvedVendorName || ""
+      }, vendor_email=${!resolvedVendorName ? tokenEmail : ""}`
     );
 
     const updateResult = await prisma.vendorReplyItem.updateMany({
       where: {
         rfq_id,
-        item_name: item_name || undefined, // filter by item_name
-        vendor_name: vendorName || undefined,
-        vendor_email: !vendorName ? tokenEmail : undefined,
+        item_name,
+        OR: [
+          { vendor_name: resolvedVendorName || undefined },
+          { vendor_email: tokenEmail },
+        ],
       },
       data: { status: "awarded" },
     });
 
     console.log(`[awards] updateMany result: ${JSON.stringify(updateResult)}`);
+
+    if (updateResult.count === 0) {
+      console.warn("[awards] No matching vendorReplyItem records found.");
+      return res
+        .status(404)
+        .json({ success: false, message: "No items updated" });
+    }
+
     return res.json({ success: true, updated: updateResult.count });
   } catch (err) {
-    console.error("[awards] JWT verification failed or error occurred:", err);
+    console.error("[awards] Error verifying token or updating item:", err);
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
