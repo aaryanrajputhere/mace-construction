@@ -109,56 +109,12 @@ export const awardItem = async (
     // Verify and decode JWT
     console.log("[awards] Verifying token (truncated):", token?.slice?.(0, 16));
     const decoded = jwt.verify(token, secret) as VendorReplyToken;
-    const tokenEmail = decoded.email;
-    const tokenRfqId = decoded.rfqId || (decoded as any).rfq_id;
-
-    console.log("[awards] Decoded token payload:", { tokenEmail, tokenRfqId });
-
-    // Ensure token RFQ matches the route RFQ
-    if (tokenRfqId && tokenRfqId !== rfq_id) {
-      console.error(
-        `[awards] Token RFQ (${tokenRfqId}) does not match request RFQ (${rfq_id})`
-      );
-      return res.status(403).json({ error: "Token does not match RFQ ID" });
-    }
-
-    // Resolve vendor name (optional if already passed in body)
-    let resolvedVendorName = vendor_name || null;
-
-    if (!resolvedVendorName && tokenEmail) {
-      try {
-        console.log(`[awards] Looking up vendor by email: ${tokenEmail}`);
-        const vendor = await prisma.vendor.findFirst({
-          where: { email: tokenEmail },
-        });
-        if (vendor) {
-          resolvedVendorName = vendor.name;
-          console.log(`[awards] Resolved vendor name: ${resolvedVendorName}`);
-        } else {
-          console.warn(
-            "[awards] No vendor found by email; will use vendor_email fallback."
-          );
-        }
-      } catch (lookupErr) {
-        console.error("[awards] Vendor lookup error:", lookupErr);
-      }
-    }
-
-    // Update vendorReplyItem
-    console.log(
-      `[awards] Updating vendorReplyItem: rfq_id=${rfq_id}, item_name=${item_name}, vendor_name=${
-        resolvedVendorName || ""
-      }, vendor_email=${!resolvedVendorName ? tokenEmail : ""}`
-    );
 
     const updateResult = await prisma.vendorReplyItem.updateMany({
       where: {
         rfq_id,
         item_name,
-        OR: [
-          { vendor_name: resolvedVendorName || undefined },
-          { vendor_email: tokenEmail },
-        ],
+        OR: [{ vendor_name: vendor_name || undefined }],
       },
       data: { status: "awarded" },
     });
