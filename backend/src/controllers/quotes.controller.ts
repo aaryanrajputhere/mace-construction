@@ -47,13 +47,16 @@ export const createQuote = async (req: Request, res: Response) => {
     const rfqId = generateRFQ();
     console.log("-".repeat(100));
     console.log(`RFQ Initiated ${rfqId}`);
-    // Map each vendor to their items
+    // Map each vendor to their items (normalize vendor names to reduce mismatches)
     const vendorItemsMap: Record<string, any[]> = {};
     items.forEach((item: any) => {
       if (item.Vendors) {
         item.Vendors.split(",")
           .map((v: string) => v.trim())
-          .forEach((vendor: string) => {
+          .forEach((vendorRaw: string) => {
+            const vendor = vendorRaw.trim();
+            if (!vendor) return;
+            // Keep the original casing as the key, but also support lookup via a normalized map below
             if (!vendorItemsMap[vendor]) vendorItemsMap[vendor] = [];
             vendorItemsMap[vendor].push(item);
           });
@@ -110,17 +113,38 @@ export const createQuote = async (req: Request, res: Response) => {
     });
 
     // Create lookup object from vendors array
-    const vendorEmailLookup: Record<string, string> = vendors.reduce(
-      (acc, vendor) => ({
-        ...acc,
-        [vendor.name]: vendor.email,
-      }),
-      {}
+    // Build both a direct-name lookup and a normalized (lowercased trimmed) lookup to increase match tolerance
+    const vendorEmailLookup: Record<string, string> = {};
+    const vendorEmailLookupNormalized: Record<string, string> = {};
+    vendors.forEach((vendor) => {
+      // Coerce nullable vendor.email to empty string to satisfy TypeScript and keep falsy-check behavior
+      const emailStr = vendor.email || "";
+      vendorEmailLookup[vendor.name] = emailStr;
+      if (vendor.name) {
+        vendorEmailLookupNormalized[vendor.name.trim().toLowerCase()] =
+          emailStr;
+      }
+    });
+
+    console.log(
+      "Vendor items map:",
+      Object.keys(vendorItemsMap).length,
+      "vendors"
+    );
+    console.log(
+      "Vendor items keys (sample):",
+      Object.keys(vendorItemsMap).slice(0, 20)
     );
 
     // Send RFQ emails to each vendor with their items
     for (const [vendor, vendorItems] of Object.entries(vendorItemsMap)) {
-      const email = vendorEmailLookup[vendor];
+      // Try direct lookup first, then normalized lookup as a fallback
+      let email = vendorEmailLookup[vendor];
+      if (!email) {
+        const normalized = vendor.trim().toLowerCase();
+        email = vendorEmailLookupNormalized[normalized];
+      }
+
       console.log("sendRFQEmail args:", {
         rfqId,
         projectInfo,
@@ -128,7 +152,13 @@ export const createQuote = async (req: Request, res: Response) => {
         vendor: { email, name: vendor },
         driveLinks: fileLinks,
       });
-      if (!email) continue;
+
+      if (!email) {
+        console.warn(
+          `Skipping email for vendor '${vendor}' (no matching vendor email found in DB).`
+        );
+        continue;
+      }
 
       await sendRFQEmail(
         rfqId,

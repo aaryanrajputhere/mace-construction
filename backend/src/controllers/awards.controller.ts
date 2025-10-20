@@ -108,13 +108,27 @@ export const awardItem = async (
 
     // Verify and decode JWT
     console.log("[awards] Verifying token (truncated):", token?.slice?.(0, 16));
-    const decoded = jwt.verify(token, secret) as VendorReplyToken;
 
+    // verify and decode token
+    const decoded = jwt.verify(token, secret) as VendorReplyToken;
+    const tokenEmail = decoded.email;
+    const tokenRfqId = decoded.rfqId || (decoded as any).rfq_id || (decoded as any).rfqId;
+
+    if (!tokenEmail || !tokenRfqId) {
+      return res.status(400).json({ success: false, error: "Invalid token" });
+    }
+
+    // ensure token's rfq matches the route param
+    if (tokenRfqId !== rfq_id) {
+      return res.status(403).json({ success: false, error: "RFQ mismatch" });
+    }
+
+    // update the specific vendor's item to awarded
     const updateResult = await prisma.vendorReplyItem.updateMany({
       where: {
-        rfq_id,
-        item_name,
-        OR: [{ vendor_name: vendor_name || undefined }],
+      rfq_id: tokenRfqId,
+      item_name,
+      vendor_name,
       },
       data: { status: "awarded" },
     });
