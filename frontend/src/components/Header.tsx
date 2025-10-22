@@ -7,17 +7,25 @@ const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<"Calculators" | null>(
     null
   );
+  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
+  // Desktop dropdown toggle
   const toggleDropdown = (dropdown: "Calculators" | null) => {
-    // ✅ Closes dropdown if it's already active
     setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
   };
 
+  // Mobile dropdown toggle
+  const toggleMobileDropdown = () => {
+    setIsMobileDropdownOpen(!isMobileDropdownOpen);
+  };
+
+  // Mobile menu toggle
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
     setActiveDropdown(null);
+    setIsMobileDropdownOpen(false);
   };
 
   useEffect(() => {
@@ -62,7 +70,7 @@ const Header = () => {
               Materials
             </a>
 
-            {/* Calculators Dropdown */}
+            {/* Calculators Dropdown (Desktop) */}
             <div className="relative">
               <button
                 onClick={() => toggleDropdown("Calculators")}
@@ -88,6 +96,7 @@ const Header = () => {
                   <div className="p-2 space-y-1">
                     <a
                       href="/calculators/studs"
+                      onClick={() => setActiveDropdown(null)}
                       className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
                     >
                       <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
@@ -97,6 +106,7 @@ const Header = () => {
                     </a>
                     <a
                       href="/calculators/osb"
+                      onClick={() => setActiveDropdown(null)}
                       className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
                     >
                       <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
@@ -161,10 +171,10 @@ const Header = () => {
                 Materials
               </a>
 
-              {/* 📁 Calculators Dropdown (Mobile) */}
+              {/* Calculators Dropdown (Mobile) */}
               <div className="rounded-xl overflow-hidden">
                 <button
-                  onClick={() => toggleDropdown("Calculators")}
+                  onClick={toggleMobileDropdown}
                   className="w-full flex items-center justify-between px-4 py-3 text-base font-semibold text-gray-700 hover:text-white hover:bg-[#033159] transition-all duration-200"
                 >
                   <div className="flex items-center">
@@ -175,15 +185,19 @@ const Header = () => {
                   </div>
                   <ChevronDown
                     className={`h-5 w-5 transition-transform ${
-                      activeDropdown === "Calculators" ? "rotate-180" : ""
+                      isMobileDropdownOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
 
-                {activeDropdown === "Calculators" && (
+                {isMobileDropdownOpen && (
                   <div className="bg-white">
                     <a
                       href="/calculators/studs"
+                      onClick={() => {
+                        setIsMobileDropdownOpen(false);
+                        setIsMobileMenuOpen(false);
+                      }}
                       className="flex items-center px-6 py-3 text-base font-semibold text-gray-700 hover:text-white hover:bg-[#033159] transition-all duration-200"
                     >
                       <span className="mr-3 text-sm">📐</span>
@@ -191,6 +205,10 @@ const Header = () => {
                     </a>
                     <a
                       href="/calculators/osb"
+                      onClick={() => {
+                        setIsMobileDropdownOpen(false);
+                        setIsMobileMenuOpen(false);
+                      }}
                       className="flex items-center px-6 py-3 text-base font-semibold text-gray-700 hover:text-white hover:bg-[#033159] transition-all duration-200"
                     >
                       <span className="mr-3 text-sm">📊</span>
