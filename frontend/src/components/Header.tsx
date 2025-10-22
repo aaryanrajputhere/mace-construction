@@ -123,10 +123,18 @@ const Header = () => {
               href="#"
               onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.preventDefault();
-                window.scrollTo({
-                  top: document.body.scrollHeight,
-                  behavior: "smooth",
-                });
+                setIsMobileMenuOpen(false); // close mobile menu if open
+                setIsMobileDropdownOpen(false); // close mobile dropdown
+                // scroll to the footer element if present, otherwise fall back to page bottom
+                const footer = document.getElementById("site-footer");
+                if (footer) {
+                  footer.scrollIntoView({ behavior: "smooth", block: "start" });
+                } else {
+                  window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: "smooth",
+                  });
+                }
               }}
               className="px-4 py-2.5 text-sm lg:text-base font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
             >
@@ -223,10 +231,18 @@ const Header = () => {
                 onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                   e.preventDefault();
                   setIsMobileMenuOpen(false);
-                  window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: "smooth",
-                  });
+                  const footer = document.getElementById("site-footer");
+                  if (footer) {
+                    footer.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  } else {
+                    window.scrollTo({
+                      top: document.body.scrollHeight,
+                      behavior: "smooth",
+                    });
+                  }
                 }}
                 className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 hover:bg-[#033159]"
               >

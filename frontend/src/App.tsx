@@ -12,6 +12,7 @@ import VendorReplyPage from "./pages/vendor-reply";
 import Award from "./pages/award";
 const App: React.FC = () => {
   const location = useLocation();
+
   // DEBUG: log location changes to help trace navigation issues
   React.useEffect(() => {
     console.log("[App] location changed:", location.pathname);

@@ -9,7 +9,10 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-gray-50 to-gray-100 border-t border-gray-200 ">
+    <footer
+      id="site-footer"
+      className="bg-gradient-to-br from-gray-50 to-gray-100 border-t border-gray-200 "
+    >
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-14 sm:py-20">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
@@ -21,9 +24,8 @@ const Footer = () => {
               className="h-12 mb-6 filter drop-shadow-sm"
             />
             <p className="text-base text-gray-700 leading-relaxed font-light font-['Helvetica_Neue'] max-w-sm">
-              Leading provider of comprehensive solutions, delivering
-              innovative technology and expert services to protect what matters
-              most.
+              Leading provider of comprehensive solutions, delivering innovative
+              technology and expert services to protect what matters most.
             </p>
           </div>
 
