@@ -21,7 +21,7 @@ const Footer = () => {
               className="h-12 mb-6 filter drop-shadow-sm"
             />
             <p className="text-base text-gray-700 leading-relaxed font-light font-['Helvetica_Neue'] max-w-sm">
-              Leading provider of comprehensive security solutions, delivering
+              Leading provider of comprehensive solutions, delivering
               innovative technology and expert services to protect what matters
               most.
             </p>
