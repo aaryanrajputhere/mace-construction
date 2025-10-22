@@ -11,6 +11,7 @@ const Header = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const toggleDropdown = (dropdown: "Calculators" | null) => {
+    // ✅ Closes dropdown if it's already active
     setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
   };
 
@@ -33,7 +34,7 @@ const Header = () => {
   }, []);
 
   return (
-  <header className="bg-white shadow-lg border-b-2 border-gray-200 font-['Helvetica Neue'] sticky top-0 z-60">
+    <header className="bg-white shadow-lg border-b-2 border-gray-200 font-['Helvetica Neue'] sticky top-0 z-60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 sm:h-20">
           {/* Logo */}
@@ -61,6 +62,7 @@ const Header = () => {
               Materials
             </a>
 
+            {/* Calculators Dropdown */}
             <div className="relative">
               <button
                 onClick={() => toggleDropdown("Calculators")}
@@ -80,7 +82,7 @@ const Header = () => {
 
               {activeDropdown === "Calculators" && (
                 <div
-                  className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden"
+                  className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl overflow-hidden"
                   style={{ zIndex: 9999 }}
                 >
                   <div className="p-2 space-y-1">
@@ -88,7 +90,7 @@ const Header = () => {
                       href="/calculators/studs"
                       className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
                     >
-                      <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200 group-hover:bg-opacity-50">
+                      <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
                         <span className="text-xs">📐</span>
                       </div>
                       Studs Calculator
@@ -97,7 +99,7 @@ const Header = () => {
                       href="/calculators/osb"
                       className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl transition-all duration-200 hover:bg-[#033159] hover:text-white hover:shadow-md transform hover:scale-[1.02]"
                     >
-                      <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200 group-hover:bg-opacity-50">
+                      <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
                         <span className="text-xs">📊</span>
                       </div>
                       OSB Calculator
@@ -121,11 +123,11 @@ const Header = () => {
               Contact Us
             </a>
           </nav>
-          {/* CTA + Mobile Button */}
+
+          {/* CTA + Mobile Menu Toggle */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             <Link
               to="/quote"
-              onClick={() => console.log('[Header] Get Quote clicked')}
               className="hidden md:inline-flex items-center px-5 lg:px-6 py-3 text-sm lg:text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <span className="mr-2">💬</span>
@@ -145,39 +147,58 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Nav */}
+        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t-2 border-gray-200 bg-gradient-to-b from-white to-gray-50">
             <div className="px-3 pt-4 pb-6 space-y-2">
               <a
                 href="/materials"
-                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
+                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 hover:bg-[#033159]"
               >
-                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
+                <div className="p-1.5 bg-gray-100 rounded-lg mr-3">
                   <span className="text-sm">🏗️</span>
                 </div>
                 Materials
               </a>
 
-              <a
-                href="/calculators/osb"
-                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
-              >
-                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
-                  <span className="text-sm">📊</span>
-                </div>
-                OSB Calculator
-              </a>
+              {/* 📁 Calculators Dropdown (Mobile) */}
+              <div className="rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleDropdown("Calculators")}
+                  className="w-full flex items-center justify-between px-4 py-3 text-base font-semibold text-gray-700 hover:text-white hover:bg-[#033159] transition-all duration-200"
+                >
+                  <div className="flex items-center">
+                    <div className="p-1.5 bg-gray-100 rounded-lg mr-3">
+                      <span className="text-sm">🧮</span>
+                    </div>
+                    Calculators
+                  </div>
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform ${
+                      activeDropdown === "Calculators" ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
-              <a
-                href="/calculators/studs"
-                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
-              >
-                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
-                  <span className="text-sm">📐</span>
-                </div>
-                Studs Calculator
-              </a>
+                {activeDropdown === "Calculators" && (
+                  <div className="bg-white">
+                    <a
+                      href="/calculators/studs"
+                      className="flex items-center px-6 py-3 text-base font-semibold text-gray-700 hover:text-white hover:bg-[#033159] transition-all duration-200"
+                    >
+                      <span className="mr-3 text-sm">📐</span>
+                      Studs Calculator
+                    </a>
+                    <a
+                      href="/calculators/osb"
+                      className="flex items-center px-6 py-3 text-base font-semibold text-gray-700 hover:text-white hover:bg-[#033159] transition-all duration-200"
+                    >
+                      <span className="mr-3 text-sm">📊</span>
+                      OSB Calculator
+                    </a>
+                  </div>
+                )}
+              </div>
 
               <a
                 href="#"
@@ -189,9 +210,9 @@ const Header = () => {
                     behavior: "smooth",
                   });
                 }}
-                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:bg-[#033159] group"
+                className="flex items-center px-4 py-3 text-base font-semibold text-gray-700 hover:text-white rounded-xl transition-all duration-200 hover:bg-[#033159]"
               >
-                <div className="p-1.5 bg-gray-100 rounded-lg mr-3 transition-colors duration-200">
+                <div className="p-1.5 bg-gray-100 rounded-lg mr-3">
                   <span className="text-sm">📞</span>
                 </div>
                 Contact Us
@@ -200,11 +221,8 @@ const Header = () => {
               <div className="pt-4">
                 <Link
                   to="/quote"
-                  onClick={() => {
-                    console.log('[Header] Mobile Get Quote clicked');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center px-5 py-4 text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center px-5 py-4 text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
                   <span className="mr-2">💬</span>
                   Get Quote
