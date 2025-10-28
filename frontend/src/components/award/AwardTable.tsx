@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 
 interface VendorQuote {
@@ -24,7 +24,14 @@ interface AwardTableProps {
 }
 
 const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
-  if (!items || items.length === 0) {
+  // keep a local copy so we can optimistically update UI (mark Awarded)
+  const [localItems, setLocalItems] = useState<ItemWithQuotes[]>(items || []);
+
+  useEffect(() => {
+    setLocalItems(items || []);
+  }, [items]);
+
+  if (!localItems || localItems.length === 0) {
     return (
       <div className="text-center py-16 text-gray-600">
         <Package className="h-16 w-16 mx-auto mb-6 text-gray-400" />
@@ -61,7 +68,7 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                 </tr>
               </thead>
               <tbody>
-                {items.map((it) => (
+                {localItems.map((it) => (
                   <React.Fragment key={it.id}>
                     <tr className="bg-white border-b border-gray-100">
                       <td className="py-6 px-3 align-top">
@@ -129,13 +136,30 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                                         ? "opacity-80 cursor-not-allowed"
                                         : "cursor-pointer";
 
+                                      const handleAwardClick = () => {
+                                        if (isDisabled) return;
+                                        // Optimistically update local state so UI updates instantly
+                                        setLocalItems((prev) =>
+                                          prev.map((p) => {
+                                            if (p.id !== it.id) return p;
+                                            return {
+                                              ...p,
+                                              vendors: p.vendors.map((vv) =>
+                                                vv.vendorName === v.vendorName
+                                                  ? { ...vv, status: "awarded" }
+                                                  : vv
+                                              ),
+                                            };
+                                          })
+                                        );
+                                        // call external handler (e.g. API) if provided
+                                        if (onAward)
+                                          onAward(it.id, v.vendorName);
+                                      };
+
                                       return (
                                         <button
-                                          onClick={() =>
-                                            !isDisabled &&
-                                            onAward &&
-                                            onAward(it.id, v.vendorName)
-                                          }
+                                          onClick={handleAwardClick}
                                           className={`${btnBase} ${btnColor} ${disabledClass}`}
                                           disabled={isDisabled}
                                         >
@@ -165,7 +189,7 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
 
       {/* Mobile Cards */}
       <div className="block lg:hidden space-y-6">
-        {items.map((it) => (
+        {localItems.map((it) => (
           <div
             key={it.id}
             className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6"
@@ -212,13 +236,28 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                           const disabledClass = isDisabled
                             ? "opacity-80 cursor-not-allowed"
                             : "cursor-pointer";
+
+                          const handleAwardClick = () => {
+                            if (isDisabled) return;
+                            setLocalItems((prev) =>
+                              prev.map((p) => {
+                                if (p.id !== it.id) return p;
+                                return {
+                                  ...p,
+                                  vendors: p.vendors.map((vv) =>
+                                    vv.vendorName === v.vendorName
+                                      ? { ...vv, status: "awarded" }
+                                      : vv
+                                  ),
+                                };
+                              })
+                            );
+                            if (onAward) onAward(it.id, v.vendorName);
+                          };
+
                           return (
                             <button
-                              onClick={() =>
-                                !isDisabled &&
-                                onAward &&
-                                onAward(it.id, v.vendorName)
-                              }
+                              onClick={handleAwardClick}
                               className={`${btnBase} ${btnColor} ${disabledClass}`}
                               disabled={isDisabled}
                             >

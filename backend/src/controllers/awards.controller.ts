@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import { vendorAwardNotification } from "../services/mail.service";
 
 const prisma = new PrismaClient();
 interface VendorReplyToken {
@@ -112,7 +113,8 @@ export const awardItem = async (
     // verify and decode token
     const decoded = jwt.verify(token, secret) as VendorReplyToken;
     const tokenEmail = decoded.email;
-    const tokenRfqId = decoded.rfqId || (decoded as any).rfq_id || (decoded as any).rfqId;
+    const tokenRfqId =
+      decoded.rfqId || (decoded as any).rfq_id || (decoded as any).rfqId;
 
     if (!tokenEmail || !tokenRfqId) {
       return res.status(400).json({ success: false, error: "Invalid token" });
@@ -126,13 +128,13 @@ export const awardItem = async (
     // update the specific vendor's item to awarded
     const updateResult = await prisma.vendorReplyItem.updateMany({
       where: {
-      rfq_id: tokenRfqId,
-      item_name,
-      vendor_name,
+        rfq_id: tokenRfqId,
+        item_name,
+        vendor_name,
       },
       data: { status: "awarded" },
     });
-
+    await vendorAwardNotification(tokenEmail, rfq_id, item_name);
     console.log(`[awards] updateMany result: ${JSON.stringify(updateResult)}`);
 
     if (updateResult.count === 0) {
