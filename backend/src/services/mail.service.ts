@@ -237,6 +237,84 @@ export const vendorAwardNotification = async (
   }
 };
 
+export const userAwardNotification = async (
+  email: string,
+  rfqId: string,
+  itemName: string,
+  vendorName: string
+) => {
+  console.log(`📨 Preparing to send user award notification...`);
+  console.log(`🔹 Email: ${email}`);
+  console.log(`🔹 RFQ ID: ${rfqId}`);
+  console.log(`🔹 Item Name: ${itemName}`);
+  console.log(`🔹 Vendor Name: ${vendorName}`);
+
+  try {
+    const apiKey = process.env.SENDGRID_API_KEY;
+    if (!apiKey) {
+      throw new Error("SendGrid API key is missing in environment variables");
+    }
+
+    sgMail.setApiKey(apiKey);
+    console.log(`✅ SendGrid API key set successfully.`);
+
+    const msg = {
+      to: email,
+      from: "rfq@maceinfo.com",
+      subject: `✅ You Have Awarded ${vendorName} for RFQ #${rfqId}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2 style="color: #2E86C1;">Award Confirmation</h2>
+          <p>Hello,</p>
+          <p>
+            This is to confirm that you have successfully 
+            <strong>awarded the item "${itemName}"</strong> 
+            to <strong>${vendorName}</strong> for 
+            <strong>RFQ #${rfqId}</strong>.
+          </p>
+          <p>
+            The vendor has been notified and can now proceed with the next steps.
+          </p>
+          <p>Thank you for using the Maceinfo RFQ System.</p>
+          <p style="margin-top: 24px;">
+            Best regards,<br>
+            <strong>Maceinfo RFQ System</strong><br>
+            <a href="mailto:rfq@maceinfo.com">rfq@maceinfo.com</a>
+          </p>
+        </div>
+      `,
+    };
+
+    console.log(`🚀 Sending award notification email to ${email}...`);
+
+    const [response] = await sgMail.send(msg);
+    console.log(`✅ Email sent successfully with status ${response.statusCode}`);
+
+    return {
+      success: true,
+      message: `Award notification email sent successfully to ${email}`,
+      statusCode: response.statusCode,
+    };
+  } catch (error) {
+    console.error("❌ Failed to send user award email.");
+    const err = error as any;
+    console.error("Error details:", {
+      message: err.message,
+      code: err.code,
+      response: err.response?.body,
+      stack: err.stack,
+    });
+
+    return {
+      success: false,
+      message: `Error sending award notification email: ${err.message}`,
+      details: err.response?.body || null,
+    };
+  }
+};
+
+
+
 export const sendReplyConfirmation = async (
   email: string,
   rfqId: string,

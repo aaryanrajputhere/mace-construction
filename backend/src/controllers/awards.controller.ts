@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-import { vendorAwardNotification } from "../services/mail.service";
+import {
+  userAwardNotification,
+  vendorAwardNotification,
+} from "../services/mail.service";
 
 const prisma = new PrismaClient();
 interface VendorReplyToken {
@@ -134,7 +137,35 @@ export const awardItem = async (
       },
       data: { status: "awarded" },
     });
-    await vendorAwardNotification(tokenEmail, rfq_id, item_name);
+
+    // Try to look up the vendor's email by vendor name from the Vendor table first.
+    // If not found, fall back to the vendor_email stored on the VendorReplyItem record.
+    let vendorEmail: string | undefined = undefined;
+    try {
+      const vendor = await prisma.vendor.findUnique({
+        where: { name: vendor_name },
+        select: { email: true },
+      });
+      vendorEmail = vendor?.email ?? undefined;
+    } catch (err) {
+      console.warn(
+        `[awards] Error looking up vendor by name: ${vendor_name}`,
+        err
+      );
+    }
+
+    // Notify the user (requester) who awarded the item
+    await userAwardNotification(tokenEmail, rfq_id, item_name, vendor_name);
+
+    // Notify the vendor if we have an email — otherwise log and skip
+    if (vendorEmail) {
+      await vendorAwardNotification(vendorEmail, rfq_id, item_name);
+    } else {
+      console.warn(
+        `[awards] No vendor email found for vendor '${vendor_name}'. Skipping vendor notification.`
+      );
+    }
+
     console.log(`[awards] updateMany result: ${JSON.stringify(updateResult)}`);
 
     if (updateResult.count === 0) {
