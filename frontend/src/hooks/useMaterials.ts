@@ -28,7 +28,7 @@ export const useMaterials = (filters?: FilterOptions) => {
         }
 
         const data = await response.json();
-        console.log("API Response:", data); // Debug log
+      
 
         // Handle different response formats
         let materialsArray: any[] = [];

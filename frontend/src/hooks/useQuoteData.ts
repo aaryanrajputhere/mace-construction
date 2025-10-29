@@ -32,7 +32,7 @@ export const useQuoteData = () => {
   // Load items from localStorage (from calculators/catalog)
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("quote") || "[]");
-    console.log(stored);
+
     // Transform localStorage objects to match table fields and assign sequential IDs
     const mapped = stored.map((item: any) => ({
       id: item["id"] || item.id,
@@ -47,7 +47,7 @@ export const useQuoteData = () => {
       selectedVendors: item.selectedVendors || [],
     }));
     setItems(mapped);
-    console.log(mapped);
+ 
   }, []);
 
   // Add new item
@@ -158,7 +158,7 @@ export const useQuoteData = () => {
     );
     formData.append("items", JSON.stringify(items));
     files.forEach((file) => formData.append("files", file));
-    console.log(items);
+  
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/quotes/apply`,
@@ -170,8 +170,6 @@ export const useQuoteData = () => {
 
       if (!res.ok) throw new Error("Failed to submit RFQ");
 
-      const result = await res.json();
-      console.log("✅ RFQ submitted:", result);
       setSubmitSuccess(true);
     } catch (err) {
       console.error("❌ RFQ submission error:", err);
