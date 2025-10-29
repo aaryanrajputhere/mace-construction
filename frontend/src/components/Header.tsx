@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -10,6 +10,7 @@ const Header = () => {
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   // Desktop dropdown toggle
   const toggleDropdown = (dropdown: "Calculators" | null) => {
@@ -144,13 +145,19 @@ const Header = () => {
 
           {/* CTA + Mobile Menu Toggle */}
           <div className="flex items-center space-x-3 sm:space-x-4">
-            <Link
-              to="/quote"
+            <button
+              type="button"
+              onClick={() => {
+                // close any open menus/dropdowns before navigating
+                setIsMobileMenuOpen(false);
+                setActiveDropdown(null);
+                navigate("/quote");
+              }}
               className="hidden md:inline-flex items-center px-5 lg:px-6 py-3 text-sm lg:text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <span className="mr-2">💬</span>
               Get Quote
-            </Link>
+            </button>
 
             <button
               onClick={toggleMobileMenu}
@@ -253,14 +260,17 @@ const Header = () => {
               </a>
 
               <div className="pt-4">
-                <Link
-                  to="/quote"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate("/quote");
+                  }}
                   className="w-full flex items-center justify-center px-5 py-4 text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
                   <span className="mr-2">💬</span>
                   Get Quote
-                </Link>
+                </button>
               </div>
             </div>
           </div>
