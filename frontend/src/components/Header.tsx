@@ -152,6 +152,8 @@ const Header = () => {
                 setIsMobileMenuOpen(false);
                 setActiveDropdown(null);
                 navigate("/quote");
+                // reload after navigation so the /quote page is fully reloaded
+                setTimeout(() => window.location.reload(), 80);
               }}
               className="hidden md:inline-flex items-center px-5 lg:px-6 py-3 text-sm lg:text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
@@ -265,6 +267,8 @@ const Header = () => {
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     navigate("/quote");
+                    // reload after navigation so the /quote page is fully reloaded
+                    setTimeout(() => window.location.reload(), 80);
                   }}
                   className="w-full flex items-center justify-center px-5 py-4 text-base font-bold text-white bg-[#033159] rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
