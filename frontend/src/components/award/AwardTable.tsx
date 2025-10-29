@@ -136,7 +136,7 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                                         ? "opacity-80 cursor-not-allowed"
                                         : "cursor-pointer";
 
-                                      const handleAwardClick = () => {
+                                      const handleAwardClick = async () => {
                                         if (isDisabled) return;
                                         // Optimistically update local state so UI updates instantly
                                         setLocalItems((prev) =>
@@ -152,9 +152,37 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                                             };
                                           })
                                         );
-                                        // call external handler (e.g. API) if provided
-                                        if (onAward)
-                                          onAward(it.id, v.vendorName);
+
+                                        try {
+                                          // call external handler (e.g. API) if provided
+                                          const result = onAward
+                                            ? (onAward as any)(
+                                                it.id,
+                                                v.vendorName
+                                              )
+                                            : undefined;
+
+                                          // if the handler returns a promise, await it
+                                          if (
+                                            result &&
+                                            typeof (result as any).then ===
+                                              "function"
+                                          ) {
+                                            await result;
+                                          }
+                                        } catch (err) {
+                                          console.error(
+                                            "Error in onAward:",
+                                            err
+                                          );
+                                        } finally {
+                                          // reload the page so the parent can refresh data from server
+                                          // small delay gives a tiny UX moment for the optimistic change to show
+                                          setTimeout(
+                                            () => window.location.reload(),
+                                            600
+                                          );
+                                        }
                                       };
 
                                       return (
@@ -237,7 +265,7 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                             ? "opacity-80 cursor-not-allowed"
                             : "cursor-pointer";
 
-                          const handleAwardClick = () => {
+                          const handleAwardClick = async () => {
                             if (isDisabled) return;
                             setLocalItems((prev) =>
                               prev.map((p) => {
@@ -252,7 +280,22 @@ const AwardTable: React.FC<AwardTableProps> = ({ items, onAward }) => {
                                 };
                               })
                             );
-                            if (onAward) onAward(it.id, v.vendorName);
+
+                            try {
+                              const result = onAward
+                                ? (onAward as any)(it.id, v.vendorName)
+                                : undefined;
+                              if (
+                                result &&
+                                typeof (result as any).then === "function"
+                              ) {
+                                await result;
+                              }
+                            } catch (err) {
+                              console.error("Error in onAward:", err);
+                            } finally {
+                              setTimeout(() => window.location.reload(), 600);
+                            }
                           };
 
                           return (
