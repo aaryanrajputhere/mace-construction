@@ -154,15 +154,77 @@ export const awardItem = async (
       );
     }
 
+    if (!vendorEmail) {
+      try {
+        const replyRecord = await prisma.vendorReplyItem.findFirst({
+          where: { rfq_id: tokenRfqId, item_name, vendor_name },
+          select: { vendor_email: true },
+        });
+        vendorEmail = replyRecord?.vendor_email ?? undefined;
+      } catch (err) {
+        console.warn(
+          `[awards] Error looking up vendor email on reply item for ${vendor_name}`,
+          err
+        );
+      }
+    }
+
+    // Fetch RFQ details for email notifications
+    const rfqDetails = await prisma.rFQ.findUnique({
+      where: { rfq_id: tokenRfqId },
+      select: {
+        project_name: true,
+        project_address: true,
+        needed_by: true,
+        created_at: true,
+        requester_name: true,
+        requester_email: true,
+        requester_phone: true,
+      },
+    });
+
+    if (!rfqDetails) {
+      console.warn(`[awards] RFQ details not found for rfq_id=${tokenRfqId}`);
+    }
+
     // Notify the user (requester) who awarded the item
     await userAwardNotification(tokenEmail, rfq_id, item_name, vendor_name);
 
-    // Notify the vendor if we have an email — otherwise log and skip
-    if (vendorEmail) {
-      await vendorAwardNotification(vendorEmail, rfq_id, item_name);
+    // Notify the vendor if we have an email and RFQ details
+    if (vendorEmail && rfqDetails) {
+      // Format dates for email
+      const rfqDate = new Date(rfqDetails.created_at).toLocaleDateString(
+        "en-US",
+        {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }
+      );
+      const neededByDate = rfqDetails.needed_by
+        ? new Date(rfqDetails.needed_by).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "Not specified";
+
+      await vendorAwardNotification(
+        vendorEmail,
+        rfq_id,
+        item_name,
+        vendor_name,
+        rfqDetails.project_name,
+        rfqDetails.project_address,
+        neededByDate,
+        rfqDate,
+        rfqDetails.requester_name,
+        rfqDetails.requester_email,
+        rfqDetails.requester_phone
+      );
     } else {
       console.warn(
-        `[awards] No vendor email found for vendor '${vendor_name}'. Skipping vendor notification.`
+        `[awards] No vendor email found for vendor '${vendor_name}' or missing RFQ details. Skipping vendor notification.`
       );
     }
 

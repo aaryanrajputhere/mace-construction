@@ -3,8 +3,8 @@ import { Package } from "lucide-react";
 
 interface VendorQuote {
   vendorName: string;
-  leadTime?: string; // date string or days
-  quotedPrice?: string; // per unit
+  leadTime?: string;
+  quotedPrice?: string; 
   notes?: string;
   status?: string;
 }
@@ -12,7 +12,7 @@ interface VendorQuote {
 interface ItemWithQuotes {
   id: number | string;
   itemName: string;
-  requestedPrice?: string; // budget or requested price
+  requestedPrice?: string; 
   quantity?: number | string;
   unit?: string;
   vendors: VendorQuote[];

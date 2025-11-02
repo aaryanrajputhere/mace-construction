@@ -165,12 +165,21 @@ export const rfqAward = async (email: string, rfqId: string) => {
 export const vendorAwardNotification = async (
   email: string,
   rfqId: string,
-  itemName: string
+  itemName: string,
+  vendorName: string,
+  projectName: string,
+  address: string,
+  neededByDate: string,
+  rfqDate: string,
+  buyerName: string,
+  buyerEmail: string,
+  buyerPhone: string
 ) => {
   console.log(`📨 Preparing to send vendor award notification...`);
   console.log(`🔹 Email: ${email}`);
   console.log(`🔹 RFQ ID: ${rfqId}`);
   console.log(`🔹 Item Name: ${itemName}`);
+  console.log(`🔹 Vendor Name: ${vendorName}`);
 
   try {
     const apiKey = process.env.SENDGRID_API_KEY;
@@ -186,22 +195,70 @@ export const vendorAwardNotification = async (
       from: "rfq@maceinfo.com",
       subject: `🎉 You've Been Awarded an Item for RFQ #${rfqId}!`,
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <h2 style="color: #2E86C1;">Congratulations!</h2>
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2 style="color: #2E86C1;">Congratulations, ${vendorName}!</h2>
           <p>Hello,</p>
           <p>
             We are pleased to inform you that you have been 
             <strong>awarded the item "${itemName}"</strong> for 
             <strong>RFQ #${rfqId}</strong>.
           </p>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #033159; margin-top: 0;">Project Details</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold; width: 180px;">Project Name:</td>
+                <td style="padding: 8px 0;">${projectName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Address:</td>
+                <td style="padding: 8px 0;">${address}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Needed By:</td>
+                <td style="padding: 8px 0;">${neededByDate}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold;">RFQ Date:</td>
+                <td style="padding: 8px 0;">${rfqDate}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #033159; margin-top: 0;">Buyer Information</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold; width: 180px;">Buyer Name:</td>
+                <td style="padding: 8px 0;">${buyerName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Email:</td>
+                <td style="padding: 8px 0;"><a href="mailto:${buyerEmail}" style="color: #2E86C1; text-decoration: none;">${buyerEmail}</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Phone:</td>
+                <td style="padding: 8px 0;"><a href="tel:${buyerPhone}" style="color: #2E86C1; text-decoration: none;">${buyerPhone}</a></td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="background-color: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2E86C1;">
+            <h3 style="color: #033159; margin-top: 0;">Awarded Item</h3>
+            <p style="font-size: 18px; margin: 0; font-weight: bold; color: #033159;">${itemName}</p>
+          </div>
+
           <p>
-            Please log in to your vendor portal to view the details and next steps.
+            Please reach out to the buyer directly using the contact information above to coordinate the next steps for delivery and payment.
           </p>
+          
           <p>Thank you for participating in our RFQ process!</p>
+          
           <p style="margin-top: 24px;">
             Best regards,<br>
             <strong>Maceinfo RFQ System</strong><br>
-            <a href="mailto:rfq@maceinfo.com">rfq@maceinfo.com</a>
+            <a href="mailto:rfq@maceinfo.com" style="color: #2E86C1; text-decoration: none;">rfq@maceinfo.com</a>
           </p>
         </div>
       `,
@@ -288,7 +345,9 @@ export const userAwardNotification = async (
     console.log(`🚀 Sending award notification email to ${email}...`);
 
     const [response] = await sgMail.send(msg);
-    console.log(`✅ Email sent successfully with status ${response.statusCode}`);
+    console.log(
+      `✅ Email sent successfully with status ${response.statusCode}`
+    );
 
     return {
       success: true,
@@ -312,8 +371,6 @@ export const userAwardNotification = async (
     };
   }
 };
-
-
 
 export const sendReplyConfirmation = async (
   email: string,
