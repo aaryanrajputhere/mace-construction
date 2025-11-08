@@ -121,34 +121,42 @@ export const syncRFQs = async (req: Request, res: Response) => {
 export const syncMaterials = async (req: Request, res: Response) => {
   try {
     const rows = req.body.data;
-    console.log("Incoming rows from sheet:", rows);
-
-    // Delete all rows in Material table only
-    await prisma.material.deleteMany({});
+    console.log("Incoming Material rows from sheet:", rows);
 
     for (const row of rows) {
-      // Prepare material data, store vendor names as a string
-      const materialData = {
-        itemName: row["Item Name"] || "",
-        category: row["Category"] || "",
-        size: row["Size/Option"] || "",
-        unit: row["Unit"] || "",
-        price: parseFloat(row["Price"]) || 0,
-        image: row["Image"] || null,
-        vendors: row["Vendors"] || "",
-      };
-
-      await prisma.material.create({
-        data: materialData,
+      await prisma.material.upsert({
+        where: {
+          category_itemName_size_unit_price: {
+            category: row.category || "",
+            itemName: row.itemName || "",
+            size: row.size || "",
+            unit: row.unit || "",
+            price: row.price || 0,
+          },
+        },
+        update: {
+          image: row.image || null,
+          vendors: row.vendors || null,
+        },
+        create: {
+          category: row.category || "",
+          itemName: row.itemName || "",
+          size: row.size || "",
+          unit: row.unit || "",
+          price: row.price || 0,
+          image: row.image || null,
+          vendors: row.vendors || null,
+        },
       });
     }
 
-    res.json({ success: true });
+    res.json({ success: true, message: "Materials synced successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("Error syncing materials:", err);
     res.status(500).json({ success: false, error: err });
   }
 };
+
 export const syncVendors = async (req: Request, res: Response) => {
   try {
     const rows = req.body.data; // Expecting [{ VendorName, Email, Phone, Notes }, ...]
