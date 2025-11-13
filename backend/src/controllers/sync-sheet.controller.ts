@@ -39,7 +39,6 @@ export const syncRFQs = async (req: Request, res: Response) => {
           typeof row["vendors_json"] === "string"
             ? row["vendors_json"]
             : JSON.stringify(row["vendors_json"] || ""),
-   
       };
 
       // Optional string fields
@@ -127,7 +126,7 @@ export const syncMaterials = async (req: Request, res: Response) => {
   try {
     const rows = req.body.data;
     console.log("Incoming Material rows:", rows.length);
-
+    console.log("Incoming Material row data:", rows);
     for (const row of rows) {
       let imagePath: string | null = null;
 
@@ -136,7 +135,13 @@ export const syncMaterials = async (req: Request, res: Response) => {
         const buffer = Buffer.from(row.image.base64, "base64");
 
         const fileName = row.image.fileName || `material_${Date.now()}.png`;
-        const savePath = path.join(__dirname, "..", "uploads", "materials", fileName);
+        const savePath = path.join(
+          __dirname,
+          "..",
+          "uploads",
+          "materials",
+          fileName
+        );
 
         fs.writeFileSync(savePath, buffer);
 
@@ -171,13 +176,11 @@ export const syncMaterials = async (req: Request, res: Response) => {
     }
 
     res.json({ success: true, message: "Materials synced successfully" });
-
   } catch (err) {
     console.error("Error syncing materials:", err);
     res.status(500).json({ success: false, error: err });
   }
 };
-
 
 export const syncVendors = async (req: Request, res: Response) => {
   try {
