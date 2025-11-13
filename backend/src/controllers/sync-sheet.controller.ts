@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
 export const syncRFQs = async (req: Request, res: Response) => {
   try {
     const rows = req.body.data; // Expecting array of ARFQ rows from sheet
@@ -38,6 +39,7 @@ export const syncRFQs = async (req: Request, res: Response) => {
           typeof row["vendors_json"] === "string"
             ? row["vendors_json"]
             : JSON.stringify(row["vendors_json"] || ""),
+   
       };
 
       // Optional string fields
@@ -118,12 +120,30 @@ export const syncRFQs = async (req: Request, res: Response) => {
   }
 };
 
+import fs from "fs";
+import path from "path";
+
 export const syncMaterials = async (req: Request, res: Response) => {
   try {
     const rows = req.body.data;
-    console.log("Incoming Material rows from sheet:", rows);
+    console.log("Incoming Material rows:", rows.length);
 
     for (const row of rows) {
+      let imagePath: string | null = null;
+
+      // If Apps Script sent an image object
+      if (row.image && row.image.base64) {
+        const buffer = Buffer.from(row.image.base64, "base64");
+
+        const fileName = row.image.fileName || `material_${Date.now()}.png`;
+        const savePath = path.join(__dirname, "..", "uploads", "materials", fileName);
+
+        fs.writeFileSync(savePath, buffer);
+
+        // Store relative path in DB
+        imagePath = `/uploads/materials/${fileName}`;
+      }
+
       await prisma.material.upsert({
         where: {
           category_itemName_size_unit_price: {
@@ -135,7 +155,7 @@ export const syncMaterials = async (req: Request, res: Response) => {
           },
         },
         update: {
-          image: row.image || null,
+          image: imagePath,
           vendors: row.vendors || null,
         },
         create: {
@@ -144,18 +164,20 @@ export const syncMaterials = async (req: Request, res: Response) => {
           size: row.size || "",
           unit: row.unit || "",
           price: row.price || 0,
-          image: row.image || null,
+          image: imagePath,
           vendors: row.vendors || null,
         },
       });
     }
 
     res.json({ success: true, message: "Materials synced successfully" });
+
   } catch (err) {
     console.error("Error syncing materials:", err);
     res.status(500).json({ success: false, error: err });
   }
 };
+
 
 export const syncVendors = async (req: Request, res: Response) => {
   try {
