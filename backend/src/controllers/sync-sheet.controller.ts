@@ -1,8 +1,19 @@
 // controllers/sync.controller.ts
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { Readable } from "stream";
+import { google } from "googleapis";
+import { getGoogleAuth } from "../utils/googleAuth"; // common auth
 
+const drive = google.drive({ version: "v3", auth: getGoogleAuth() });
 const prisma = new PrismaClient();
+
+function bufferToStream(buffer: Buffer) {
+  const readable = new Readable();
+  readable.push(buffer);
+  readable.push(null);
+  return readable;
+}
 
 export const syncRFQs = async (req: Request, res: Response) => {
   try {
@@ -180,6 +191,31 @@ export const syncMaterials = async (req: Request, res: Response) => {
     console.error("Error syncing materials:", err);
     res.status(500).json({ success: false, error: err });
   }
+};
+
+export const uploadFileToFolder = async (
+  file: Express.Multer.File,
+  folderId: string
+): Promise<string> => {
+  const response = await drive.files.create({
+    requestBody: {
+      name: file.originalname,
+      parents: [folderId],
+    },
+    media: {
+      mimeType: file.mimetype,
+      body: bufferToStream(file.buffer),
+    },
+    supportsAllDrives: true,
+    fields: "id",
+  });
+
+  const fileId = response.data.id!;
+
+  // Permissions inherited from folder (Shared Drive)
+  const link = `https://drive.google.com/file/d/${fileId}/view`;
+
+  return link;
 };
 
 export const syncVendors = async (req: Request, res: Response) => {

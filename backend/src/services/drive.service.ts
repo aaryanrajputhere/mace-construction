@@ -35,7 +35,7 @@ const createDriveFolder = async (
 /**
  * Upload files into a Shared Drive folder and make them accessible with link
  */
-const uploadFilesToFolder = async (
+export const uploadFilesToFolder = async (
   files: Express.Multer.File[],
   folderId: string
 ): Promise<string[]> => {
