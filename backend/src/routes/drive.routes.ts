@@ -19,11 +19,7 @@ router.post(
         return res.status(400).json({ error: "No image uploaded" });
       }
 
-      if (!materialName) {
-        return res
-          .status(400)
-          .json({ error: "Material name is required" });
-      }
+     
 
       if (!folderId) {
         return res

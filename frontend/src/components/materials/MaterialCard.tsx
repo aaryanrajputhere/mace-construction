@@ -87,6 +87,25 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
     createdAt,
   } = material;
 
+  console.log("Material image:", image);
+  console.log("Full material:", material);
+
+  // Convert Google Drive URL to direct image URL
+  const getDirectImageUrl = (url: string | undefined): string | undefined => {
+    if (!url) return undefined;
+
+    // Check if it's a Google Drive URL
+    const fileIdMatch = url.match(/\/file\/d\/([^\/]+)/);
+    if (fileIdMatch && fileIdMatch[1]) {
+      // Convert to direct image URL format
+      return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w1000`;
+    }
+
+    return url;
+  };
+
+  const directImageUrl = getDirectImageUrl(image);
+
   // Calculate total price
   const calculateTotal = (): number => {
     const priceNum = parseFloat(String(price).replace(/[^0-9.-]/g, "")) || 0;
@@ -109,9 +128,9 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
       >
         {/* Image */}
         <div className="mb-6 w-full h-52 flex items-center justify-center rounded-xl overflow-hidden bg-gray-100 relative">
-          {!imgError && image ? (
+          {true ? (
             <img
-              src={image}
+              src={directImageUrl}
               alt={name}
               className={`w-full h-full object-cover transition-transform duration-500 ${
                 isHovered ? "scale-110" : "scale-100"
@@ -259,9 +278,9 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
             <div className="flex-1 p-6 lg:p-8 overflow-y-auto">
               {/* Product Image */}
               <div className="w-full h-48 mb-8 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
-                {!imgError && image ? (
+                {!imgError && directImageUrl ? (
                   <img
-                    src={image}
+                    src={directImageUrl}
                     alt={name}
                     className="w-full h-full object-cover"
                   />
@@ -437,7 +456,7 @@ const MaterialCard: React.FC<{ material: Material }> = ({ material }) => {
                     price: Number(price.toString().replace(/[^0-9.-]/g, "")), // convert string -> number and remove currency symbols
                     Vendors: material.Vendors,
                     quantity: Number(quantity),
-                    image: "",
+                    image: material.image || "",
                     selectedVendors,
                     addedAt: new Date().toLocaleString(),
                   };
