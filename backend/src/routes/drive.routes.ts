@@ -19,10 +19,10 @@ router.post(
         return res.status(400).json({ error: "No image uploaded" });
       }
 
-      if (!materialId || !materialName) {
+      if (!materialName) {
         return res
           .status(400)
-          .json({ error: "Material ID and name are required" });
+          .json({ error: "Material name is required" });
       }
 
       if (!folderId) {
@@ -35,7 +35,7 @@ router.post(
       res.json({
         success: true,
         imageUrl: links[0],
-        materialId,
+        materialId: materialId || null,
         materialName,
       });
     } catch (error) {
