@@ -1,6 +1,12 @@
 import express from "express";
 import multer from "multer";
-import { handleVendorReply, getItems } from "../controllers/vendors.controller";
+import {
+  getAllVendors,
+  createVendor,
+  deleteVendor,
+  handleVendorReply,
+  getItems,
+} from "../controllers/vendors.controller";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -12,6 +18,11 @@ const upload = multer({
 
 const router = express.Router();
 
+router.get("/", getAllVendors);
+router.post("/", createVendor);
+router.delete("/:vendorId", deleteVendor);
+
+// Get items for a specific RFQ (GET)
 router.get("/get-items/:rfqId/:token", getItems);
 
 // Vendor submits reply (POST) with file upload support

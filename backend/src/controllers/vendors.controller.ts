@@ -24,6 +24,41 @@ interface ItemReply {
   files?: Express.Multer.File[];
 }
 
+export const getAllVendors = async (req: Request, res: Response) => {
+  try {
+    const vendors = await prisma.vendor.findMany({
+      select: { name: true, email: true, phone: true, notes: true },
+    });
+    return res.json({ success: true, vendors });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch vendors" });
+  }
+};
+
+export const createVendor = async (req: Request, res: Response) => {
+  const { name, email, phone, notes } = req.body;
+  try {
+    const newVendor = await prisma.vendor.create({
+      data: { name, email, phone, notes },
+    });
+    return res.status(201).json({ success: true, vendor: newVendor });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to create vendor" });
+  }
+};
+
+export const deleteVendor = async (req: Request, res: Response) => {
+  const { vendorId } = req.params;
+  try {
+    await prisma.vendor.delete({
+      where: { id: parseInt(vendorId) },
+    });
+    return res.json({ success: true, message: "Vendor deleted" });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete vendor" });
+  }
+};
+
 export const getItems = async (req: Request, res: Response) => {
   const { rfqId, token } = req.params;
   console.log(`🔍 getItems called for rfqId: ${rfqId}`);
