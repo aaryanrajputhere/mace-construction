@@ -15,15 +15,6 @@ interface VendorReplyToken {
   rfqId: string;
 }
 
-interface ItemReply {
-  itemId: string;
-  pricing: string;
-  leadTime: string;
-  notes: string;
-  substitutions: string;
-  files?: Express.Multer.File[];
-}
-
 export const getAllVendors = async (req: Request, res: Response) => {
   try {
     const vendors = await prisma.vendor.findMany({
@@ -48,10 +39,10 @@ export const createVendor = async (req: Request, res: Response) => {
 };
 
 export const deleteVendor = async (req: Request, res: Response) => {
-  const { vendorId } = req.params;
+  const { name } = req.params;
   try {
     await prisma.vendor.delete({
-      where: { id: parseInt(vendorId) },
+      where: { name: name },
     });
     return res.json({ success: true, message: "Vendor deleted" });
   } catch (err) {

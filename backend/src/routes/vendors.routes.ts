@@ -20,7 +20,7 @@ const router = express.Router();
 
 router.get("/", getAllVendors);
 router.post("/", createVendor);
-router.delete("/:vendorId", deleteVendor);
+router.delete("/:name", deleteVendor);
 
 // Get items for a specific RFQ (GET)
 router.get("/get-items/:rfqId/:token", getItems);
