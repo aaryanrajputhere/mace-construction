@@ -109,6 +109,7 @@ const StudCalculator: React.FC = () => {
       price: price,
       quantity: Math.ceil(result.plates / 2), // Half of total plates
       vendors: "Home Depot, Lowes, Menards",
+      selectedVendors: ["Home Depot", "Lowes", "Menards"],
       image: "",
       addedAt: new Date().toLocaleString(),
     });
@@ -123,6 +124,8 @@ const StudCalculator: React.FC = () => {
       price: price,
       quantity: Math.ceil(result.plates / 2), // Half of total plates
       vendors: "Home Depot, Lowes, Menards",
+      selectedVendors: ["Home Depot", "Lowes", "Menards"],
+
       image: "",
       addedAt: new Date().toLocaleString(),
     });
